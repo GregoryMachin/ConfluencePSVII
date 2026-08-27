@@ -403,6 +403,14 @@ namespace ConfluencePS.Tests {
             ([System.Web.HttpUtility]::ParseQueryString(([uri]$script:requestUris[2]).Query))["start"] | Should -Be "40"
         }
 
+        It "refuses pagination links that leave the original trusted host" {
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                New-FakeWebResponse -StatusCode 200 -Json '{"results":[{"id":1}],"_links":{"base":"https://evil.example.com","next":"/wiki/rest/api/content?start=25"}}'
+            }
+
+            { Invoke-Method -Uri "https://example.com/wiki/rest/api/content" -ErrorAction Stop } | Should -Throw "*untrusted host*"
+        }
+
         It "surfaces JSON errorMessages from HTTP error responses" {
             Mock Invoke-WebRequest -ModuleName ConfluencePS {
                 New-FakeWebResponse -StatusCode 400 -Json '{"errorMessages":["Alpha issue","Beta issue"]}'

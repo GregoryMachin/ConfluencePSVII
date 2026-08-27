@@ -3,9 +3,12 @@
     [System.Diagnostics.CodeAnalysis.SuppressMessage('PSUseShouldProcessForStateChangingFunctions', '')]
     param (
         [Parameter(
+            ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             HelpMessage = 'Example = https://brianbunke.atlassian.net/wiki (/wiki for Cloud instances)'
         )]
-        [Uri]$BaseURi,
+        [Alias('Uri')]
+        [Object]$BaseURi,
 
         [PSCredential]$Credential,
 
@@ -49,11 +52,24 @@
     }
 
     PROCESS {
+        $configuredInfo = $null
+        if ($BaseURi) {
+            $configuredInfo = Resolve-ConfiguredInfo -BaseUri $BaseURi
+            $script:ConfluenceRequestContext = @{
+                BaseUri            = $configuredInfo.BaseUri
+                ApiUri             = $configuredInfo.ApiUri
+                Product            = $configuredInfo.Metadata.Product
+                DeploymentType     = $configuredInfo.Metadata.DeploymentType
+                AuthenticationType = $configuredInfo.Metadata.AuthenticationType
+                CloudId            = $configuredInfo.Metadata.CloudId
+            }
+        }
+
         foreach ($command in $moduleCommands) {
 
             $parameter = "ApiUri"
-            if ($BaseURi -and ($command.Parameters.Keys -contains $parameter)) {
-                Add-ConfluenceDefaultParameter -Command $command -Parameter $parameter -Value ($BaseURi.AbsoluteUri.TrimEnd('/') + '/rest/api')
+            if ($configuredInfo -and ($command.Parameters.Keys -contains $parameter)) {
+                Add-ConfluenceDefaultParameter -Command $command -Parameter $parameter -Value $configuredInfo.ApiUri.AbsoluteUri.TrimEnd('/')
             }
 
             $parameter = "Credential"

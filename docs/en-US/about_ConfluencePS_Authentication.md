@@ -33,6 +33,7 @@ Use your Atlassian account email address as the credential username and the API 
 
 Cloud site URLs must include `/wiki` when passed to `Set-ConfluenceInfo`.
 For example, use `https://yournamehere.atlassian.net/wiki`, not only `https://yournamehere.atlassian.net`.
+When configuring ConfluencePS from an AtlassianPS.Configuration server entry with explicit `DeploymentType = 'Cloud'`, ConfluencePS normalizes the REST API URI to include `/wiki`.
 
 ```powershell
 $credential = Get-Credential -UserName 'me@example.com'
@@ -87,6 +88,7 @@ Set-ConfluenceInfo -BaseURI 'https://wiki.yourcompany.com'
 
 `Set-ConfluenceInfo` configures defaults for the current PowerShell session.
 You can still pass `-ApiUri`, `-Credential`, `-PersonalAccessToken`, or `-Certificate` to an individual command to override the defaults.
+AtlassianPS.Configuration server entries can also provide explicit deployment and authentication metadata; those values are retained in the session but are not used as request headers or credentials.
 
 ```powershell
 Get-ConfluenceSpace -ApiUri 'https://otherwiki.example.com/rest/api' -Credential $otherCredential

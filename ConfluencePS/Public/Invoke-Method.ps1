@@ -386,7 +386,12 @@
                                 $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):IncludeTotalCount")
 
                                 $parameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Method", "Headers", "OutputType", "TimeoutSec")
-                                $parameters['Uri'] = "{0}{1}" -f $response._links.base, $response._links.next
+                                $nextUri = [Uri]("{0}{1}" -f $response._links.base, $response._links.next)
+                                if ($nextUri.Host -ne $Uri.Host -or $nextUri.Scheme -ne $Uri.Scheme) {
+                                    throw "Refusing to follow Confluence pagination link to an untrusted host."
+                                }
+
+                                $parameters['Uri'] = $nextUri
                                 if ($paginationGetParameters) {
                                     $parameters['GetParameters'] = $paginationGetParameters
                                     $nextUriBuilder = [System.UriBuilder]$parameters['Uri']

@@ -1,4 +1,4 @@
-@{
+﻿@{
     PublicCmdlets = @{
         'Add-Attachment'          = @{ Covered = $false }
         'Add-Label'               = @{ Covered = $false }
@@ -19,7 +19,7 @@
         'Remove-Page'             = @{ Covered = $false }
         'Remove-Space'            = @{ Covered = $false }
         'Set-Attachment'          = @{ Covered = $false }
-        'Set-Info'                = @{ Covered = $false }
+        'Set-Info'                = @{ Covered = $true }
         'Set-Label'               = @{ Covered = $false }
         'Set-Page'                = @{ Covered = $true }
     }

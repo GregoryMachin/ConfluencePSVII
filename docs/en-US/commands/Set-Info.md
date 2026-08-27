@@ -16,7 +16,7 @@ Specify wiki location and authorization for use in this session's REST API reque
 ## SYNTAX
 
 ```powershell
-Set-ConfluenceInfo [-BaseURi <Uri>] [-Credential <PSCredential>]
+Set-ConfluenceInfo [-BaseURi <Object>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [-PageSize <UInt32>] [-PromptCredentials]
 ```
@@ -27,6 +27,9 @@ Set-ConfluenceInfo uses scoped variables and PSDefaultParameterValues to supply
 URI/auth info to all other functions in the module (e.g. Get-ConfluenceSpace).
 These session defaults can be overwritten on any single command, but using
 Set-ConfluenceInfo avoids repetitively specifying -ApiUri and -Credential parameters.
+The `-BaseUri` parameter still accepts the legacy URI or string value.
+It also accepts an AtlassianPS.Configuration server entry from the pipeline or by property name.
+When the entry includes `Product`, `DeploymentType`, `AuthenticationType`, or `CloudId`, ConfluencePS keeps that metadata in the current module session and uses it to build a deterministic REST API URI.
 
 Confluence's REST API supports passing basic authentication in headers. For
 Confluence Cloud, use your Atlassian account email address as the username and
@@ -47,6 +50,7 @@ Set-ConfluenceInfo -BaseURI 'https://yournamehere.atlassian.net/wiki' -Credentia
 Declare the URI of your Confluence Cloud instance and authenticate with an
 Atlassian account email address and API token. When prompted, enter the API
 token as the password. Cloud instances use the /wiki subdirectory.
+When explicit Cloud metadata is supplied, ConfluencePS normalizes the REST API URI to `/wiki/rest/api`.
 
 ### -------------------------- EXAMPLE 2 --------------------------
 
@@ -87,22 +91,35 @@ Set-ConfluenceInfo -BaseURI 'https://wiki.yourcompany.com' -PersonalAccessToken 
 Declare the URI of your Confluence instance and the Personal Access Token. 
 See: <https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html>
 
+### -------------------------- EXAMPLE 6 --------------------------
+
+```powershell
+Get-AtlassianServerConfiguration -Name 'Confluence Cloud' | Set-ConfluenceInfo
+```
+
+Configure ConfluencePS from an AtlassianPS.Configuration server entry.
+Explicit Cloud metadata preserves `/wiki`, and explicit Data Center metadata preserves custom context paths such as `/confluence`.
+
 ## PARAMETERS
 
 ### -BaseURi
 
-Address of your base Confluence install.
-For Atlassian Cloud instances, include /wiki.
+Address of your base Confluence install, or a configuration object with a `Uri` property.
+Configuration objects can also include `Product`, `DeploymentType`, `AuthenticationType`, and `CloudId` metadata.
+Only Confluence entries are accepted.
+For Atlassian Cloud instances, include /wiki unless explicit Cloud metadata is supplied.
+Cloud and OAuth entries must use HTTPS.
 
 ```yaml
-Type: Uri
+Type: Object
 Parameter Sets: (All)
 Aliases:
+- Uri
 
 Required: False
 Position: Named
 Default value: None
-Accept pipeline input: False
+Accept pipeline input: True
 Accept wildcard characters: False
 ```
 
@@ -195,6 +212,8 @@ https://id.atlassian.com/manage-profile/security/api-tokens. Use your Atlassian
 account email address as the credential username and paste the API token as the
 credential password. The BaseURI must include /wiki, for example
 https://yournamehere.atlassian.net/wiki.
+If an AtlassianPS.Configuration entry explicitly sets `DeploymentType = 'Cloud'`,
+ConfluencePS adds `/wiki` when it is missing.
 
 ## RELATED LINKS
 

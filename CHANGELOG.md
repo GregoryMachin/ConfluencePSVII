@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Documented how to authenticate to Confluence Cloud with an Atlassian account email address and API token, including a dedicated authentication about topic (#203, #248, [@lipkau]).
 - Migrated `Tools/setup.ps1` and `Tools/update.dependencies.ps1` to shared `AtlassianPS.Standards` bootstrap/update commands with deterministic standards-version resolution from `Tools/build.requirements.psd1`.
 - Replaced legacy PSDepend hashtable dependencies with pinned array requirements and aligned workflow setup action usage to the pinned standards action release.
+- `Set-ConfluenceInfo` now accepts AtlassianPS.Configuration server entries with explicit Confluence deployment/authentication metadata, normalizes Cloud API URIs to `/wiki/rest/api`, preserves Data Center context paths, and rejects conflicting product or OAuth metadata.
 - `Set-ConfluencePage` now forwards `Version.Message` for `-InputObject` / pipeline updates when provided (#207, #231, [@JoseAPortilloJSC])
 - CI smoke tests now run the dedicated `Smoke` integration tag and fail fast when required Confluence Cloud integration settings are missing.
 - `integration_tests.yml` now runs real Cloud and Data Center integration jobs (instead of a scaffold marker), matching the JiraPS track model.

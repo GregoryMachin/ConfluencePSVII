@@ -11,6 +11,15 @@ if (!("System.Web.HttpUtility" -as [Type])) {
 }
 #endregion Dependencies
 
+$script:ConfluenceRequestContext = @{
+    BaseUri            = $null
+    ApiUri             = $null
+    Product            = $null
+    DeploymentType     = $null
+    AuthenticationType = $null
+    CloudId            = $null
+}
+
 #region LoadFunctions
 $PublicFunctions = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
 $PrivateFunctions = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
