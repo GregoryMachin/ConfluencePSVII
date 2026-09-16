@@ -117,5 +117,57 @@ InModuleScope ConfluencePS {
 
             { Set-Info -BaseUri $entry } | Should -Throw "*Cloud configuration requires an HTTPS*"
         }
+
+        Context "BaseUri and DeploymentType defaults (Task 44)" {
+            AfterEach {
+                $global:PSDefaultParameterValues.Remove("Get-ConfluencePage:BaseUri")
+                $global:PSDefaultParameterValues.Remove("Get-ConfluencePage:DeploymentType")
+                $global:PSDefaultParameterValues.Remove("Get-ConfluenceChildPage:BaseUri")
+                $global:PSDefaultParameterValues.Remove("Get-ConfluenceChildPage:DeploymentType")
+                $global:PSDefaultParameterValues.Remove("Set-ConfluenceInfo:BaseUri")
+                $script:PSDefaultParameterValues.Remove("Get-ConfluencePage:BaseUri")
+                $script:PSDefaultParameterValues.Remove("Get-ConfluencePage:DeploymentType")
+                $script:PSDefaultParameterValues.Remove("Get-ConfluenceChildPage:BaseUri")
+                $script:PSDefaultParameterValues.Remove("Get-ConfluenceChildPage:DeploymentType")
+                $script:PSDefaultParameterValues.Remove("Set-ConfluenceInfo:BaseUri")
+            }
+
+            It "defaults -BaseUri on commands that declare it" {
+                Set-Info -BaseUri "https://tenant.atlassian.net"
+
+                $global:PSDefaultParameterValues["Get-ConfluencePage:BaseUri"] | Should -Not -BeNullOrEmpty
+                $global:PSDefaultParameterValues["Get-ConfluenceChildPage:BaseUri"] | Should -Not -BeNullOrEmpty
+            }
+
+            It "defaults -DeploymentType only when explicit Cloud/DataCenter metadata is supplied" {
+                $entry = [PSCustomObject]@{
+                    Uri            = "https://tenant.atlassian.net"
+                    Type           = "Confluence"
+                    Product        = "Confluence"
+                    DeploymentType = "Cloud"
+                }
+
+                Set-Info -BaseUri $entry
+
+                $global:PSDefaultParameterValues["Get-ConfluencePage:DeploymentType"] | Should -Be "Cloud"
+            }
+
+            It "does not default -DeploymentType for a plain legacy BaseUri with no metadata" {
+                Set-Info -BaseUri "https://tenant.atlassian.net"
+
+                $global:PSDefaultParameterValues["Get-ConfluencePage:DeploymentType"] | Should -BeNullOrEmpty
+            }
+
+            It "never defaults Set-ConfluenceInfo's own -BaseURi parameter" {
+                # Regression guard: -BaseURi (Set-ConfluenceInfo's own parameter) name-matches
+                # the new -BaseUri default case-insensitively. If this were ever defaulted, a
+                # later parameterless call would silently reuse the previous base URI instead
+                # of clearing configuration.
+                Set-Info -BaseUri "https://tenant.atlassian.net"
+
+                $global:PSDefaultParameterValues["Set-ConfluenceInfo:BaseUri"] | Should -BeNullOrEmpty
+                $global:PSDefaultParameterValues["Set-ConfluenceInfo:BaseURi"] | Should -BeNullOrEmpty
+            }
+        }
     }
 }

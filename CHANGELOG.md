@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `.github/workflows/integration_tests.yml` with parallel Cloud and Dockerized Data Center tracks (nightly schedule + manual dispatch input).
 - Added `ConvertTo-ConfluenceStorageFormat -AsPlainText` to publish literal text containing wiki markup characters without Confluence converting them to links, mentions, or macros (#178, [@empty03]).
 - Added `Get-ConfluenceServerInformation` to expose Confluence system information and deployment type.
+- Added Confluence Cloud REST API v2 support (Phase 7): a deployment-aware private route resolver; `Invoke-ConfluenceMethod` now follows Cloud v2 pagination (opaque cursor via body `_links.next` or an RFC 5988 `Link` response header) alongside the existing v1/Data Center convention; new private response adapters that convert Cloud v2 page, space, attachment, version, and user shapes into the existing public types; and `Get-ConfluencePage -PageID`/`Get-ConfluenceChildPage` now route to the Cloud v2 page and direct-children/descendants endpoints when new `-BaseUri`/`-DeploymentType Cloud` parameters are supplied (via `Set-ConfluenceInfo` or explicitly). Without them, every command keeps its existing v1/Data Center behavior unchanged. `Get-ConfluencePage`'s `bySpace`/`byLabel`/`byQuery` parameter sets remain on v1 CQL/content-search routes on both deployments, since Cloud v2 has no CQL-search equivalent and filters its page collection by numeric space ID rather than space key.
 
 ### Changed
 
@@ -37,6 +38,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed `-PersonalAccessToken` authentication on PowerShell 6+ by forwarding it as a bearer authorization header (#208, #209, [@sebmaurer])
 - Fixed Confluence Cloud attachment downloads on PowerShell 6+ by preserving authorization across Atlassian download redirects.
 - `Set-ConfluenceInfo` now preserves configured defaults when called from inside another function (#199, [@lipkau]).
+- `Invoke-ConfluenceMethod -First` now actually limits the number of returned results and stops following pagination links once satisfied, instead of being silently ignored; help previously and incorrectly noted it as "Not yet implemented".
+- `Invoke-ConfluenceMethod` no longer loops forever if a server returns the same pagination link twice in a row, and caps total pagination depth.
+- `ConvertTo-ConfluenceAttachment` (the private v1 attachment converter) now correctly resolves `PageID` from the response; it previously always resolved to `$null`/`0` because of an unbound `$_` reference outside a `Select-Object` scriptblock, so `Attachment.PageID` and the sanitized `Attachment.Filename` were silently wrong for every attachment.
+- `Set-ConfluenceInfo` no longer defaults its own `-BaseURi` parameter through `PSDefaultParameterValues`. `Get-Command -Module` returns both a prefixed and an unprefixed `CommandInfo` for every function when queried from inside the module, and the unprefixed one's default `ToString()` conversion reconstructs the prefixed command name; without excluding both, a later parameterless `Set-ConfluenceInfo` call would have silently reused the previous base URI instead of clearing configuration, once any command declared a `-BaseUri` parameter (Task 44).
 
 ### Fixed
 

@@ -16,7 +16,8 @@ Retrieve the child pages of a given wiki page or pages.
 ## SYNTAX
 
 ```powershell
-Get-ConfluenceChildPage -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluenceChildPage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>]
+ [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [-PageID] <UInt64> [-Recurse] [-PageSize <UInt64>] [-IncludeTotalCount]
  [-Skip <UInt64>] [-First <UInt64>] [-ExcludePageBody]
@@ -63,6 +64,42 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BaseUri
+
+The site's base URi, used together with -DeploymentType to route requests to Confluence Cloud REST API v2 (direct-children/descendants).
+Without it, requests fall back to the v1 route regardless of -DeploymentType.
+Note that the Cloud v2 hierarchy routes never include page body or version data, unlike v1; -ExcludePageBody has no effect on Cloud v2 requests.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: Uri
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DeploymentType
+
+Selects Confluence Cloud REST API v2 routing when set to `Cloud` and -BaseUri is also supplied.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

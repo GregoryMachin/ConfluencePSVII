@@ -9,6 +9,13 @@
         [Uri]$ApiUri,
 
         [Parameter( Mandatory = $false )]
+        [Uri]$BaseUri,
+
+        [Parameter( Mandatory = $false )]
+        [ValidateSet('', 'Cloud', 'DataCenter', 'Server')]
+        [String]$DeploymentType,
+
+        [Parameter( Mandatory = $false )]
         [PSCredential]$Credential,
 
         [Parameter( Mandatory = $false )]
@@ -104,6 +111,22 @@
         }
 
         $iwParameters['OutputType'] = [ConfluencePS.Page]
+
+        # Only the byId parameter set has a Cloud v2 route today (see Resolve-ConfluenceRoute).
+        # bySpace/byLabel/byQuery stay on v1: v2's page collection filters by numeric space ID
+        # rather than space key, and CQL search has no v2 equivalent at all.
+        $useCloudV2 = ($DeploymentType -eq 'Cloud') -and $BaseUri
+        $iwParametersV2 = $null
+        if ($useCloudV2) {
+            $iwParametersV2 = Copy-CommonParameter -InputObject $PSBoundParameters
+            $iwParametersV2['Method'] = 'Get'
+            $iwParametersV2['GetParameters'] = @{ limit = $PageSize }
+            if (-not $ExcludePageBody) {
+                $iwParametersV2.GetParameters['body-format'] = 'storage'
+            }
+
+            # Paging is applied per-call below since it depends on $PSCmdlet.PagingParameters.
+        }
     }
 
     PROCESS {
@@ -121,6 +144,19 @@
 
         switch -regex ($PsCmdlet.ParameterSetName) {
             "byId" {
+                if ($useCloudV2) {
+                    ($PSCmdlet.PagingParameters | Get-Member -MemberType Property).Name | ForEach-Object {
+                        $iwParametersV2[$_] = $PSCmdlet.PagingParameters.$_
+                    }
+
+                    foreach ($_pageID in $PageID) {
+                        $iwParametersV2["Uri"] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource PageById -PageId $_pageID
+
+                        Invoke-Method @iwParametersV2 | ConvertTo-PageV2 -BaseUri $BaseUri
+                    }
+                    break
+                }
+
                 foreach ($_pageID in $PageID) {
                     $iwParameters["Uri"] = $resourceApi -f "/$_pageID"
 

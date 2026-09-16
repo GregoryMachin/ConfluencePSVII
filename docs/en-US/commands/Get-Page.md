@@ -18,7 +18,7 @@ Retrieve a listing of pages in your Confluence instance.
 ### byId (Default)
 
 ```powershell
-Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [-PageID] <UInt64[]> [-PageSize <UInt32>] [-IncludeTotalCount] [-Skip <UInt64>]
  [-First <UInt64>] [-ExcludePageBody]
@@ -27,7 +27,7 @@ Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
 ### byLabel
 
 ```powershell
-Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [-SpaceKey <String>] [-Space <Space>] -Label <String[]> [-Status <String[]>]
  [-PageSize <UInt32>] [-IncludeTotalCount] [-Skip <UInt64>] [-First <UInt64>]
@@ -37,7 +37,7 @@ Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
 ### bySpace
 
 ```powershell
-Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  -SpaceKey <String> [-Title <String>] [-PageSize <UInt32>] [-IncludeTotalCount]
  [-Skip <UInt64>] [-First <UInt64>] [-ExcludePageBody]
@@ -46,7 +46,7 @@ Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
 ### byQuery
 
 ```powershell
-Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [-Query] <String> [-PageSize <UInt32>] [-IncludeTotalCount] [-Skip <UInt64>]
  [-First <UInt64>] [-ExcludePageBody]
@@ -55,7 +55,7 @@ Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
 ### bySpaceObject
 
 ```powershell
-Get-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  -Space <Space> [-Title <String>] [-PageSize <UInt32>] [-IncludeTotalCount]
  [-Skip <UInt64>] [-First <UInt64>] [-ExcludePageBody]
@@ -152,6 +152,42 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BaseUri
+
+The site's base URi, used together with -DeploymentType to route the byId parameter set to Confluence Cloud REST API v2.
+Without it, byId falls back to the v1 route regardless of -DeploymentType.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: Uri
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DeploymentType
+
+Selects Confluence Cloud REST API v2 routing for the byId parameter set when set to `Cloud` and -BaseUri is also supplied.
+The bySpace, byLabel, and byQuery parameter sets always use the v1 CQL/content-search routes, since Cloud v2 has no equivalent for arbitrary CQL search and its page collection filters by numeric space ID rather than space key.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

@@ -6,6 +6,13 @@
         [Uri]$ApiUri,
 
         [Parameter( Mandatory = $false )]
+        [Uri]$BaseUri,
+
+        [Parameter( Mandatory = $false )]
+        [ValidateSet('', 'Cloud', 'DataCenter', 'Server')]
+        [String]$DeploymentType,
+
+        [Parameter( Mandatory = $false )]
         [PSCredential]$Credential,
 
         [Parameter( Mandatory = $false )]
@@ -64,6 +71,90 @@
         }
         if ($ExcludePageBody) {
             $baseGetParameters.expand = "space,version,ancestors"
+        }
+
+        # Cloud v2's direct-children/descendants endpoints return minimal page data (no
+        # body or version) regardless of query parameters; -ExcludePageBody has no effect
+        # on the v2 path because v2 has no body-inclusion option on these two routes. This
+        # is a documented Cloud v2 parity gap (see docs/api-contract-inventory.md).
+        $useCloudV2 = ($DeploymentType -eq 'Cloud') -and $BaseUri
+
+        if ($useCloudV2) {
+            $v2Parameters = Copy-CommonParameter -InputObject $PSBoundParameters
+            $v2Parameters['Method'] = 'Get'
+            $v2Parameters['GetParameters'] = @{ limit = $PageSize }
+
+            # Paging
+            ($PSCmdlet.PagingParameters | Get-Member -MemberType Property).Name | ForEach-Object {
+                $v2Parameters[$_] = $PSCmdlet.PagingParameters.$_
+            }
+
+            if (-not $Recurse.IsPresent) {
+                $v2Parameters['Uri'] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource ChildPage -PageId $PageID
+                Invoke-Method @v2Parameters | ConvertTo-PageV2 -BaseUri $BaseUri
+                return
+            }
+
+            # Prefer the native descendants endpoint to preserve paging semantics and minimize API calls.
+            $v2Parameters['Uri'] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource DescendantPage -PageId $PageID
+            try {
+                Invoke-Method @v2Parameters | ConvertTo-PageV2 -BaseUri $BaseUri
+                return
+            }
+            catch {
+                $isRecoverableServerResponse = $false
+                if (($_.FullyQualifiedErrorId -match 'InvalidResponse\.Status(500|502|503|504)') -or
+                    (($_.Exception -is [System.ArgumentException]) -and ($_.Exception.Message -eq 'Invalid Server Response'))) {
+                    $isRecoverableServerResponse = $true
+                }
+
+                if (-not $isRecoverableServerResponse) {
+                    throw
+                }
+
+                Write-Warning "Confluence descendants endpoint is unstable; falling back to iterative child-page traversal."
+            }
+
+            # Fallback: breadth-first traversal via direct-children, then apply paging globally.
+            $v2FallbackParameters = Copy-CommonParameter -InputObject $PSBoundParameters
+            $v2FallbackParameters['Method'] = 'Get'
+            $v2FallbackParameters['GetParameters'] = @{ limit = $PageSize }
+
+            $allPages = New-Object System.Collections.Generic.List[ConfluencePS.Page]
+            $visitedPageIds = New-Object System.Collections.Generic.HashSet[UInt64]
+            $pagesToVisit = New-Object System.Collections.Generic.Queue[UInt64]
+            $pagesToVisit.Enqueue($PageID)
+
+            while ($pagesToVisit.Count -gt 0) {
+                $currentPageId = $pagesToVisit.Dequeue()
+                $v2FallbackParameters['Uri'] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource ChildPage -PageId $currentPageId
+                $childPages = @(Invoke-Method @v2FallbackParameters | ConvertTo-PageV2 -BaseUri $BaseUri)
+
+                foreach ($childPage in $childPages) {
+                    if ((-not $childPage) -or (-not $visitedPageIds.Add($childPage.ID))) {
+                        continue
+                    }
+
+                    $allPages.Add($childPage)
+                    $pagesToVisit.Enqueue($childPage.ID)
+                }
+            }
+
+            if ($PSCmdlet.PagingParameters.IncludeTotalCount) {
+                [double]$accuracy = 0.0
+                $PSCmdlet.PagingParameters.NewTotalCount($allPages.Count, $accuracy)
+            }
+
+            $pagedResults = @($allPages)
+            if ($PSBoundParameters.ContainsKey('Skip')) {
+                $pagedResults = @($pagedResults | Select-Object -Skip $PSCmdlet.PagingParameters.Skip)
+            }
+            if ($PSBoundParameters.ContainsKey('First')) {
+                $pagedResults = @($pagedResults | Select-Object -First $PSCmdlet.PagingParameters.First)
+            }
+
+            $pagedResults
+            return
         }
 
         $iwParameters = Copy-CommonParameter -InputObject $PSBoundParameters

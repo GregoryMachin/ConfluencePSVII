@@ -66,10 +66,28 @@
         }
 
         foreach ($command in $moduleCommands) {
+            if ($command.Name -in @('Set-ConfluenceInfo', 'Set-Info')) {
+                # Skip Set-ConfluenceInfo itself: Get-Command -Module returns both its
+                # prefixed and unprefixed CommandInfo, and its own -BaseURi parameter
+                # name-matches the new -BaseUri default case-insensitively, which would
+                # otherwise make a later parameterless call silently reuse the previous
+                # base URI.
+                continue
+            }
 
             $parameter = "ApiUri"
             if ($configuredInfo -and ($command.Parameters.Keys -contains $parameter)) {
                 Add-ConfluenceDefaultParameter -Command $command -Parameter $parameter -Value $configuredInfo.ApiUri.AbsoluteUri.TrimEnd('/')
+            }
+
+            $parameter = "BaseUri"
+            if ($configuredInfo -and ($command.Parameters.Keys -contains $parameter)) {
+                Add-ConfluenceDefaultParameter -Command $command -Parameter $parameter -Value $configuredInfo.BaseUri
+            }
+
+            $parameter = "DeploymentType"
+            if ($configuredInfo -and $configuredInfo.Metadata.DeploymentType -and ($command.Parameters.Keys -contains $parameter)) {
+                Add-ConfluenceDefaultParameter -Command $command -Parameter $parameter -Value $configuredInfo.Metadata.DeploymentType
             }
 
             $parameter = "Credential"

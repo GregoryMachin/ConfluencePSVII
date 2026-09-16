@@ -97,5 +97,92 @@ InModuleScope ConfluencePS {
                 $Uri -like "https://example.com/wiki/rest/api/content/*/child/page"
             }
         }
+
+        Context "Cloud v2 routing" {
+            BeforeAll {
+                function New-TestPageV2Json {
+                    param([UInt64]$ID)
+
+                    '{{"id": "{0}"}}' -f $ID
+                }
+            }
+
+            It "uses the v2 direct-children route for non-recursive queries" {
+                Mock Invoke-Method -ModuleName ConfluencePS {
+                    ConvertFrom-Json (New-TestPageV2Json -ID 11)
+                }
+
+                $result = Get-ChildPage -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 10
+
+                $result | Should -BeOfType [ConfluencePS.Page]
+                $result.ID | Should -Be 11
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                    $Uri -eq "https://example.atlassian.net/wiki/api/v2/pages/10/direct-children"
+                }
+            }
+
+            It "uses the v2 descendants route directly for recursive queries" {
+                Mock Invoke-Method -ModuleName ConfluencePS {
+                    ConvertFrom-Json (New-TestPageV2Json -ID 11)
+                }
+
+                $null = Get-ChildPage -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 10 -Recurse -Skip 2 -First 3 -IncludeTotalCount
+
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                    $Uri -eq "https://example.atlassian.net/wiki/api/v2/pages/10/descendants" -and
+                    $Skip -eq 2 -and
+                    $First -eq 3 -and
+                    $IncludeTotalCount
+                }
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 0 -Scope It -ParameterFilter {
+                    $Uri -like "*/direct-children"
+                }
+            }
+
+            It "falls back to iterative v2 direct-children traversal when descendants fails" {
+                Mock Invoke-Method -ModuleName ConfluencePS {
+                    param([string]$Uri)
+
+                    switch ($Uri) {
+                        "https://example.atlassian.net/wiki/api/v2/pages/10/descendants" {
+                            throw [System.ArgumentException]::new("Invalid Server Response")
+                        }
+                        "https://example.atlassian.net/wiki/api/v2/pages/10/direct-children" {
+                            @((ConvertFrom-Json (New-TestPageV2Json -ID 11)), (ConvertFrom-Json (New-TestPageV2Json -ID 12)))
+                        }
+                        "https://example.atlassian.net/wiki/api/v2/pages/11/direct-children" {
+                            @(ConvertFrom-Json (New-TestPageV2Json -ID 13))
+                        }
+                        "https://example.atlassian.net/wiki/api/v2/pages/12/direct-children" {
+                            @()
+                        }
+                        "https://example.atlassian.net/wiki/api/v2/pages/13/direct-children" {
+                            @()
+                        }
+                        default {
+                            throw "Unexpected URI: $Uri"
+                        }
+                    }
+                }
+
+                $result = @(Get-ChildPage -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 10 -Recurse -Skip 1 -First 2)
+
+                $result.ID | Should -Be @(12, 13)
+            }
+
+            It "falls back to the v1 traversal when -BaseUri is not supplied, even with -DeploymentType Cloud" {
+                Mock Invoke-Method -ModuleName ConfluencePS {
+                    $page = [ConfluencePS.Page]::new()
+                    $page.ID = 11
+                    $page
+                }
+
+                $null = Get-ChildPage -ApiUri "https://example.atlassian.net/wiki/rest/api" -DeploymentType Cloud -PageID 10
+
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                    $Uri -eq "https://example.atlassian.net/wiki/rest/api/content/10/child/page"
+                }
+            }
+        }
     }
 }

@@ -118,5 +118,56 @@ InModuleScope ConfluencePS {
 
             $script:PSDefaultParameterValues["Get-ConfluencePage:ApiUri"] | Should -Be "https://example.com/wiki/rest/api"
         }
+
+        Context "Cloud v2 byId routing" {
+            BeforeEach {
+                Mock Invoke-Method -ModuleName ConfluencePS {
+                    param([Uri]$Uri, [hashtable]$GetParameters)
+
+                    $script:lastUri = $Uri.AbsoluteUri
+                    $script:lastGetParameters = $GetParameters
+                    ConvertFrom-Json '{"id": "100", "status": "current", "title": "Example", "body": {"storage": {"value": "<p>Hi</p>"}}}'
+                }
+            }
+
+            It "routes a byId request to the v2 page route and converts the v2 shape" {
+                $result = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100
+
+                $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/pages/100"
+                $result | Should -BeOfType [ConfluencePS.Page]
+                $result.ID | Should -Be 100
+                $result.Body | Should -Be '<p>Hi</p>'
+            }
+
+            It "requests body-format=storage unless -ExcludePageBody is set" {
+                $null = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100
+
+                $script:lastGetParameters['body-format'] | Should -Be 'storage'
+            }
+
+            It "omits body-format when -ExcludePageBody is set" {
+                $null = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100 -ExcludePageBody
+
+                $script:lastGetParameters.ContainsKey('body-format') | Should -BeFalse
+            }
+
+            It "requests one v2 route per PageID" {
+                $null = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100, 200
+
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 2 -Scope It
+            }
+
+            It "falls back to the v1 route when -BaseUri is not supplied, even with -DeploymentType Cloud" {
+                $null = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -DeploymentType Cloud -PageID 100
+
+                $script:lastUri | Should -Be "https://example.atlassian.net/wiki/rest/api/content/100"
+            }
+
+            It "uses the v1 route for Data Center regardless of -BaseUri" {
+                $null = Get-Page -ApiUri "https://dc.example.com/rest/api" -BaseUri "https://dc.example.com" -DeploymentType DataCenter -PageID 100
+
+                $script:lastUri | Should -Be "https://dc.example.com/rest/api/content/100"
+            }
+        }
     }
 }
