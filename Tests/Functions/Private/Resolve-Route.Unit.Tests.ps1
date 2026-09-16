@@ -46,6 +46,8 @@ InModuleScope ConfluencePS {
             @{ Resource = 'InlineCommentCreate'; Params = @{}; Expected = '/wiki/api/v2/inline-comments' }
             @{ Resource = 'InlineCommentUpdate'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/inline-comments/200' }
             @{ Resource = 'InlineCommentDelete'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/inline-comments/200' }
+            @{ Resource = 'DatabaseCollection'; Params = @{}; Expected = '/wiki/api/v2/databases' }
+            @{ Resource = 'DatabaseById'; Params = @{ DatabaseId = 300 }; Expected = '/wiki/api/v2/databases/300' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -188,6 +190,16 @@ InModuleScope ConfluencePS {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource InlineCommentCreate
 
                 $uri.AbsoluteUri | Should -BeExactly "$cloudBase/wiki/api/v2/inline-comments"
+            }
+
+            It "throws for DatabaseCollection on Data Center, since databases have no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource DatabaseCollection } |
+                    Should -Throw "*Cloud*"
+            }
+
+            It "throws for a missing DatabaseId on a database by-id route" {
+                { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource DatabaseById } |
+                    Should -Throw "*DatabaseId*"
             }
 
             It "throws for an invalid Resource value" {

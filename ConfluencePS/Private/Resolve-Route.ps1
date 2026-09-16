@@ -28,6 +28,7 @@
             'LabelCollection', 'LabelAdd', 'LabelRemove',
             'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
             'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
+            'DatabaseCollection', 'DatabaseById',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -60,7 +61,11 @@
 
         [Parameter()]
         [UInt32]
-        $VersionNumber
+        $VersionNumber,
+
+        [Parameter()]
+        [UInt64]
+        $DatabaseId
     )
 
     process {
@@ -88,7 +93,8 @@
             'LabelCollection',
             'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
             'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
-            'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete'
+            'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
+            'DatabaseCollection', 'DatabaseById'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -234,6 +240,19 @@
             'InlineCommentDelete' {
                 Assert-RouteId -Name CommentId -Value $CommentId
                 if ($useV2) { "/inline-comments/$CommentId" } else { "/content/$CommentId" }
+            }
+            'DatabaseCollection' {
+                if (-not $useV2) {
+                    throw "DatabaseCollection has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                '/databases'
+            }
+            'DatabaseById' {
+                if (-not $useV2) {
+                    throw "DatabaseById has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name DatabaseId -Value $DatabaseId
+                "/databases/$DatabaseId"
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }
