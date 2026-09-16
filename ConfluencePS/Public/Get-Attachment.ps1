@@ -6,6 +6,13 @@
         [Uri]$ApiUri,
 
         [Parameter( Mandatory = $false )]
+        [Uri]$BaseUri,
+
+        [Parameter( Mandatory = $false )]
+        [ValidateSet('', 'Cloud', 'DataCenter', 'Server')]
+        [String]$DeploymentType,
+
+        [Parameter( Mandatory = $false )]
         [PSCredential]$Credential,
 
         [Parameter( Mandatory = $false )]
@@ -49,13 +56,21 @@
             Throw $exception
         }
 
+        # Cloud v2 opt-in (Task 47): -BaseUri + -DeploymentType Cloud route attachment
+        # metadata reads to GET /pages/{id}/attachments, converted through
+        # ConvertTo-AttachmentV2. Upload, update, and download stay v1-only always (Cloud
+        # v2 has no equivalent operation for any of them).
+        $useCloudV2 = ($DeploymentType -eq 'Cloud') -and $BaseUri
+
         $iwParameters = Copy-CommonParameter -InputObject $PSBoundParameters
         $iwParameters['Method'] = 'Get'
         $iwParameters['GetParameters'] = @{
-            expand = "version"
-            limit  = $PageSize
+            limit = $PageSize
         }
-        $iwParameters['OutputType'] = [ConfluencePS.Attachment]
+        if (-not $useCloudV2) {
+            $iwParameters['GetParameters']['expand'] = 'version'
+            $iwParameters['OutputType'] = [ConfluencePS.Attachment]
+        }
 
         if ($FileNameFilter) {
             $iwParameters["GetParameters"]["filename"] = $FileNameFilter
@@ -71,9 +86,14 @@
         }
 
         foreach ($_PageID in $PageID) {
-            $iwParameters['Uri'] = "$ApiUri/content/{0}/child/attachment" -f $_PageID
-
-            Invoke-Method @iwParameters
+            if ($useCloudV2) {
+                $iwParameters['Uri'] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource AttachmentCollection -PageId $_PageID
+                Invoke-Method @iwParameters | ConvertTo-AttachmentV2 -BaseUri $BaseUri
+            }
+            else {
+                $iwParameters['Uri'] = "$ApiUri/content/{0}/child/attachment" -f $_PageID
+                Invoke-Method @iwParameters
+            }
         }
     }
 
