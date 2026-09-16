@@ -14,6 +14,7 @@
         'Get-InlineComment'       = @{ Covered = $true }
         'Get-InlineTask'          = @{ Covered = $true }
         'Get-Label'               = @{ Covered = $false }
+        'Get-OAuthResource'       = @{ Covered = $true }
         'Get-Page'                = @{ Covered = $true }
         'Get-PageAncestor'        = @{ Covered = $true }
         'Get-PageVersion'         = @{ Covered = $true }

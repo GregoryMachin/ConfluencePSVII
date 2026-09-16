@@ -266,6 +266,20 @@ namespace ConfluencePS
         }
     }
 
+    public class OAuthResource
+    {
+        public String CloudId { get; set; }
+        public String Name { get; set; }
+        public Uri Url { get; set; }
+        public String[] Scopes { get; set; }
+        public Uri AvatarUrl { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + CloudId + "] " + Name;
+        }
+    }
+
     public class ServerInformation
     {
         public String DeploymentType { get; set; }
