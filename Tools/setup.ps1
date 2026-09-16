@@ -17,6 +17,17 @@ $buildRequirementsPath = Join-Path -Path $projectRoot -ChildPath 'Tools/build.re
 $manifestPath = Join-Path -Path $projectRoot -ChildPath 'ConfluencePS/ConfluencePS.psd1'
 $psScriptAnalyzerSettingsPath = Join-Path -Path $projectRoot -ChildPath 'PSScriptAnalyzerSettings.psd1'
 
+# A sibling, git-ignored ".local-modules" directory (outside every repo, never committed)
+# holds AtlassianPS.Standards builds that have not been published to the real PowerShell
+# Gallery -- consumed directly per the project's own direction, without ever installing
+# into (or colliding with) the machine's real, shared module path. Prepending it here is
+# scoped to this process only; it is never written to $PROFILE or a persistent
+# environment variable.
+$localModulesPath = Join-Path -Path (Split-Path -Path $projectRoot -Parent) -ChildPath '.local-modules'
+if ((Test-Path -LiteralPath $localModulesPath -PathType Container) -and ($env:PSModulePath -notlike "*$localModulesPath*")) {
+    $env:PSModulePath = "$localModulesPath;$env:PSModulePath"
+}
+
 function Get-BuildRequirementsFromDataFile {
     [CmdletBinding()]
     [OutputType([Object[]])]
@@ -103,13 +114,24 @@ if ($isWindowsPowerShell -and ($ForceDesktopBootstrapRemediation -or $psGalleryR
     Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted -ErrorAction Stop
 }
 
-Install-Module -Name 'AtlassianPS.Standards' `
-    -RequiredVersion $standardsVersion `
-    -Scope CurrentUser `
-    -Repository 'PSGallery' `
-    -AllowClobber `
-    -Force `
-    -ErrorAction Stop
+# Skip the network install when the exact pinned version is already available locally
+# (for example a locally built, not-yet-published AtlassianPS.Standards release installed
+# directly into a module path) -- matching the idempotency Install-AtlassianPSDependencyRequirement
+# already applies to every other dependency, rather than unconditionally forcing a Gallery
+# fetch that would fail outright for a version PSGallery does not have yet.
+$existingStandards = Get-Module -Name 'AtlassianPS.Standards' -ListAvailable |
+    Where-Object { $_.Version.ToString() -eq $standardsVersion } |
+    Select-Object -First 1
+
+if (-not $existingStandards) {
+    Install-Module -Name 'AtlassianPS.Standards' `
+        -RequiredVersion $standardsVersion `
+        -Scope CurrentUser `
+        -Repository 'PSGallery' `
+        -AllowClobber `
+        -Force `
+        -ErrorAction Stop
+}
 
 Import-Module -Name 'AtlassianPS.Standards' -RequiredVersion $standardsVersion -Force -ErrorAction Stop
 
