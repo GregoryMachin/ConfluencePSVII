@@ -411,6 +411,77 @@ namespace ConfluencePS.Tests {
             { Invoke-Method -Uri "https://example.com/wiki/rest/api/content" -ErrorAction Stop } | Should -Throw "*untrusted host*"
         }
 
+        It "follows a v2-style Link response header when the body has no next link" {
+            $script:requestUris = @()
+            $script:invokeCount = 0
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                param($Uri)
+
+                $script:requestUris += $Uri.AbsoluteUri
+
+                if ($script:invokeCount -eq 0) {
+                    $script:invokeCount++
+                    return New-FakeWebResponse -StatusCode 200 -Json '{"results":[{"id":1}]}' -Headers @{
+                        Link = '<https://example.com/wiki/api/v2/pages?cursor=abc&limit=25>; rel="next"'
+                    }
+                }
+
+                New-FakeWebResponse -StatusCode 200 -Json '{"results":[{"id":2}]}'
+            }
+
+            $result = Invoke-Method -Uri "https://example.com/wiki/api/v2/pages?limit=25" -ErrorAction Stop
+
+            $result | Should -HaveCount 2
+            $script:requestUris | Should -HaveCount 2
+            $script:requestUris[1] | Should -Be "https://example.com/wiki/api/v2/pages?cursor=abc&limit=25"
+        }
+
+        It "stops instead of looping forever when the same link is returned again" {
+            $script:invokeCount = 0
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                $script:invokeCount++
+                New-FakeWebResponse -StatusCode 200 -Json '{"results":[{"id":1}],"_links":{"base":"https://example.com","next":"/wiki/rest/api/content?start=25"}}'
+            }
+            Mock Write-Warning -ModuleName ConfluencePS {}
+
+            $result = Invoke-Method -Uri "https://example.com/wiki/rest/api/content?start=25" -ErrorAction Stop
+
+            $result | Should -HaveCount 1
+            $script:invokeCount | Should -Be 1
+            Should -Invoke -CommandName Write-Warning -ModuleName ConfluencePS -ParameterFilter {
+                $Message -match "same pagination link again"
+            } -Exactly -Times 1 -Scope It
+        }
+
+        It "stops following pagination links once -First is satisfied" {
+            $script:invokeCount = 0
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                $script:invokeCount++
+                New-FakeWebResponse -StatusCode 200 -Json (
+                    '{{"results":[{{"id":{0}}},{{"id":{1}}}],"_links":{{"base":"https://example.com","next":"/wiki/rest/api/content?start={2}"}}}}' -f
+                    (($script:invokeCount - 1) * 2 + 1), (($script:invokeCount - 1) * 2 + 2), ($script:invokeCount * 2)
+                )
+            }
+
+            $result = Invoke-Method -Uri "https://example.com/wiki/rest/api/content" -First 3 -ErrorAction Stop
+
+            @($result).Count | Should -Be 3
+            $script:invokeCount | Should -Be 2
+        }
+
+        It "does not fetch a second page when -First is satisfied by the first page" {
+            $script:invokeCount = 0
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                $script:invokeCount++
+                New-FakeWebResponse -StatusCode 200 -Json '{"results":[{"id":1},{"id":2},{"id":3}],"_links":{"base":"https://example.com","next":"/wiki/rest/api/content?start=3"}}'
+            }
+
+            $result = Invoke-Method -Uri "https://example.com/wiki/rest/api/content" -First 2 -ErrorAction Stop
+
+            @($result).Count | Should -Be 2
+            $script:invokeCount | Should -Be 1
+        }
+
         It "surfaces JSON errorMessages from HTTP error responses" {
             Mock Invoke-WebRequest -ModuleName ConfluencePS {
                 New-FakeWebResponse -StatusCode 400 -Json '{"errorMessages":["Alpha issue","Beta issue"]}'

@@ -61,7 +61,17 @@
         [System.Security.Cryptography.X509Certificates.X509Certificate]
         $Certificate,
 
-        $Caller = $PSCmdlet
+        $Caller = $PSCmdlet,
+
+        # Internal pagination bookkeeping, forwarded automatically between recursive calls.
+        # Not for direct use.
+        [Parameter(DontShow)]
+        [UInt64]
+        $ResultsEmitted = 0,
+
+        [Parameter(DontShow)]
+        [UInt32]
+        $PageDepth = 1
     )
 
     BEGIN {
@@ -367,31 +377,61 @@
                             if ($hasResults) {
                                 $result = $response.results
                             }
+
+                            # Trim this page to whatever is still needed to satisfy -First, and
+                            # remember how many items have been emitted across every page so a
+                            # recursive call further down the pagination chain can do the same.
+                            $resultItems = @($result)
+                            $emitCount = $resultItems.Count
+                            $satisfiedFirst = $false
+                            $first = $PSCmdlet.PagingParameters.First
+                            if ($first -lt [UInt64]::MaxValue) {
+                                $remaining = if ($first -gt $ResultsEmitted) { $first - $ResultsEmitted } else { 0 }
+                                if ($remaining -lt $emitCount) {
+                                    $resultItems = @($resultItems | Select-Object -First $remaining)
+                                    $emitCount = $resultItems.Count
+                                }
+                                if (($ResultsEmitted + $emitCount) -ge $first) {
+                                    $satisfiedFirst = $true
+                                }
+                            }
+
                             if ($OutputType) {
                                 # Results shall be casted to custom objects (see ValidateSet)
                                 Write-Verbose "[$($MyInvocation.MyCommand.Name)] Outputting results as $($OutputType.FullName)"
                                 $converter = "ConvertTo-$($OutputType.Name)"
-                                $result | & $converter
+                                $resultItems | & $converter
                             }
                             else {
-                                $result
+                                $resultItems
                             }
+                            $ResultsEmitted += $emitCount
 
-                            # Detect if result is paginated
-                            if ($response._links.next) {
+                            # Detect if the result is paginated, from either the body or a
+                            # `Link` response header (Confluence Cloud v2 may use either).
+                            $nextUri = Resolve-NextPageLink -RequestUri $Uri -ResponseBody $response -Headers $webResponse.Headers
+
+                            if ($nextUri -and $satisfiedFirst) {
+                                Write-Verbose "[$($MyInvocation.MyCommand.Name)] -First is satisfied; not following the remaining pagination link."
+                            }
+                            elseif ($nextUri -and $nextUri.AbsoluteUri -eq $Uri.AbsoluteUri) {
+                                Write-Warning "[$($MyInvocation.MyCommand.Name)] Confluence returned the same pagination link again; stopping to avoid an infinite loop."
+                            }
+                            elseif ($nextUri) {
+                                if ($PageDepth -ge 10000) {
+                                    throw "Confluence pagination exceeded the maximum of 10000 pages."
+                                }
+
                                 Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoking pagination"
 
                                 # Remove Parameters that don't need propagation
                                 $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):GetParameters")
                                 $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):IncludeTotalCount")
 
-                                $parameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Method", "Headers", "OutputType", "TimeoutSec")
-                                $nextUri = [Uri]("{0}{1}" -f $response._links.base, $response._links.next)
-                                if ($nextUri.Host -ne $Uri.Host -or $nextUri.Scheme -ne $Uri.Scheme) {
-                                    throw "Refusing to follow Confluence pagination link to an untrusted host."
-                                }
-
+                                $parameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Method", "Headers", "OutputType", "TimeoutSec", "First")
                                 $parameters['Uri'] = $nextUri
+                                $parameters['ResultsEmitted'] = $ResultsEmitted
+                                $parameters['PageDepth'] = $PageDepth + 1
                                 if ($paginationGetParameters) {
                                     $parameters['GetParameters'] = $paginationGetParameters
                                     $nextUriBuilder = [System.UriBuilder]$parameters['Uri']
@@ -405,7 +445,9 @@
                                     $parameters['Uri'] = $nextUriBuilder.Uri
                                 }
 
-                                Write-Verbose "NEXT PAGE: $($parameters["Uri"])"
+                                # The next-page URI (and any cursor it carries) is deliberately
+                                # not logged, even at -Verbose.
+                                Write-Verbose "[$($MyInvocation.MyCommand.Name)] Following pagination link to the next page"
 
                                 Invoke-Method @parameters
                             }

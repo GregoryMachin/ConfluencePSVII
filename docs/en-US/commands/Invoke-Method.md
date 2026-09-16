@@ -42,6 +42,13 @@ When used by a module, the Manifest (.psd1) can define the dependency to Conflue
 property.
 This will import the module if not already loaded or even download it from the PSGallery.
 
+Pagination is followed automatically. A collection response's `_links.next` (Cloud v1 and Data
+Center) or a `Link` response header with `rel="next"` (Cloud v2) is resolved against the
+original request and followed only while it stays on the same host and scheme as that request.
+`-First` stops pagination as soon as enough items have been returned; `-Skip` only affects the
+first request, since Confluence Cloud v2 cursors have no offset equivalent for Data Center's
+`start` parameter to translate to.
+
 ## EXAMPLES
 
 ### EXAMPLE 1
@@ -431,8 +438,7 @@ Accept wildcard characters: False
 
 ### -First
 
-NOTE: Not yet implemented.
-Indicates how many items to return.
+Indicates how many items to return in total, following pagination links only as far as needed to satisfy that count.
 
 ```yaml
 Type: UInt64
