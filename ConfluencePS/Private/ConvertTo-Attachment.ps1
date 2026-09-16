@@ -16,11 +16,11 @@
         foreach ($object in $InputObject) {
             Write-Verbose "[$($MyInvocation.MyCommand.Name)] Converting Object to Attachment"
 
-            if ($_.container.id) {
-                $PageId = $_.container.id
+            if ($object.container.id) {
+                $PageId = $object.container.id
             }
             else {
-                [UInt32]$PageID = $_._expandable.container -replace '^.*\/content\/', ''
+                [UInt32]$PageID = $object._expandable.container -replace '^.*\/content\/', ''
             }
 
             [ConfluencePS.Attachment](ConvertTo-Hashtable -InputObject ($object | Select-Object `
