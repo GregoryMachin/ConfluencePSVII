@@ -66,7 +66,57 @@
     # NestedModules = @()
 
     # Functions to export from this module
-    FunctionsToExport = '*'
+    FunctionsToExport = @(
+        'Add-Attachment'
+        'Add-Label'
+        'ConvertTo-StorageFormat'
+        'ConvertTo-Table'
+        'Get-Attachment'
+        'Get-AttachmentFile'
+        'Get-BlogPost'
+        'Get-ChildPage'
+        'Get-Database'
+        'Get-Folder'
+        'Get-FooterComment'
+        'Get-InlineComment'
+        'Get-InlineTask'
+        'Get-Label'
+        'Get-OAuthResource'
+        'Get-Page'
+        'Get-PageAncestor'
+        'Get-PageVersion'
+        'Get-ServerInformation'
+        'Get-Space'
+        'Get-SpacePermission'
+        'Get-SpaceProperty'
+        'Get-SpaceRoleAssignment'
+        'Get-Whiteboard'
+        'Invoke-Method'
+        'New-BlogPost'
+        'New-FooterComment'
+        'New-InlineComment'
+        'New-Page'
+        'New-Space'
+        'New-SpaceProperty'
+        'Remove-Attachment'
+        'Remove-BlogPost'
+        'Remove-FooterComment'
+        'Remove-InlineComment'
+        'Remove-Label'
+        'Remove-Page'
+        'Remove-Space'
+        'Remove-SpaceProperty'
+        'Set-Attachment'
+        'Set-BlogPost'
+        'Set-FooterComment'
+        'Set-Info'
+        'Set-InlineComment'
+        'Set-InlineTask'
+        'Set-Label'
+        'Set-Page'
+        'Set-SpaceProperty'
+        'Set-SpaceRoleAssignment'
+    )
 
     # Cmdlets to export from this module
     # CmdletsToExport = '*'
@@ -75,7 +125,7 @@
     # VariablesToExport = '*'
 
     # Aliases to export from this module
-    AliasesToExport = '*'
+    AliasesToExport = @()
 
     # DSC resources to export from this module
     # DscResourcesToExport = @()

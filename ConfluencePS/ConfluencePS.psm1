@@ -40,4 +40,6 @@ ForEach ($File in @($PublicFunctions + $PrivateFunctions)) {
         $PSCmdlet.ThrowTerminatingError($errorItem)
     }
 }
+
+Export-ModuleMember -Function $PublicFunctions.BaseName
 #endregion LoadFunctions

@@ -56,7 +56,13 @@ Describe "General project validation" -Tag Unit {
             }
 
             It "is not exported" {
-                $exportedFunctionNames | Should -Not -Contain $functionName
+                # Compare against the prefixed export name (not the bare private function
+                # name): a private helper's own name never collides with the "Verb-ConfluenceNoun"
+                # shape actual exports use, so this must be prefix-normalized the same way the
+                # "Public functions" checks above are, or it would pass vacuously and never
+                # catch a real leak.
+                $expectedExportNameIfPublic = $functionName -replace "\-", "-$($module.Prefix)"
+                $exportedFunctionNames | Should -Not -Contain $expectedExportNameIfPublic
             }
         }
     }
@@ -66,6 +72,23 @@ Describe "General project validation" -Tag Unit {
             foreach ($exportedFunctionName in $exportedFunctionNames) {
                 $expectedPublicExportNames | Should -Contain $exportedFunctionName -Because "exported function '$exportedFunctionName' should have a corresponding file in ConfluencePS/Public/"
             }
+        }
+
+        It "exports every public function file" {
+            foreach ($expectedPublicExportName in $expectedPublicExportNames) {
+                $exportedFunctionNames | Should -Contain $expectedPublicExportName
+            }
+        }
+
+        It "declares its exported functions explicitly in the manifest (Task 58)" {
+            # The manifest's own FunctionsToExport is this module's committed compatibility
+            # baseline: unlike the Public-folder-consistency checks above (which only catch a
+            # folder/export mismatch), this catches an unreviewed addition or removal of a
+            # public command, since updating the manifest is the explicit approval step.
+            $manifestData = Import-PowerShellDataFile -Path "$moduleRoot/ConfluencePS/ConfluencePS.psd1"
+            $manifestData.FunctionsToExport | Should -Not -Be '*'
+            Compare-Object -ReferenceObject ($manifestData.FunctionsToExport | Sort-Object) -DifferenceObject ($publicFunctionFiles | Sort-Object) |
+                Should -BeNullOrEmpty
         }
     }
 }

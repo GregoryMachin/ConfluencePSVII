@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `ConfluencePS.psm1` now calls `Export-ModuleMember` to restrict exports to `ConfluencePS/Public/*.ps1` (Phase 9 Task 58). Previously, importing the module directly from source (`Import-Module ./ConfluencePS/ConfluencePS.psd1`, as opposed to the compiled `Release` artifact, which already restricted its exports at build time) also exported every one of the module's ~56 private implementation helpers, since the source manifest's `FunctionsToExport = '*'` combined with the missing `Export-ModuleMember` call left every loaded function exported. Declared the source manifest's `FunctionsToExport`/`AliasesToExport` explicitly instead of `'*'`, making the manifest itself the committed compatibility baseline, and added new `Tests/Project.Tests.ps1` assertions that fail the build if the declared list drifts from the actual `Public/` folder contents. **This is a breaking change for any external code that was directly calling one of those private helpers by its unsupported name** (for example `ConvertTo-ConfluenceHashTable`) through a source-manifest import; none of the 49 supported public commands are affected.
+
 ### Added
 
 - Added Confluence Data Center integration-test infrastructure: `docker-compose.yml` (moveworkforward `atlas-run-standalone` image), `Tools/Wait-ConfluenceServer.ps1`, and `StartConfluenceDocker` / `StopConfluenceDocker` build tasks.
