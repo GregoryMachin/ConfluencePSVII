@@ -50,6 +50,8 @@ InModuleScope ConfluencePS {
             @{ Resource = 'DatabaseById'; Params = @{ DatabaseId = 300 }; Expected = '/wiki/api/v2/databases/300' }
             @{ Resource = 'FolderCollection'; Params = @{}; Expected = '/wiki/api/v2/folders' }
             @{ Resource = 'FolderById'; Params = @{ FolderId = 400 }; Expected = '/wiki/api/v2/folders/400' }
+            @{ Resource = 'WhiteboardCollection'; Params = @{}; Expected = '/wiki/api/v2/whiteboards' }
+            @{ Resource = 'WhiteboardById'; Params = @{ WhiteboardId = 500 }; Expected = '/wiki/api/v2/whiteboards/500' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -212,6 +214,16 @@ InModuleScope ConfluencePS {
             It "throws for a missing FolderId on a folder by-id route" {
                 { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource FolderById } |
                     Should -Throw "*FolderId*"
+            }
+
+            It "throws for WhiteboardCollection on Data Center, since whiteboards have no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource WhiteboardCollection } |
+                    Should -Throw "*Cloud*"
+            }
+
+            It "throws for a missing WhiteboardId on a whiteboard by-id route" {
+                { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource WhiteboardById } |
+                    Should -Throw "*WhiteboardId*"
             }
 
             It "throws for an invalid Resource value" {

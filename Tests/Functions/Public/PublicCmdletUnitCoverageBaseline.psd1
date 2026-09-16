@@ -18,6 +18,7 @@
         'Get-PageVersion'         = @{ Covered = $true }
         'Get-ServerInformation'   = @{ Covered = $true }
         'Get-Space'               = @{ Covered = $true }
+        'Get-Whiteboard'          = @{ Covered = $true }
         'Invoke-Method'           = @{ Covered = $true }
         'New-BlogPost'            = @{ Covered = $true }
         'New-FooterComment'       = @{ Covered = $true }

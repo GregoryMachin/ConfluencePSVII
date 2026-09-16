@@ -30,6 +30,7 @@
             'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
             'DatabaseCollection', 'DatabaseById',
             'FolderCollection', 'FolderById',
+            'WhiteboardCollection', 'WhiteboardById',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -70,7 +71,11 @@
 
         [Parameter()]
         [UInt64]
-        $FolderId
+        $FolderId,
+
+        [Parameter()]
+        [UInt64]
+        $WhiteboardId
     )
 
     process {
@@ -100,7 +105,8 @@
             'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
             'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
             'DatabaseCollection', 'DatabaseById',
-            'FolderCollection', 'FolderById'
+            'FolderCollection', 'FolderById',
+            'WhiteboardCollection', 'WhiteboardById'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -272,6 +278,19 @@
                 }
                 Assert-RouteId -Name FolderId -Value $FolderId
                 "/folders/$FolderId"
+            }
+            'WhiteboardCollection' {
+                if (-not $useV2) {
+                    throw "WhiteboardCollection has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                '/whiteboards'
+            }
+            'WhiteboardById' {
+                if (-not $useV2) {
+                    throw "WhiteboardById has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name WhiteboardId -Value $WhiteboardId
+                "/whiteboards/$WhiteboardId"
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }
