@@ -12,6 +12,8 @@
         'Get-InlineComment'       = @{ Covered = $true }
         'Get-Label'               = @{ Covered = $false }
         'Get-Page'                = @{ Covered = $true }
+        'Get-PageAncestor'        = @{ Covered = $true }
+        'Get-PageVersion'         = @{ Covered = $true }
         'Get-ServerInformation'   = @{ Covered = $true }
         'Get-Space'               = @{ Covered = $true }
         'Invoke-Method'           = @{ Covered = $true }

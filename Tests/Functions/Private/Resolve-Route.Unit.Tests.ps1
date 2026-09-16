@@ -25,6 +25,9 @@ InModuleScope ConfluencePS {
             @{ Resource = 'PageDelete'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100' }
             @{ Resource = 'ChildPage'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/direct-children' }
             @{ Resource = 'DescendantPage'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/descendants' }
+            @{ Resource = 'PageAncestor'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/ancestors' }
+            @{ Resource = 'PageVersionCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/versions' }
+            @{ Resource = 'PageVersionById'; Params = @{ PageId = 100; VersionNumber = 3 }; Expected = '/wiki/api/v2/pages/100/versions/3' }
             @{ Resource = 'AttachmentCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/attachments' }
             @{ Resource = 'AttachmentDelete'; Params = @{ AttachmentId = 55 }; Expected = '/wiki/api/v2/attachments/55' }
             @{ Resource = 'LabelCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/labels' }
@@ -78,6 +81,9 @@ InModuleScope ConfluencePS {
             @{ Resource = 'PageSearch'; Params = @{}; Expected = '/rest/api/content/search' }
             @{ Resource = 'ChildPage'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/child/page' }
             @{ Resource = 'DescendantPage'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/descendant/page' }
+            @{ Resource = 'PageAncestor'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100' }
+            @{ Resource = 'PageVersionCollection'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/version' }
+            @{ Resource = 'PageVersionById'; Params = @{ PageId = 100; VersionNumber = 3 }; Expected = '/rest/api/content/100' }
             @{ Resource = 'AttachmentCollection'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/child/attachment' }
             @{ Resource = 'AttachmentDelete'; Params = @{ AttachmentId = 55 }; Expected = '/rest/api/content/55' }
             @{ Resource = 'LabelCollection'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/label' }
@@ -161,6 +167,11 @@ InModuleScope ConfluencePS {
             It "throws for a missing CommentId on a footer comment by-id route" {
                 { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource FooterCommentById } |
                     Should -Throw "*CommentId*"
+            }
+
+            It "throws for a missing VersionNumber on a page-version by-id route" {
+                { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource PageVersionById -PageId 100 } |
+                    Should -Throw "*VersionNumber*"
             }
 
             It "throws for InlineCommentCreate on Data Center, since it has no v1 equivalent" {

@@ -22,7 +22,7 @@
         [ValidateSet(
             'SpaceCollection', 'SpaceById', 'SpaceCreate', 'SpaceDelete',
             'PageCollection', 'PageById', 'PageSearch', 'PageCreate', 'PageUpdate', 'PageDelete',
-            'ChildPage', 'DescendantPage',
+            'ChildPage', 'DescendantPage', 'PageAncestor', 'PageVersionCollection', 'PageVersionById',
             'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
             'AttachmentCollection', 'AttachmentUpload', 'AttachmentUpdate', 'AttachmentDownload', 'AttachmentDelete',
             'LabelCollection', 'LabelAdd', 'LabelRemove',
@@ -56,7 +56,11 @@
 
         [Parameter()]
         [UInt64]
-        $CommentId
+        $CommentId,
+
+        [Parameter()]
+        [UInt32]
+        $VersionNumber
     )
 
     process {
@@ -79,7 +83,7 @@
         $v2CapableResources = @(
             'SpaceCollection', 'SpaceById', 'SpaceCreate',
             'PageCollection', 'PageById', 'PageCreate', 'PageUpdate', 'PageDelete',
-            'ChildPage', 'DescendantPage',
+            'ChildPage', 'DescendantPage', 'PageAncestor', 'PageVersionCollection', 'PageVersionById',
             'AttachmentCollection', 'AttachmentDelete',
             'LabelCollection',
             'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
@@ -130,6 +134,19 @@
             'DescendantPage' {
                 Assert-RouteId -Name PageId -Value $PageId
                 if ($useV2) { "/pages/$PageId/descendants" } else { "/content/$PageId/descendant/page" }
+            }
+            'PageAncestor' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/pages/$PageId/ancestors" } else { "/content/$PageId" }
+            }
+            'PageVersionCollection' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/pages/$PageId/versions" } else { "/content/$PageId/version" }
+            }
+            'PageVersionById' {
+                Assert-RouteId -Name PageId -Value $PageId
+                Assert-RouteId -Name VersionNumber -Value $VersionNumber
+                if ($useV2) { "/pages/$PageId/versions/$VersionNumber" } else { "/content/$PageId" }
             }
             'AttachmentCollection' {
                 Assert-RouteId -Name PageId -Value $PageId
