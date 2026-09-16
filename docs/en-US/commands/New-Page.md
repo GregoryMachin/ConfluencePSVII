@@ -18,7 +18,7 @@ Create a new page on your Confluence instance.
 ### byParameters (Default)
 
 ```powershell
-New-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+New-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  -Title <String> [-ParentID <UInt64>] [-Parent <Page>] [-SpaceKey <String>]
  [-Space <Space>] [-Body <String>] [-Convert] [-WhatIf] [-Confirm]
@@ -27,7 +27,7 @@ New-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
 ### byObject
 
 ```powershell
-New-ConfluencePage -ApiUri <Uri> [-Credential <PSCredential>]
+New-ConfluencePage -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  -InputObject <Page> [-WhatIf] [-Confirm]
 ```
@@ -120,6 +120,42 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BaseUri
+
+The site's base URi, used together with -DeploymentType to route page creation to Confluence Cloud REST API v2's POST /pages.
+The v2 request identifies the target space only by numeric ID; a -SpaceKey (or a -Space/-InputObject.Space with only a Key) is resolved to an ID through Get-ConfluenceSpace.
+Without -BaseUri, requests fall back to the v1 route regardless of -DeploymentType.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: Uri
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DeploymentType
+
+Selects Confluence Cloud REST API v2 routing when set to `Cloud` and -BaseUri is also supplied.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

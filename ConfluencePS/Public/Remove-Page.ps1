@@ -9,6 +9,13 @@
         [Uri]$ApiUri,
 
         [Parameter( Mandatory = $false )]
+        [Uri]$BaseUri,
+
+        [Parameter( Mandatory = $false )]
+        [ValidateSet('', 'Cloud', 'DataCenter', 'Server')]
+        [String]$DeploymentType,
+
+        [Parameter( Mandatory = $false )]
         [PSCredential]$Credential,
 
         [Parameter( Mandatory = $false )]
@@ -47,11 +54,20 @@
             Throw $exception
         }
 
+        # Cloud v2 opt-in (Task 48): -BaseUri + -DeploymentType Cloud route deletion to
+        # DELETE /pages/{id}.
+        $useCloudV2 = ($DeploymentType -eq 'Cloud') -and $BaseUri
+
         $iwParameters = Copy-CommonParameter -InputObject $PSBoundParameters
         $iwParameters['Method'] = 'Delete'
 
         foreach ($_page in $PageID) {
-            $iwParameters["Uri"] = $resourceApi -f $_page
+            if ($useCloudV2) {
+                $iwParameters["Uri"] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource PageDelete -PageId $_page
+            }
+            else {
+                $iwParameters["Uri"] = $resourceApi -f $_page
+            }
 
             If ($PSCmdlet.ShouldProcess("PageID $_page")) {
                 Invoke-Method @iwParameters
