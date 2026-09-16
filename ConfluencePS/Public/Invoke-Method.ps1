@@ -40,6 +40,7 @@
         [ValidateSet(
             [ConfluencePS.Page],
             [ConfluencePS.BlogPost],
+            [ConfluencePS.Comment],
             [ConfluencePS.Space],
             [ConfluencePS.Label],
             [ConfluencePS.Icon],

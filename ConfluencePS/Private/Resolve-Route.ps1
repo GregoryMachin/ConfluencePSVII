@@ -26,6 +26,8 @@
             'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
             'AttachmentCollection', 'AttachmentUpload', 'AttachmentUpdate', 'AttachmentDownload', 'AttachmentDelete',
             'LabelCollection', 'LabelAdd', 'LabelRemove',
+            'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
+            'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -50,7 +52,11 @@
 
         [Parameter()]
         [UInt64]
-        $AttachmentId
+        $AttachmentId,
+
+        [Parameter()]
+        [UInt64]
+        $CommentId
     )
 
     process {
@@ -76,7 +82,9 @@
             'ChildPage', 'DescendantPage',
             'AttachmentCollection', 'AttachmentDelete',
             'LabelCollection',
-            'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete'
+            'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
+            'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
+            'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -170,6 +178,45 @@
             'BlogPostDelete' {
                 Assert-RouteId -Name PageId -Value $PageId
                 if ($useV2) { "/blogposts/$PageId" } else { "/content/$PageId" }
+            }
+            'FooterCommentCollection' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/pages/$PageId/footer-comments" } else { "/content/$PageId/child/comment" }
+            }
+            'FooterCommentById' {
+                Assert-RouteId -Name CommentId -Value $CommentId
+                if ($useV2) { "/footer-comments/$CommentId" } else { "/content/$CommentId" }
+            }
+            'FooterCommentCreate' { if ($useV2) { '/footer-comments' } else { '/content' } }
+            'FooterCommentUpdate' {
+                Assert-RouteId -Name CommentId -Value $CommentId
+                if ($useV2) { "/footer-comments/$CommentId" } else { "/content/$CommentId" }
+            }
+            'FooterCommentDelete' {
+                Assert-RouteId -Name CommentId -Value $CommentId
+                if ($useV2) { "/footer-comments/$CommentId" } else { "/content/$CommentId" }
+            }
+            'InlineCommentCollection' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/pages/$PageId/inline-comments" } else { "/content/$PageId/child/comment" }
+            }
+            'InlineCommentById' {
+                Assert-RouteId -Name CommentId -Value $CommentId
+                if ($useV2) { "/inline-comments/$CommentId" } else { "/content/$CommentId" }
+            }
+            'InlineCommentCreate' {
+                if (-not $useV2) {
+                    throw "InlineCommentCreate has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                '/inline-comments'
+            }
+            'InlineCommentUpdate' {
+                Assert-RouteId -Name CommentId -Value $CommentId
+                if ($useV2) { "/inline-comments/$CommentId" } else { "/content/$CommentId" }
+            }
+            'InlineCommentDelete' {
+                Assert-RouteId -Name CommentId -Value $CommentId
+                if ($useV2) { "/inline-comments/$CommentId" } else { "/content/$CommentId" }
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }

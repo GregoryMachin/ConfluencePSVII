@@ -99,6 +99,52 @@ InModuleScope ConfluencePS {
             }
         }
 
+        Context "Comment" {
+            BeforeAll {
+                $v1Json = @'
+{
+    "id": "327680",
+    "status": "current",
+    "version": { "number": 1, "by": { "username": "jsmith", "displayName": "J Smith" } },
+    "body": { "storage": { "value": "<p>Nice work!</p>" } },
+    "container": { "id": "196608", "type": "page" }
+}
+'@
+                $v2Json = @'
+{
+    "id": "327680",
+    "status": "current",
+    "version": { "number": 1, "authorId": "712020:aaaa" },
+    "body": { "storage": { "value": "<p>Nice work!</p>" } },
+    "pageId": "196608"
+}
+'@
+                $script:v1Result = ConvertTo-Comment -InputObject (ConvertFrom-Json -InputObject $v1Json) -Type footer
+                $script:v2Result = ConvertTo-CommentV2 -InputObject (ConvertFrom-Json -InputObject $v2Json) -Type footer
+            }
+
+            It "both produce a ConfluencePS.Comment" {
+                $v1Result | Should -BeOfType [ConfluencePS.Comment]
+                $v2Result | Should -BeOfType [ConfluencePS.Comment]
+            }
+
+            It "both agree on ID, Status, Body, and PageID" {
+                $v1Result.ID | Should -Be $v2Result.ID
+                $v1Result.Status | Should -Be $v2Result.Status
+                $v1Result.Body | Should -Be $v2Result.Body
+                $v1Result.PageID | Should -Be $v2Result.PageID
+            }
+
+            It "both populate Version.Number identically" {
+                $v1Result.Version.Number | Should -Be $v2Result.Version.Number
+            }
+
+            It "both record the caller-supplied Type" {
+                $v1Result.Type | Should -Be 'footer'
+                $v2Result.Type | Should -Be 'footer'
+            }
+        }
+
         Context "Space" {
             BeforeAll {
                 $v1Json = @'

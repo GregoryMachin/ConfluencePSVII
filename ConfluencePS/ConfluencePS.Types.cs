@@ -98,6 +98,24 @@ namespace ConfluencePS
         }
     }
 
+    public class Comment
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Body { get; set; }
+        public Version Version { get; set; }
+        public UInt64 PageID { get; set; }
+        public UInt64 ParentID { get; set; }
+        public String Type { get; set; }
+        public String URL { get; set; }
+        public String ShortURL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Type;
+        }
+    }
+
     public class Label
     {
         public UInt64 ID { get; set; }

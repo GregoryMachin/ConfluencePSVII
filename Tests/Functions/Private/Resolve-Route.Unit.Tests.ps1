@@ -33,6 +33,16 @@ InModuleScope ConfluencePS {
             @{ Resource = 'BlogPostCreate'; Params = @{}; Expected = '/wiki/api/v2/blogposts' }
             @{ Resource = 'BlogPostUpdate'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/blogposts/100' }
             @{ Resource = 'BlogPostDelete'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/blogposts/100' }
+            @{ Resource = 'FooterCommentCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/footer-comments' }
+            @{ Resource = 'FooterCommentById'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/footer-comments/200' }
+            @{ Resource = 'FooterCommentCreate'; Params = @{}; Expected = '/wiki/api/v2/footer-comments' }
+            @{ Resource = 'FooterCommentUpdate'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/footer-comments/200' }
+            @{ Resource = 'FooterCommentDelete'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/footer-comments/200' }
+            @{ Resource = 'InlineCommentCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/inline-comments' }
+            @{ Resource = 'InlineCommentById'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/inline-comments/200' }
+            @{ Resource = 'InlineCommentCreate'; Params = @{}; Expected = '/wiki/api/v2/inline-comments' }
+            @{ Resource = 'InlineCommentUpdate'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/inline-comments/200' }
+            @{ Resource = 'InlineCommentDelete'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/inline-comments/200' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -78,6 +88,15 @@ InModuleScope ConfluencePS {
             @{ Resource = 'BlogPostCreate'; Params = @{}; Expected = '/rest/api/content' }
             @{ Resource = 'BlogPostUpdate'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100' }
             @{ Resource = 'BlogPostDelete'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100' }
+            @{ Resource = 'FooterCommentCollection'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/child/comment' }
+            @{ Resource = 'FooterCommentById'; Params = @{ CommentId = 200 }; Expected = '/rest/api/content/200' }
+            @{ Resource = 'FooterCommentCreate'; Params = @{}; Expected = '/rest/api/content' }
+            @{ Resource = 'FooterCommentUpdate'; Params = @{ CommentId = 200 }; Expected = '/rest/api/content/200' }
+            @{ Resource = 'FooterCommentDelete'; Params = @{ CommentId = 200 }; Expected = '/rest/api/content/200' }
+            @{ Resource = 'InlineCommentCollection'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/child/comment' }
+            @{ Resource = 'InlineCommentById'; Params = @{ CommentId = 200 }; Expected = '/rest/api/content/200' }
+            @{ Resource = 'InlineCommentUpdate'; Params = @{ CommentId = 200 }; Expected = '/rest/api/content/200' }
+            @{ Resource = 'InlineCommentDelete'; Params = @{ CommentId = 200 }; Expected = '/rest/api/content/200' }
         ) {
             It "resolves <Resource> to the Data Center v1 route" {
                 $uri = Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource $Resource @Params
@@ -137,6 +156,27 @@ InModuleScope ConfluencePS {
             It "throws for a SpaceKey containing a path separator" {
                 { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource SpaceDelete -SpaceKey 'TEST/../ADMIN' } |
                     Should -Throw
+            }
+
+            It "throws for a missing CommentId on a footer comment by-id route" {
+                { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource FooterCommentById } |
+                    Should -Throw "*CommentId*"
+            }
+
+            It "throws for InlineCommentCreate on Data Center, since it has no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource InlineCommentCreate } |
+                    Should -Throw "*Cloud*"
+            }
+
+            It "throws for InlineCommentCreate on Cloud without an HTTPS BaseUri" {
+                { Resolve-Route -BaseUri 'http://example.atlassian.net' -DeploymentType Cloud -Resource InlineCommentCreate } |
+                    Should -Throw
+            }
+
+            It "resolves InlineCommentCreate on Cloud with an HTTPS BaseUri" {
+                $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource InlineCommentCreate
+
+                $uri.AbsoluteUri | Should -BeExactly "$cloudBase/wiki/api/v2/inline-comments"
             }
 
             It "throws for an invalid Resource value" {
