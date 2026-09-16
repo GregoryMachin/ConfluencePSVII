@@ -23,6 +23,7 @@
             'SpaceCollection', 'SpaceById', 'SpaceCreate', 'SpaceDelete',
             'PageCollection', 'PageById', 'PageSearch', 'PageCreate', 'PageUpdate', 'PageDelete',
             'ChildPage', 'DescendantPage',
+            'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
             'AttachmentCollection', 'AttachmentUpload', 'AttachmentUpdate', 'AttachmentDownload', 'AttachmentDelete',
             'LabelCollection', 'LabelAdd', 'LabelRemove',
             'StorageFormatConversion', 'ServerInformation'
@@ -74,7 +75,8 @@
             'PageCollection', 'PageById', 'PageCreate', 'PageUpdate', 'PageDelete',
             'ChildPage', 'DescendantPage',
             'AttachmentCollection', 'AttachmentDelete',
-            'LabelCollection'
+            'LabelCollection',
+            'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -154,6 +156,20 @@
             'LabelRemove' {
                 Assert-RouteId -Name PageId -Value $PageId
                 "/content/$PageId/label"
+            }
+            'BlogPostCollection' { if ($useV2) { '/blogposts' } else { '/content' } }
+            'BlogPostById' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/blogposts/$PageId" } else { "/content/$PageId" }
+            }
+            'BlogPostCreate' { if ($useV2) { '/blogposts' } else { '/content' } }
+            'BlogPostUpdate' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/blogposts/$PageId" } else { "/content/$PageId" }
+            }
+            'BlogPostDelete' {
+                Assert-RouteId -Name PageId -Value $PageId
+                if ($useV2) { "/blogposts/$PageId" } else { "/content/$PageId" }
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }

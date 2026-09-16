@@ -81,6 +81,23 @@ namespace ConfluencePS
         }
     }
 
+    public class BlogPost
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public Space Space { get; set; }
+        public Version Version { get; set; }
+        public String Body { get; set; }
+        public String URL { get; set; }
+        public String ShortURL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Title;
+        }
+    }
+
     public class Label
     {
         public UInt64 ID { get; set; }

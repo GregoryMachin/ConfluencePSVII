@@ -58,6 +58,47 @@ InModuleScope ConfluencePS {
             }
         }
 
+        Context "BlogPost" {
+            BeforeAll {
+                $v1Json = @'
+{
+    "id": "262144",
+    "status": "current",
+    "title": "Example Blog Post",
+    "version": { "number": 2, "by": { "username": "jsmith", "displayName": "J Smith" } },
+    "body": { "storage": { "value": "<p>Announcement</p>" } }
+}
+'@
+                $v2Json = @'
+{
+    "id": "262144",
+    "status": "current",
+    "title": "Example Blog Post",
+    "version": { "number": 2, "authorId": "712020:aaaa" },
+    "body": { "storage": { "value": "<p>Announcement</p>" } }
+}
+'@
+                $script:v1Result = ConvertTo-BlogPost -InputObject (ConvertFrom-Json -InputObject $v1Json)
+                $script:v2Result = ConvertTo-BlogPostV2 -InputObject (ConvertFrom-Json -InputObject $v2Json)
+            }
+
+            It "both produce a ConfluencePS.BlogPost" {
+                $v1Result | Should -BeOfType [ConfluencePS.BlogPost]
+                $v2Result | Should -BeOfType [ConfluencePS.BlogPost]
+            }
+
+            It "both agree on ID, Status, Title, and Body" {
+                $v1Result.ID | Should -Be $v2Result.ID
+                $v1Result.Status | Should -Be $v2Result.Status
+                $v1Result.Title | Should -Be $v2Result.Title
+                $v1Result.Body | Should -Be $v2Result.Body
+            }
+
+            It "both populate Version.Number identically" {
+                $v1Result.Version.Number | Should -Be $v2Result.Version.Number
+            }
+        }
+
         Context "Space" {
             BeforeAll {
                 $v1Json = @'

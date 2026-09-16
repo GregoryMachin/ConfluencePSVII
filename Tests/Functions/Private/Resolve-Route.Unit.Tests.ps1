@@ -28,6 +28,11 @@ InModuleScope ConfluencePS {
             @{ Resource = 'AttachmentCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/attachments' }
             @{ Resource = 'AttachmentDelete'; Params = @{ AttachmentId = 55 }; Expected = '/wiki/api/v2/attachments/55' }
             @{ Resource = 'LabelCollection'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/pages/100/labels' }
+            @{ Resource = 'BlogPostCollection'; Params = @{}; Expected = '/wiki/api/v2/blogposts' }
+            @{ Resource = 'BlogPostById'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/blogposts/100' }
+            @{ Resource = 'BlogPostCreate'; Params = @{}; Expected = '/wiki/api/v2/blogposts' }
+            @{ Resource = 'BlogPostUpdate'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/blogposts/100' }
+            @{ Resource = 'BlogPostDelete'; Params = @{ PageId = 100 }; Expected = '/wiki/api/v2/blogposts/100' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -68,6 +73,11 @@ InModuleScope ConfluencePS {
             @{ Resource = 'LabelCollection'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100/label' }
             @{ Resource = 'StorageFormatConversion'; Params = @{}; Expected = '/rest/api/contentbody/convert/storage' }
             @{ Resource = 'ServerInformation'; Params = @{}; Expected = '/rest/api/settings/systemInfo' }
+            @{ Resource = 'BlogPostCollection'; Params = @{}; Expected = '/rest/api/content' }
+            @{ Resource = 'BlogPostById'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100' }
+            @{ Resource = 'BlogPostCreate'; Params = @{}; Expected = '/rest/api/content' }
+            @{ Resource = 'BlogPostUpdate'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100' }
+            @{ Resource = 'BlogPostDelete'; Params = @{ PageId = 100 }; Expected = '/rest/api/content/100' }
         ) {
             It "resolves <Resource> to the Data Center v1 route" {
                 $uri = Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource $Resource @Params
