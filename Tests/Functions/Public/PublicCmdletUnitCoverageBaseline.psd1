@@ -19,6 +19,7 @@
         'Get-PageVersion'         = @{ Covered = $true }
         'Get-ServerInformation'   = @{ Covered = $true }
         'Get-Space'               = @{ Covered = $true }
+        'Get-SpacePermission'     = @{ Covered = $true }
         'Get-SpaceProperty'       = @{ Covered = $true }
         'Get-Whiteboard'          = @{ Covered = $true }
         'Invoke-Method'           = @{ Covered = $true }

@@ -199,6 +199,21 @@ namespace ConfluencePS
         }
     }
 
+    public class SpacePermission
+    {
+        public UInt64 ID { get; set; }
+        public UInt64 SpaceID { get; set; }
+        public String PrincipalType { get; set; }
+        public String PrincipalID { get; set; }
+        public String OperationKey { get; set; }
+        public String OperationTargetType { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + PrincipalType + " " + PrincipalID + "] " + OperationKey;
+        }
+    }
+
     public class Label
     {
         public UInt64 ID { get; set; }

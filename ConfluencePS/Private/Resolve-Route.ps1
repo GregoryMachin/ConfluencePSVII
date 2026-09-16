@@ -33,6 +33,7 @@
             'WhiteboardCollection', 'WhiteboardById',
             'InlineTaskCollection', 'InlineTaskById', 'InlineTaskUpdate',
             'SpacePropertyCollection', 'SpacePropertyById',
+            'SpacePermissionCollection',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -118,7 +119,8 @@
             'FolderCollection', 'FolderById',
             'WhiteboardCollection', 'WhiteboardById',
             'InlineTaskCollection', 'InlineTaskById', 'InlineTaskUpdate',
-            'SpacePropertyCollection', 'SpacePropertyById'
+            'SpacePropertyCollection', 'SpacePropertyById',
+            'SpacePermissionCollection'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -338,6 +340,13 @@
                 Assert-RouteId -Name SpaceId -Value $SpaceId
                 Assert-RouteId -Name PropertyId -Value $PropertyId
                 "/spaces/$SpaceId/properties/$PropertyId"
+            }
+            'SpacePermissionCollection' {
+                if (-not $useV2) {
+                    throw "SpacePermissionCollection has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name SpaceId -Value $SpaceId
+                "/spaces/$SpaceId/permissions"
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }

@@ -57,6 +57,7 @@ InModuleScope ConfluencePS {
             @{ Resource = 'InlineTaskUpdate'; Params = @{ TaskId = 600 }; Expected = '/wiki/api/v2/tasks/600' }
             @{ Resource = 'SpacePropertyCollection'; Params = @{ SpaceId = 98307 }; Expected = '/wiki/api/v2/spaces/98307/properties' }
             @{ Resource = 'SpacePropertyById'; Params = @{ SpaceId = 98307; PropertyId = 700 }; Expected = '/wiki/api/v2/spaces/98307/properties/700' }
+            @{ Resource = 'SpacePermissionCollection'; Params = @{ SpaceId = 98307 }; Expected = '/wiki/api/v2/spaces/98307/permissions' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -249,6 +250,11 @@ InModuleScope ConfluencePS {
             It "throws for a missing PropertyId on a space-property by-id route" {
                 { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource SpacePropertyById -SpaceId 98307 } |
                     Should -Throw "*PropertyId*"
+            }
+
+            It "throws for SpacePermissionCollection on Data Center, since space permissions have no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource SpacePermissionCollection -SpaceId 98307 } |
+                    Should -Throw "*Cloud*"
             }
 
             It "throws for an invalid Resource value" {
