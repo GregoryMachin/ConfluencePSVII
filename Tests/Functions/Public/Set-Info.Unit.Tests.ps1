@@ -118,6 +118,129 @@ InModuleScope ConfluencePS {
             { Set-Info -BaseUri $entry } | Should -Throw "*Cloud configuration requires an HTTPS*"
         }
 
+        Context "OAuth access token configuration (Task 56)" {
+            AfterEach {
+                $global:PSDefaultParameterValues.Remove("Get-ConfluenceSpace:PersonalAccessToken")
+                $script:PSDefaultParameterValues.Remove("Get-ConfluenceSpace:PersonalAccessToken")
+            }
+
+            It "configures an OAuth Cloud session from -OAuthAccessToken and -CloudId" {
+                $token = ConvertTo-SecureString -String 'my-oauth-token' -AsPlainText -Force
+
+                Set-Info -OAuthAccessToken $token -CloudId '11223344-a1b2-3b33-c444-def123456789'
+
+                $global:PSDefaultParameterValues["Get-ConfluenceSpace:ApiUri"] |
+                    Should -BeExactly "https://api.atlassian.com/ex/confluence/11223344-a1b2-3b33-c444-def123456789/wiki/rest/api"
+                $global:PSDefaultParameterValues["Get-ConfluenceSpace:PersonalAccessToken"] | Should -BeExactly 'my-oauth-token'
+                $script:ConfluenceRequestContext.DeploymentType | Should -BeExactly "Cloud"
+                $script:ConfluenceRequestContext.AuthenticationType | Should -BeExactly "OAuth"
+                $script:ConfluenceRequestContext.CloudId | Should -BeExactly '11223344-a1b2-3b33-c444-def123456789'
+            }
+
+            It "throws when both -BaseUri and -OAuthAccessToken are supplied" {
+                $token = ConvertTo-SecureString -String 'my-oauth-token' -AsPlainText -Force
+
+                { Set-Info -BaseUri "https://example.com" -OAuthAccessToken $token -CloudId '11223344-a1b2-3b33-c444-def123456789' } |
+                    Should -Throw "*either -BaseUri or -OAuthAccessToken*"
+            }
+
+            It "throws when -CloudId is missing" {
+                $token = ConvertTo-SecureString -String 'my-oauth-token' -AsPlainText -Force
+
+                { Set-Info -OAuthAccessToken $token } | Should -Throw "*-CloudId is required*"
+            }
+
+            It "throws when -CloudId is not a UUID" {
+                $token = ConvertTo-SecureString -String 'my-oauth-token' -AsPlainText -Force
+
+                { Set-Info -OAuthAccessToken $token -CloudId 'not-a-guid' } | Should -Throw "*must be a UUID*"
+            }
+        }
+
+        Context "OAuth client-credentials configuration (Task 56)" {
+            AfterEach {
+                $global:PSDefaultParameterValues.Remove("Get-ConfluenceSpace:PersonalAccessToken")
+                $script:PSDefaultParameterValues.Remove("Get-ConfluenceSpace:PersonalAccessToken")
+            }
+
+            BeforeEach {
+                Mock Request-OAuthClientCredentialsToken -ModuleName ConfluencePS {
+                    [PSCustomObject]@{
+                        AccessToken = (ConvertTo-SecureString -String 'client-credentials-token' -AsPlainText -Force)
+                        ExpiresAt   = (Get-Date).AddHours(1)
+                        TokenType   = 'Bearer'
+                        Scopes      = @('read:confluence-content.all')
+                    }
+                }
+
+                Mock Get-OAuthResource -ModuleName ConfluencePS {
+                    [ConfluencePS.OAuthResource]@{
+                        CloudId = '11223344-a1b2-3b33-c444-def123456789'
+                        Name    = 'Example Site'
+                        Url     = [Uri]'https://example.atlassian.net/'
+                        Scopes  = @('read:confluence-content.all')
+                    }
+                }
+            }
+
+            It "exchanges client credentials and configures the single reachable site" {
+                $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force
+
+                Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret
+
+                Should -Invoke Request-OAuthClientCredentialsToken -ModuleName ConfluencePS -Times 1
+                $global:PSDefaultParameterValues["Get-ConfluenceSpace:ApiUri"] |
+                    Should -BeExactly "https://api.atlassian.com/ex/confluence/11223344-a1b2-3b33-c444-def123456789/wiki/rest/api"
+                $global:PSDefaultParameterValues["Get-ConfluenceSpace:PersonalAccessToken"] | Should -BeExactly 'client-credentials-token'
+                $script:ConfluenceRequestContext.CloudId | Should -BeExactly '11223344-a1b2-3b33-c444-def123456789'
+            }
+
+            It "forwards a -SiteUrl selector to Get-ConfluenceOAuthResource" {
+                $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force
+
+                Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret -SiteUrl 'https://example.atlassian.net'
+
+                Should -Invoke Get-OAuthResource -ModuleName ConfluencePS -ParameterFilter { $SiteUrl -eq 'https://example.atlassian.net' }
+            }
+
+            It "throws when only -OAuthClientId is supplied" {
+                { Set-Info -OAuthClientId 'my-client-id' } | Should -Throw "*must be supplied together*"
+            }
+
+            It "throws when -OAuthClientId and -OAuthAccessToken are both supplied" {
+                $token = ConvertTo-SecureString -String 'my-oauth-token' -AsPlainText -Force
+                $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force
+
+                { Set-Info -OAuthAccessToken $token -CloudId '11223344-a1b2-3b33-c444-def123456789' -OAuthClientId 'my-client-id' -OAuthClientSecret $secret } |
+                    Should -Throw "*either -OAuthAccessToken or -OAuthClientId*"
+            }
+
+            It "throws when -SiteName is supplied without client credentials" {
+                { Set-Info -SiteName 'Example Site' } | Should -Throw "*only valid together with*"
+            }
+
+            It "throws when the client credentials reach no site" {
+                Mock Get-OAuthResource -ModuleName ConfluencePS { }
+                $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force
+
+                { Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret } |
+                    Should -Throw -ExceptionType ([System.Management.Automation.ItemNotFoundException])
+            }
+
+            It "throws when the client credentials reach more than one site with no selector" {
+                Mock Get-OAuthResource -ModuleName ConfluencePS {
+                    @(
+                        [ConfluencePS.OAuthResource]@{ CloudId = '11223344-a1b2-3b33-c444-def123456789'; Name = 'Example Site'; Url = [Uri]'https://example.atlassian.net/' }
+                        [ConfluencePS.OAuthResource]@{ CloudId = '99887766-a1b2-3b33-c444-def123456789'; Name = 'Other Site'; Url = [Uri]'https://other.atlassian.net/' }
+                    )
+                }
+                $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force
+
+                { Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret } |
+                    Should -Throw -ExceptionType ([System.InvalidOperationException])
+            }
+        }
+
         Context "BaseUri and DeploymentType defaults (Task 44)" {
             AfterEach {
                 $global:PSDefaultParameterValues.Remove("Get-ConfluencePage:BaseUri")

@@ -17,8 +17,9 @@ Specify wiki location and authorization for use in this session's REST API reque
 
 ```powershell
 Set-ConfluenceInfo [-BaseURi <Object>] [-Credential <PSCredential>]
- [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
- [-PageSize <UInt32>] [-PromptCredentials]
+ [-PersonalAccessToken <String>] [-OAuthAccessToken <SecureString>] [-CloudId <String>]
+ [-OAuthClientId <String>] [-OAuthClientSecret <SecureString>] [-SiteName <String>] [-SiteUrl <Uri>]
+ [-Certificate <X509Certificate>] [-PageSize <UInt32>] [-PromptCredentials]
 ```
 
 ## DESCRIPTION
@@ -30,6 +31,10 @@ Set-ConfluenceInfo avoids repetitively specifying -ApiUri and -Credential parame
 The `-BaseUri` parameter still accepts the legacy URI or string value.
 It also accepts an AtlassianPS.Configuration server entry from the pipeline or by property name.
 When the entry includes `Product`, `DeploymentType`, `AuthenticationType`, or `CloudId`, ConfluencePS keeps that metadata in the current module session and uses it to build a deterministic REST API URI.
+
+`-OAuthAccessToken` and `-CloudId` configure an OAuth 2.0 (3LO) Cloud session from a caller-supplied access token, without needing an AtlassianPS.Configuration entry: they are mutually exclusive with `-BaseUri`, and both must be supplied together. Use `Get-ConfluenceOAuthResource` to discover a site's `CloudId` from the token itself. The access token is reused as this session's `-PersonalAccessToken` default, since Confluence's REST API already accepts an OAuth access token the same way it accepts a Data Center Personal Access Token: as an `Authorization: Bearer` header.
+
+`-OAuthClientId` and `-OAuthClientSecret` configure a fully non-interactive OAuth 2.0 client-credentials session for a service account: ConfluencePS exchanges the client credentials for an access token, discovers which site(s) it can reach, and configures the session the same way `-OAuthAccessToken` does. When the client credentials can reach more than one site, supply `-CloudId`, `-SiteName`, or `-SiteUrl` to pick one; otherwise the command throws rather than guessing. ConfluencePS has no session object to cache this token in, so the token exchange happens again on every `Set-ConfluenceInfo -OAuthClientId` call.
 
 Confluence's REST API supports passing basic authentication in headers. For
 Confluence Cloud, use your Atlassian account email address as the username and
@@ -100,6 +105,27 @@ Get-AtlassianServerConfiguration -Name 'Confluence Cloud' | Set-ConfluenceInfo
 Configure ConfluencePS from an AtlassianPS.Configuration server entry.
 Explicit Cloud metadata preserves `/wiki`, and explicit Data Center metadata preserves custom context paths such as `/confluence`.
 
+### -------------------------- EXAMPLE 7 --------------------------
+
+```powershell
+$resource = Get-ConfluenceOAuthResource -OAuthAccessToken $token -SiteUrl 'https://yournamehere.atlassian.net'
+Set-ConfluenceInfo -OAuthAccessToken $token -CloudId $resource.CloudId
+```
+
+Discover a site's Cloud ID from an OAuth 2.0 (3LO) access token, then configure an
+OAuth-authenticated Cloud session for it. `-BaseUri`/`-ApiUri` are computed automatically as
+the Cloud API gateway address for that Cloud ID.
+
+### -------------------------- EXAMPLE 8 --------------------------
+
+```powershell
+$clientSecret = Read-Host -AsSecureString -Prompt 'Client secret'
+Set-ConfluenceInfo -OAuthClientId $clientId -OAuthClientSecret $clientSecret -SiteUrl 'https://yournamehere.atlassian.net'
+```
+
+Configure a fully non-interactive OAuth 2.0 client-credentials session for a service account,
+selecting a specific site by URL when the client credentials can reach more than one.
+
 ## PARAMETERS
 
 ### -BaseURi
@@ -150,6 +176,109 @@ and an Atlassian API token.
 
 ```yaml
 Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OAuthAccessToken
+
+An OAuth 2.0 (3LO) Cloud access token. Requires `-CloudId`; mutually exclusive with `-BaseUri`.
+Configures an OAuth-authenticated Cloud session and is also used as this session's
+`-PersonalAccessToken` default.
+
+```yaml
+Type: SecureString
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -CloudId
+
+The Cloud ID of the Confluence site the OAuth access token authenticates to. Required with
+`-OAuthAccessToken`. Discover it with `Get-ConfluenceOAuthResource`.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OAuthClientId
+
+The OAuth 2.0 client ID for a non-interactive service-account session. Requires
+`-OAuthClientSecret`; mutually exclusive with `-BaseUri` and `-OAuthAccessToken`.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -OAuthClientSecret
+
+The OAuth 2.0 client secret for a non-interactive service-account session. Requires
+`-OAuthClientId`.
+
+```yaml
+Type: SecureString
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SiteName
+
+Selects a single site by display name when `-OAuthClientId`/`-OAuthClientSecret` can reach more
+than one. Only valid together with `-OAuthClientId`/`-OAuthClientSecret`.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -SiteUrl
+
+Selects a single site by URL when `-OAuthClientId`/`-OAuthClientSecret` can reach more than
+one. Only valid together with `-OAuthClientId`/`-OAuthClientSecret`.
+
+```yaml
+Type: Uri
 Parameter Sets: (All)
 Aliases:
 
