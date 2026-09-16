@@ -29,6 +29,7 @@
             'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
             'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
             'DatabaseCollection', 'DatabaseById',
+            'FolderCollection', 'FolderById',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -65,7 +66,11 @@
 
         [Parameter()]
         [UInt64]
-        $DatabaseId
+        $DatabaseId,
+
+        [Parameter()]
+        [UInt64]
+        $FolderId
     )
 
     process {
@@ -94,7 +99,8 @@
             'BlogPostCollection', 'BlogPostById', 'BlogPostCreate', 'BlogPostUpdate', 'BlogPostDelete',
             'FooterCommentCollection', 'FooterCommentById', 'FooterCommentCreate', 'FooterCommentUpdate', 'FooterCommentDelete',
             'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
-            'DatabaseCollection', 'DatabaseById'
+            'DatabaseCollection', 'DatabaseById',
+            'FolderCollection', 'FolderById'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -253,6 +259,19 @@
                 }
                 Assert-RouteId -Name DatabaseId -Value $DatabaseId
                 "/databases/$DatabaseId"
+            }
+            'FolderCollection' {
+                if (-not $useV2) {
+                    throw "FolderCollection has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                '/folders'
+            }
+            'FolderById' {
+                if (-not $useV2) {
+                    throw "FolderById has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name FolderId -Value $FolderId
+                "/folders/$FolderId"
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }

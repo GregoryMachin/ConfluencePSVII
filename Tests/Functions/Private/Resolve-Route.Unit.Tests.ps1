@@ -48,6 +48,8 @@ InModuleScope ConfluencePS {
             @{ Resource = 'InlineCommentDelete'; Params = @{ CommentId = 200 }; Expected = '/wiki/api/v2/inline-comments/200' }
             @{ Resource = 'DatabaseCollection'; Params = @{}; Expected = '/wiki/api/v2/databases' }
             @{ Resource = 'DatabaseById'; Params = @{ DatabaseId = 300 }; Expected = '/wiki/api/v2/databases/300' }
+            @{ Resource = 'FolderCollection'; Params = @{}; Expected = '/wiki/api/v2/folders' }
+            @{ Resource = 'FolderById'; Params = @{ FolderId = 400 }; Expected = '/wiki/api/v2/folders/400' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -200,6 +202,16 @@ InModuleScope ConfluencePS {
             It "throws for a missing DatabaseId on a database by-id route" {
                 { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource DatabaseById } |
                     Should -Throw "*DatabaseId*"
+            }
+
+            It "throws for FolderCollection on Data Center, since folders have no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource FolderCollection } |
+                    Should -Throw "*Cloud*"
+            }
+
+            It "throws for a missing FolderId on a folder by-id route" {
+                { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource FolderById } |
+                    Should -Throw "*FolderId*"
             }
 
             It "throws for an invalid Resource value" {

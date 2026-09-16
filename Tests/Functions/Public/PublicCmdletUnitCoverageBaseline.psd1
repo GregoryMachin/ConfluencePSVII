@@ -9,6 +9,7 @@
         'Get-BlogPost'            = @{ Covered = $true }
         'Get-ChildPage'           = @{ Covered = $true }
         'Get-Database'            = @{ Covered = $true }
+        'Get-Folder'              = @{ Covered = $true }
         'Get-FooterComment'       = @{ Covered = $true }
         'Get-InlineComment'       = @{ Covered = $true }
         'Get-Label'               = @{ Covered = $false }
