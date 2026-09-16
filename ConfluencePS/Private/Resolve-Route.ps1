@@ -34,6 +34,7 @@
             'InlineTaskCollection', 'InlineTaskById', 'InlineTaskUpdate',
             'SpacePropertyCollection', 'SpacePropertyById',
             'SpacePermissionCollection',
+            'SpaceRoleAssignmentCollection', 'SpaceRoleAssignmentUpdate',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -120,7 +121,8 @@
             'WhiteboardCollection', 'WhiteboardById',
             'InlineTaskCollection', 'InlineTaskById', 'InlineTaskUpdate',
             'SpacePropertyCollection', 'SpacePropertyById',
-            'SpacePermissionCollection'
+            'SpacePermissionCollection',
+            'SpaceRoleAssignmentCollection', 'SpaceRoleAssignmentUpdate'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -347,6 +349,20 @@
                 }
                 Assert-RouteId -Name SpaceId -Value $SpaceId
                 "/spaces/$SpaceId/permissions"
+            }
+            'SpaceRoleAssignmentCollection' {
+                if (-not $useV2) {
+                    throw "SpaceRoleAssignmentCollection has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name SpaceId -Value $SpaceId
+                "/spaces/$SpaceId/role-assignments"
+            }
+            'SpaceRoleAssignmentUpdate' {
+                if (-not $useV2) {
+                    throw "SpaceRoleAssignmentUpdate has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name SpaceId -Value $SpaceId
+                "/spaces/$SpaceId/role-assignments"
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }

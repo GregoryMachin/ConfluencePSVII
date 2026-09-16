@@ -214,6 +214,20 @@ namespace ConfluencePS
         }
     }
 
+    public class SpaceRoleAssignment
+    {
+        public UInt64 SpaceID { get; set; }
+        public String PrincipalType { get; set; }
+        public String PrincipalID { get; set; }
+        public String RoleID { get; set; }
+        public String RoleName { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + PrincipalType + " " + PrincipalID + "] " + RoleName;
+        }
+    }
+
     public class Label
     {
         public UInt64 ID { get; set; }

@@ -21,6 +21,7 @@
         'Get-Space'               = @{ Covered = $true }
         'Get-SpacePermission'     = @{ Covered = $true }
         'Get-SpaceProperty'       = @{ Covered = $true }
+        'Get-SpaceRoleAssignment' = @{ Covered = $true }
         'Get-Whiteboard'          = @{ Covered = $true }
         'Invoke-Method'           = @{ Covered = $true }
         'New-BlogPost'            = @{ Covered = $true }
@@ -46,5 +47,6 @@
         'Set-Label'               = @{ Covered = $false }
         'Set-Page'                = @{ Covered = $true }
         'Set-SpaceProperty'       = @{ Covered = $true }
+        'Set-SpaceRoleAssignment' = @{ Covered = $true }
     }
 }

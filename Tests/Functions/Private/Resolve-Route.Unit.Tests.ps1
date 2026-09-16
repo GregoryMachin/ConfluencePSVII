@@ -58,6 +58,8 @@ InModuleScope ConfluencePS {
             @{ Resource = 'SpacePropertyCollection'; Params = @{ SpaceId = 98307 }; Expected = '/wiki/api/v2/spaces/98307/properties' }
             @{ Resource = 'SpacePropertyById'; Params = @{ SpaceId = 98307; PropertyId = 700 }; Expected = '/wiki/api/v2/spaces/98307/properties/700' }
             @{ Resource = 'SpacePermissionCollection'; Params = @{ SpaceId = 98307 }; Expected = '/wiki/api/v2/spaces/98307/permissions' }
+            @{ Resource = 'SpaceRoleAssignmentCollection'; Params = @{ SpaceId = 98307 }; Expected = '/wiki/api/v2/spaces/98307/role-assignments' }
+            @{ Resource = 'SpaceRoleAssignmentUpdate'; Params = @{ SpaceId = 98307 }; Expected = '/wiki/api/v2/spaces/98307/role-assignments' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -254,6 +256,11 @@ InModuleScope ConfluencePS {
 
             It "throws for SpacePermissionCollection on Data Center, since space permissions have no v1 equivalent" {
                 { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource SpacePermissionCollection -SpaceId 98307 } |
+                    Should -Throw "*Cloud*"
+            }
+
+            It "throws for SpaceRoleAssignmentUpdate on Data Center, since role assignments have no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource SpaceRoleAssignmentUpdate -SpaceId 98307 } |
                     Should -Throw "*Cloud*"
             }
 
