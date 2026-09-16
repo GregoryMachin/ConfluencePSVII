@@ -164,6 +164,15 @@ Accept wildcard characters: False
 
 ## NOTES
 
+Confluence Cloud REST API v2 has no synchronous storage-format conversion route; this
+command always calls the v1 `POST /contentbody/convert/storage` endpoint on both Cloud and
+Data Center, and does not opt into any parameter routing to a v2 replacement. This is a
+deliberate, permanent choice, not an oversight: adopting Cloud's newer asynchronous
+`/contentbody/convert/async/storage` contract would change this command from returning a
+converted string directly to returning a background task that must be polled, which is a
+breaking change to its output contract. If Cloud removes the synchronous endpoint outright,
+a caller-facing behavior change (and a major version bump) will be required.
+
 ## RELATED LINKS
 
 [https://github.com/AtlassianPS/ConfluencePS](https://github.com/AtlassianPS/ConfluencePS)

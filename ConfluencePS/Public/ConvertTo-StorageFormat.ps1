@@ -30,6 +30,11 @@
 
     BEGIN {
         Write-Verbose "[$($MyInvocation.MyCommand.Name)] Function started"
+
+        # Task 49: deliberately no -BaseUri/-DeploymentType routing here. Cloud v2 has no
+        # synchronous storage-format conversion route; its only replacement returns a
+        # pollable background task instead of a converted string, which would break this
+        # command's output contract. Always call the v1 synchronous endpoint.
     }
 
     PROCESS {

@@ -18,7 +18,7 @@ Create a new blank space on your Confluence instance.
 ### byObject (Default)
 
 ```powershell
-New-ConfluenceSpace -ApiUri <Uri> [-Credential <PSCredential>]
+New-ConfluenceSpace -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  -InputObject <Space> [-WhatIf] [-Confirm]
 ```
@@ -26,7 +26,7 @@ New-ConfluenceSpace -ApiUri <Uri> [-Credential <PSCredential>]
 ### byProperties
 
 ```powershell
-New-ConfluenceSpace -ApiUri <Uri> [-Credential <PSCredential>]
+New-ConfluenceSpace -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  -SpaceKey <String> -Name <String> [-Description <String>] [-WhatIf] [-Confirm]
 ```
@@ -79,6 +79,41 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BaseUri
+
+The site's base URi, used together with -DeploymentType to route space creation to Confluence Cloud REST API v2's POST /spaces.
+Without -BaseUri, requests fall back to the v1 route regardless of -DeploymentType.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: Uri
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DeploymentType
+
+Selects Confluence Cloud REST API v2 routing when set to `Cloud` and -BaseUri is also supplied.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
