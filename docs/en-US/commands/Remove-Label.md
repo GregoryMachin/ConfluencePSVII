@@ -16,7 +16,7 @@ Remove a label from existing Confluence content.
 ## SYNTAX
 
 ```powershell
-Remove-ConfluenceLabel -ApiUri <Uri> [-Credential <PSCredential>]
+Remove-ConfluenceLabel -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>] [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [-PageID] <UInt64[]> [-Label <String[]>] [-WhatIf] [-Confirm]
 ```
@@ -70,6 +70,40 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BaseUri
+
+The site's base URi. Forwarded to the internal label lookup used when -Label is not supplied, so it can use Confluence Cloud REST API v2 when configured; the label removal itself always uses the v1 route, since Cloud v2 has no label mutation operation.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: Uri
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DeploymentType
+
+Forwarded to the internal label lookup used when -Label is not supplied; see -BaseUri.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False

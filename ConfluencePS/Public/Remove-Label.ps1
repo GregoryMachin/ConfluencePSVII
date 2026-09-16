@@ -9,6 +9,13 @@
         [Uri]$ApiUri,
 
         [Parameter( Mandatory = $false )]
+        [Uri]$BaseUri,
+
+        [Parameter( Mandatory = $false )]
+        [ValidateSet('', 'Cloud', 'DataCenter', 'Server')]
+        [String]$DeploymentType,
+
+        [Parameter( Mandatory = $false )]
         [PSCredential]$Credential,
 
         [Parameter( Mandatory = $false )]
@@ -57,7 +64,7 @@
             $_labels = $Label
             if (!$_labels) {
                 Write-Verbose "[$($MyInvocation.MyCommand.Name)] Collecting all Labels for page $_page"
-                $authAndApiUri = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter "ApiUri"
+                $authAndApiUri = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @('ApiUri', 'BaseUri', 'DeploymentType')
                 $allLabels = Get-Label -PageID $_page @authAndApiUri
                 if ($allLabels.Labels) {
                     $_labels = $allLabels.Labels | Select-Object -ExpandProperty Name

@@ -8,6 +8,13 @@
         [Uri]$ApiUri,
 
         [Parameter( Mandatory = $false )]
+        [Uri]$BaseUri,
+
+        [Parameter( Mandatory = $false )]
+        [ValidateSet('', 'Cloud', 'DataCenter', 'Server')]
+        [String]$DeploymentType,
+
+        [Parameter( Mandatory = $false )]
         [PSCredential]$Credential,
 
         [Parameter( Mandatory = $false )]
@@ -49,6 +56,13 @@
             Throw $exception
         }
 
+        # Cloud v2 opt-in (Task 46): -BaseUri + -DeploymentType Cloud route label reads to
+        # GET /pages/{id}/labels. The Cloud v2 label shape is field-identical to v1
+        # ({id, name, prefix}), so the existing ConvertTo-Label converter handles both and
+        # no new v2-specific adapter is needed. Add-Label/Set-Label/Remove-Label stay on v1:
+        # Cloud v2 has no label mutation operation at all.
+        $useCloudV2 = ($DeploymentType -eq 'Cloud') -and $BaseUri
+
         $iwParameters = Copy-CommonParameter -InputObject $PSBoundParameters
         $iwParameters['Method'] = 'Get'
         $iwParameters['GetParameters'] = @{
@@ -61,15 +75,21 @@
             $iwParameters[$_] = $PSCmdlet.PagingParameters.$_
         }
 
+        $authAndApiUri = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @('ApiUri', 'BaseUri', 'DeploymentType')
         foreach ($_page in $PageID) {
             if ($_ -is [ConfluencePS.Page]) {
                 $InputObject = $_
             }
             else {
-                $authAndApiUri = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter "ApiUri"
                 $InputObject = Get-Page -PageID $_page @authAndApiUri
             }
-            $iwParameters["Uri"] = $resourceApi -f $_page
+
+            if ($useCloudV2) {
+                $iwParameters["Uri"] = Resolve-Route -BaseUri $BaseUri -DeploymentType Cloud -Resource LabelCollection -PageId $_page
+            }
+            else {
+                $iwParameters["Uri"] = $resourceApi -f $_page
+            }
             $output = New-Object -TypeName ConfluencePS.ContentLabelSet
             $output.Page = $InputObject
             $output.Labels += (Invoke-Method @iwParameters)
