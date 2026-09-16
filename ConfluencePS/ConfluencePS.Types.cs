@@ -185,6 +185,20 @@ namespace ConfluencePS
         }
     }
 
+    public class SpaceProperty
+    {
+        public UInt64 ID { get; set; }
+        public UInt64 SpaceID { get; set; }
+        public String Key { get; set; }
+        public Object Value { get; set; }
+        public Version Version { get; set; }
+
+        public override string ToString()
+        {
+            return Key;
+        }
+    }
+
     public class Label
     {
         public UInt64 ID { get; set; }

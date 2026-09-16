@@ -19,6 +19,7 @@
         'Get-PageVersion'         = @{ Covered = $true }
         'Get-ServerInformation'   = @{ Covered = $true }
         'Get-Space'               = @{ Covered = $true }
+        'Get-SpaceProperty'       = @{ Covered = $true }
         'Get-Whiteboard'          = @{ Covered = $true }
         'Invoke-Method'           = @{ Covered = $true }
         'New-BlogPost'            = @{ Covered = $true }
@@ -26,6 +27,7 @@
         'New-InlineComment'       = @{ Covered = $true }
         'New-Page'                = @{ Covered = $false }
         'New-Space'               = @{ Covered = $false }
+        'New-SpaceProperty'       = @{ Covered = $true }
         'Remove-Attachment'       = @{ Covered = $false }
         'Remove-BlogPost'         = @{ Covered = $true }
         'Remove-FooterComment'    = @{ Covered = $true }
@@ -33,6 +35,7 @@
         'Remove-Label'            = @{ Covered = $false }
         'Remove-Page'             = @{ Covered = $false }
         'Remove-Space'            = @{ Covered = $false }
+        'Remove-SpaceProperty'    = @{ Covered = $true }
         'Set-Attachment'          = @{ Covered = $false }
         'Set-BlogPost'            = @{ Covered = $true }
         'Set-FooterComment'       = @{ Covered = $true }
@@ -41,5 +44,6 @@
         'Set-Info'                = @{ Covered = $true }
         'Set-Label'               = @{ Covered = $false }
         'Set-Page'                = @{ Covered = $true }
+        'Set-SpaceProperty'       = @{ Covered = $true }
     }
 }
