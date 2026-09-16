@@ -17,7 +17,8 @@ Retrieve a listing of spaces in your Confluence instance.
 ## SYNTAX
 
 ```powershell
-Get-ConfluenceSpace -ApiUri <Uri> [-Credential <PSCredential>]
+Get-ConfluenceSpace -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <String>]
+ [-Credential <PSCredential>]
  [-PersonalAccessToken <String>] [-Certificate <X509Certificate>]
  [[-SpaceKey] <String[]>] [-PageSize <UInt32>] [-IncludeTotalCount]
  [-Skip <UInt64>] [-First <UInt64>]
@@ -70,6 +71,42 @@ Parameter Sets: (All)
 Aliases:
 
 Required: True
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -BaseUri
+
+The site's base URi, used together with -DeploymentType to route requests to Confluence Cloud REST API v2.
+On the v2 path, one or more -SpaceKey values are requested with a single `keys` filter on the spaces collection instead of one v1-style lookup per key; a key that does not exist is silently omitted rather than producing a per-key error.
+Without -BaseUri, requests fall back to the v1 route regardless of -DeploymentType.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: Uri
+Parameter Sets: (All)
+Aliases:
+
+Required: False
+Position: Named
+Default value: None
+Accept pipeline input: False
+Accept wildcard characters: False
+```
+
+### -DeploymentType
+
+Selects Confluence Cloud REST API v2 routing when set to `Cloud` and -BaseUri is also supplied.
+Value can be set persistently with Set-ConfluenceInfo.
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: False
 Position: Named
 Default value: None
 Accept pipeline input: False
