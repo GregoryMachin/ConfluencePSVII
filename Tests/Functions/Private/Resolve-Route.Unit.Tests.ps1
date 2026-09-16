@@ -52,6 +52,9 @@ InModuleScope ConfluencePS {
             @{ Resource = 'FolderById'; Params = @{ FolderId = 400 }; Expected = '/wiki/api/v2/folders/400' }
             @{ Resource = 'WhiteboardCollection'; Params = @{}; Expected = '/wiki/api/v2/whiteboards' }
             @{ Resource = 'WhiteboardById'; Params = @{ WhiteboardId = 500 }; Expected = '/wiki/api/v2/whiteboards/500' }
+            @{ Resource = 'InlineTaskCollection'; Params = @{}; Expected = '/wiki/api/v2/tasks' }
+            @{ Resource = 'InlineTaskById'; Params = @{ TaskId = 600 }; Expected = '/wiki/api/v2/tasks/600' }
+            @{ Resource = 'InlineTaskUpdate'; Params = @{ TaskId = 600 }; Expected = '/wiki/api/v2/tasks/600' }
         ) {
             It "resolves <Resource> to the v2 route on Cloud" {
                 $uri = Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource $Resource @Params
@@ -224,6 +227,16 @@ InModuleScope ConfluencePS {
             It "throws for a missing WhiteboardId on a whiteboard by-id route" {
                 { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource WhiteboardById } |
                     Should -Throw "*WhiteboardId*"
+            }
+
+            It "throws for InlineTaskCollection on Data Center, since inline tasks have no v1 equivalent" {
+                { Resolve-Route -BaseUri $dcBase -DeploymentType DataCenter -Resource InlineTaskCollection } |
+                    Should -Throw "*Cloud*"
+            }
+
+            It "throws for a missing TaskId on an inline-task by-id route" {
+                { Resolve-Route -BaseUri $cloudBase -DeploymentType Cloud -Resource InlineTaskById } |
+                    Should -Throw "*TaskId*"
             }
 
             It "throws for an invalid Resource value" {

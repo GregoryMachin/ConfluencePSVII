@@ -164,6 +164,27 @@ namespace ConfluencePS
         }
     }
 
+    public class InlineTask
+    {
+        public UInt64 ID { get; set; }
+        public UInt64 LocalID { get; set; }
+        public UInt64 PageID { get; set; }
+        public String Status { get; set; }
+        public String Body { get; set; }
+        public User CreatedBy { get; set; }
+        public User AssignedTo { get; set; }
+        public User CompletedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? DueAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public Version Version { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Status;
+        }
+    }
+
     public class Label
     {
         public UInt64 ID { get; set; }

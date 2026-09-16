@@ -12,6 +12,7 @@
         'Get-Folder'              = @{ Covered = $true }
         'Get-FooterComment'       = @{ Covered = $true }
         'Get-InlineComment'       = @{ Covered = $true }
+        'Get-InlineTask'          = @{ Covered = $true }
         'Get-Label'               = @{ Covered = $false }
         'Get-Page'                = @{ Covered = $true }
         'Get-PageAncestor'        = @{ Covered = $true }
@@ -36,6 +37,7 @@
         'Set-BlogPost'            = @{ Covered = $true }
         'Set-FooterComment'       = @{ Covered = $true }
         'Set-InlineComment'       = @{ Covered = $true }
+        'Set-InlineTask'          = @{ Covered = $true }
         'Set-Info'                = @{ Covered = $true }
         'Set-Label'               = @{ Covered = $false }
         'Set-Page'                = @{ Covered = $true }

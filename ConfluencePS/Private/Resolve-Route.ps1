@@ -31,6 +31,7 @@
             'DatabaseCollection', 'DatabaseById',
             'FolderCollection', 'FolderById',
             'WhiteboardCollection', 'WhiteboardById',
+            'InlineTaskCollection', 'InlineTaskById', 'InlineTaskUpdate',
             'StorageFormatConversion', 'ServerInformation'
         )]
         [String]
@@ -75,7 +76,11 @@
 
         [Parameter()]
         [UInt64]
-        $WhiteboardId
+        $WhiteboardId,
+
+        [Parameter()]
+        [UInt64]
+        $TaskId
     )
 
     process {
@@ -106,7 +111,8 @@
             'InlineCommentCollection', 'InlineCommentById', 'InlineCommentCreate', 'InlineCommentUpdate', 'InlineCommentDelete',
             'DatabaseCollection', 'DatabaseById',
             'FolderCollection', 'FolderById',
-            'WhiteboardCollection', 'WhiteboardById'
+            'WhiteboardCollection', 'WhiteboardById',
+            'InlineTaskCollection', 'InlineTaskById', 'InlineTaskUpdate'
         )
         $useV2 = ($deployment -eq 'Cloud') -and ($Resource -in $v2CapableResources)
 
@@ -291,6 +297,26 @@
                 }
                 Assert-RouteId -Name WhiteboardId -Value $WhiteboardId
                 "/whiteboards/$WhiteboardId"
+            }
+            'InlineTaskCollection' {
+                if (-not $useV2) {
+                    throw "InlineTaskCollection has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                '/tasks'
+            }
+            'InlineTaskById' {
+                if (-not $useV2) {
+                    throw "InlineTaskById has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name TaskId -Value $TaskId
+                "/tasks/$TaskId"
+            }
+            'InlineTaskUpdate' {
+                if (-not $useV2) {
+                    throw "InlineTaskUpdate has no Confluence v1 or Data Center equivalent; supply an HTTPS -BaseUri with -DeploymentType Cloud."
+                }
+                Assert-RouteId -Name TaskId -Value $TaskId
+                "/tasks/$TaskId"
             }
             'StorageFormatConversion' { '/contentbody/convert/storage' }
             'ServerInformation' { '/settings/systemInfo' }
