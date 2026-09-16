@@ -1,0 +1,134 @@
+name: API Canary
+
+# Phase 9 Task 60. Two independent, low-impact tiers, distinct from the
+# per-PR smoke_tests job (ci.yml) and the full nightly integration_tests.yml:
+#
+# - read_canary: the existing pure-read Contexts in
+#   Tests/Integration/Configuration.Integration.Tests.ps1 ("Integration
+#   Connectivity", "Smoke Read Coverage" -- tagged CanaryRead in addition to
+#   their existing tags), run frequently, to catch a Cloud contract change (a
+#   field disappearing, a route shape changing) fast, well before a user
+#   reports it.
+# - write_canary: the same file's existing "Smoke Write Coverage" Context
+#   (tagged CanaryWrite), a bounded disposable space + page create -> update
+#   -> label lifecycle -> attachment lifecycle -> delete, run on a slower,
+#   off-peak cadence separate from the nightly full-suite writes.
+#
+# Both tiers use a dedicated, least-privilege canary account
+# (ATLASSIAN_CANARY_USER / ATLASSIAN_CANARY_PAT) rather than the shared
+# ATLASSIAN_CLOUD_USER/ATLASSIAN_CLOUD_PAT the smoke/nightly jobs use, and
+# publish a machine-readable result per operation as a workflow artifact.
+#
+# SETUP REQUIRED before either schedule can run green: create a dedicated,
+# least-privilege Confluence Cloud account/API token for the canary (do not
+# reuse the smoke/nightly account; the write tier needs space-create
+# permission) and add it as the ATLASSIAN_CANARY_USER repository variable and
+# ATLASSIAN_CANARY_PAT repository secret. Until then, both jobs fail fast on
+# the "missing environment variables" check inside
+# Invoke-Build -Task TestIntegration with an actionable message, rather than
+# silently skipping or falsely reporting green.
+on:
+  schedule:
+    # Read canary: every 4 hours.
+    - cron: "0 */4 * * *"
+    # Write-lifecycle canary: once daily, offset from smoke_tests (every PR),
+    # integration_tests.yml's nightly full suite (05:00 UTC), and the other
+    # read_canary runs, to keep quota usage spread out.
+    - cron: "50 11 * * *"
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Which canary tier to run"
+        required: false
+        default: both
+        type: choice
+        options:
+          - read
+          - write
+          - both
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  read_canary:
+    name: Read Canary (Cloud)
+    if: (github.event_name == 'schedule' && github.event.schedule == '0 */4 * * *' && github.repository == 'AtlassianPS/ConfluencePS') ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.track == 'read' || inputs.track == 'both'))
+    runs-on: ubuntu-latest
+    # Bounded: a handful of read operations against a live tenant should
+    # never legitimately take this long; a hang is a real signal.
+    timeout-minutes: 15
+    env:
+      CI_CONFLUENCE_TYPE: Cloud
+      CONFLUENCE_CLOUD_URL: ${{ vars.CONFLUENCE_CLOUD_URL }}
+      ATLASSIAN_CLOUD_USER: ${{ vars.ATLASSIAN_CANARY_USER }}
+      ATLASSIAN_CLOUD_PAT: ${{ secrets.ATLASSIAN_CANARY_PAT }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: AtlassianPS/AtlassianPS.Standards/.github/actions/setup-powershell@6fe5d05db84cdd10c9e4284e235a8f359c9537ad # v0.1.11
+
+      - name: Run read-only API canaries
+        run: |
+          Invoke-Build -Task TestIntegration -Tag "CanaryRead" -PesterVerbosity Detailed
+        shell: pwsh
+
+      - name: Publish machine-readable canary results
+        if: always()
+        run: ./Tools/Publish-ApiCanaryResult.ps1 -ResultXmlPath 'Test-Integration.xml' -Repository 'ConfluencePS' -DeploymentType 'Cloud' -OutputPath 'api-canary-read-results.json'
+        shell: pwsh
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Read-Canary-Results
+          path: |
+            Test-Integration.xml
+            api-canary-read-results.json
+
+  write_canary:
+    name: Write-Lifecycle Canary (Cloud)
+    if: (github.event_name == 'schedule' && github.event.schedule == '50 11 * * *' && github.repository == 'AtlassianPS/ConfluencePS') ||
+      (github.event_name == 'workflow_dispatch' &&
+       (inputs.track == 'write' || inputs.track == 'both'))
+    runs-on: ubuntu-latest
+    # Bounded: one space+page create/update/label/attachment/delete cycle. A
+    # hang here means the lifecycle is stuck, not that more time would help.
+    timeout-minutes: 15
+    env:
+      CI_CONFLUENCE_TYPE: Cloud
+      CONFLUENCE_CLOUD_URL: ${{ vars.CONFLUENCE_CLOUD_URL }}
+      ATLASSIAN_CLOUD_USER: ${{ vars.ATLASSIAN_CANARY_USER }}
+      ATLASSIAN_CLOUD_PAT: ${{ secrets.ATLASSIAN_CANARY_PAT }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: AtlassianPS/AtlassianPS.Standards/.github/actions/setup-powershell@6fe5d05db84cdd10c9e4284e235a8f359c9537ad # v0.1.11
+
+      - name: Run write-lifecycle API canary
+        run: |
+          Invoke-Build -Task TestIntegration -Tag "CanaryWrite" -PesterVerbosity Detailed
+        shell: pwsh
+
+      - name: Publish machine-readable canary results
+        if: always()
+        run: ./Tools/Publish-ApiCanaryResult.ps1 -ResultXmlPath 'Test-Integration.xml' -Repository 'ConfluencePS' -DeploymentType 'Cloud' -OutputPath 'api-canary-write-results.json'
+        shell: pwsh
+
+      # No separate guaranteed-cleanup step here: the "Smoke Write Coverage"
+      # Context's own AfterAll (best-effort, removing the disposable page then
+      # space) self-heals; a leftover disposable space/page from a hard
+      # workflow failure is easy to spot by its "ConfluencePS Smoke Write"/
+      # "SMOKE" naming convention.
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Write-Canary-Results
+          path: |
+            Test-Integration.xml
+            api-canary-write-results.json

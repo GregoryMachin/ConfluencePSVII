@@ -37,7 +37,7 @@ Describe "Integration Test Configuration" -Tag 'Integration', 'Smoke', 'Cloud', 
         }
     }
 
-    Context "Integration Connectivity" {
+    Context "Integration Connectivity" -Tag 'CanaryRead' {
         It "can authenticate and query Confluence" {
             if (-not $script:isIntegrationEnvironmentConfigured) {
                 Set-ItResult -Skipped -Because "Environment not configured"
@@ -48,7 +48,7 @@ Describe "Integration Test Configuration" -Tag 'Integration', 'Smoke', 'Cloud', 
         }
     }
 
-    Context "Smoke Read Coverage" {
+    Context "Smoke Read Coverage" -Tag 'CanaryRead' {
         BeforeAll {
             if ($script:isIntegrationEnvironmentConfigured) {
                 $script:smokeSpace = Get-ConfluenceSpace -ApiUri $script:apiUri -Credential $script:credential -ErrorAction Stop |
@@ -129,7 +129,7 @@ Describe "Integration Test Configuration" -Tag 'Integration', 'Smoke', 'Cloud', 
         }
     }
 
-    Context "Smoke Write Coverage" {
+    Context "Smoke Write Coverage" -Tag 'CanaryWrite' {
         BeforeAll {
             $script:smokeWriteReady = $false
             $script:smokeWritePage = $null
