@@ -7,10 +7,10 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Remove-SpaceProperty" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
             }
@@ -25,7 +25,7 @@ InModuleScope ConfluencePS {
         It "requests one deletion per PropertyID" {
             $null = Remove-SpaceProperty -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -SpaceID 98307 -PropertyID 1000, 1001 -Confirm:$false
 
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 2 -Scope It
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 2 -Scope It
         }
 
         It "throws when -BaseUri is not an HTTPS URI, since space properties have no v1/Data Center equivalent" {
@@ -35,7 +35,7 @@ InModuleScope ConfluencePS {
         It "does not call Invoke-Method when -WhatIf is set" {
             $null = Remove-SpaceProperty -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -SpaceID 98307 -PropertyID 1000 -WhatIf
 
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 0 -Scope It
         }
     }
 }

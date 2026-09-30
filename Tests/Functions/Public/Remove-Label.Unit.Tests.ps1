@@ -7,10 +7,10 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Remove-Label" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
             }
@@ -23,13 +23,13 @@ InModuleScope ConfluencePS {
         }
 
         It "forwards -BaseUri and -DeploymentType to the internal Get-Label lookup when -Label is not supplied" {
-            Mock Get-Label -ModuleName ConfluencePS {
-                [ConfluencePS.ContentLabelSet]@{ Labels = @([ConfluencePS.Label]@{ Name = 'how-to' }) }
+            Mock Get-Label -ModuleName ConfluencePSVII {
+                [ConfluencePSVII.ContentLabelSet]@{ Labels = @([ConfluencePSVII.Label]@{ Name = 'how-to' }) }
             }
 
             $null = Remove-Label -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100 -Confirm:$false
 
-            Should -Invoke -CommandName Get-Label -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Get-Label -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $BaseUri -eq "https://example.atlassian.net" -and $DeploymentType -eq 'Cloud'
             }
         }

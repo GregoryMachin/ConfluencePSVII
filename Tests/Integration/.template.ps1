@@ -2,7 +2,7 @@
 
 <#
 .SYNOPSIS
-    Integration test template for ConfluencePS functions.
+    Integration test template for ConfluencePSVII functions.
 
 .DESCRIPTION
     Copy this file and rename it to <Area>.Integration.Tests.ps1.
@@ -23,7 +23,7 @@ Describe '%AREA%' -Tag 'Integration', 'Cloud', 'DataCenter' {
             return
         }
 
-        $script:space = New-ConfluenceIntegrationSpace -Fixture $script:fixture -NamePrefix 'ConfluencePS Template'
+        $script:space = New-ConfluenceIntegrationSpace -Fixture $script:fixture -NamePrefix 'ConfluencePSVII Template'
         $script:page = New-ConfluenceIntegrationPage -Fixture $script:fixture -SpaceKey $script:space.Key -TitlePrefix 'Template Page'
     }
 
@@ -42,7 +42,7 @@ Describe '%AREA%' -Tag 'Integration', 'Cloud', 'DataCenter' {
 
             $result = Get-ConfluencePage -PageID $script:page.ID -ErrorAction Stop
 
-            $result | Should -BeOfType [ConfluencePS.Page]
+            $result | Should -BeOfType [ConfluencePSVII.Page]
             $result.ID | Should -Be $script:page.ID
         }
     }

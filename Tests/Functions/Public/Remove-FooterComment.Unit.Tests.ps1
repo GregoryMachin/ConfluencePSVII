@@ -7,10 +7,10 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Remove-FooterComment" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
             }
@@ -37,7 +37,7 @@ InModuleScope ConfluencePS {
         It "does not call Invoke-Method when -WhatIf is set" {
             $null = Remove-FooterComment -ApiUri "https://example.com/wiki/rest/api" -CommentID 327680 -WhatIf
 
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 0 -Scope It
         }
     }
 }

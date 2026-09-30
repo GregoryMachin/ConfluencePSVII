@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-PageV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -44,10 +44,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Page object" {
+            It "creates a ConfluencePSVII.Page object" {
                 $result = ConvertTo-PageV2 -InputObject $fullObject -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.Page]
+                $result | Should -BeOfType [ConfluencePSVII.Page]
             }
 
             It "does not throw on an unrecognized field" {

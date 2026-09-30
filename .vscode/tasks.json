@@ -38,7 +38,7 @@
             "taskName": "Build Help",
             "suppressTaskName": true,
             "args": [
-                "Write-Host 'Invoking platyPS'; New-ExternalHelp -Path .\\docs\\en-US -OutputPath .\\ConfluencePS\\en-US -Force;",
+                "Write-Host 'Invoking platyPS'; New-ExternalHelp -Path .\\docs\\en-US -OutputPath .\\ConfluencePSVII\\en-US -Force;",
                 "Invoke-Command { Write-Host 'Completed Build task in task runner.' }"
             ]
         },

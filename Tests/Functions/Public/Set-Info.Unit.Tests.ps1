@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Set-Info" -Tag 'Unit' {
         BeforeEach {
             $global:PSDefaultParameterValues.Remove("Get-ConfluenceSpace:ApiUri")
@@ -164,7 +164,7 @@ InModuleScope ConfluencePS {
             }
 
             BeforeEach {
-                Mock Request-OAuthClientCredentialsToken -ModuleName ConfluencePS {
+                Mock Request-OAuthClientCredentialsToken -ModuleName ConfluencePSVII {
                     [PSCustomObject]@{
                         AccessToken = (ConvertTo-SecureString -String 'client-credentials-token' -AsPlainText -Force)
                         ExpiresAt   = (Get-Date).AddHours(1)
@@ -173,8 +173,8 @@ InModuleScope ConfluencePS {
                     }
                 }
 
-                Mock Get-OAuthResource -ModuleName ConfluencePS {
-                    [ConfluencePS.OAuthResource]@{
+                Mock Get-OAuthResource -ModuleName ConfluencePSVII {
+                    [ConfluencePSVII.OAuthResource]@{
                         CloudId = '11223344-a1b2-3b33-c444-def123456789'
                         Name    = 'Example Site'
                         Url     = [Uri]'https://example.atlassian.net/'
@@ -188,7 +188,7 @@ InModuleScope ConfluencePS {
 
                 Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret
 
-                Should -Invoke Request-OAuthClientCredentialsToken -ModuleName ConfluencePS -Times 1
+                Should -Invoke Request-OAuthClientCredentialsToken -ModuleName ConfluencePSVII -Times 1
                 $global:PSDefaultParameterValues["Get-ConfluenceSpace:ApiUri"] |
                     Should -BeExactly "https://api.atlassian.com/ex/confluence/11223344-a1b2-3b33-c444-def123456789/wiki/rest/api"
                 $global:PSDefaultParameterValues["Get-ConfluenceSpace:PersonalAccessToken"] | Should -BeExactly 'client-credentials-token'
@@ -200,7 +200,7 @@ InModuleScope ConfluencePS {
 
                 Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret -SiteUrl 'https://example.atlassian.net'
 
-                Should -Invoke Get-OAuthResource -ModuleName ConfluencePS -ParameterFilter { $SiteUrl -eq 'https://example.atlassian.net' }
+                Should -Invoke Get-OAuthResource -ModuleName ConfluencePSVII -ParameterFilter { $SiteUrl -eq 'https://example.atlassian.net' }
             }
 
             It "throws when only -OAuthClientId is supplied" {
@@ -220,7 +220,7 @@ InModuleScope ConfluencePS {
             }
 
             It "throws when the client credentials reach no site" {
-                Mock Get-OAuthResource -ModuleName ConfluencePS { }
+                Mock Get-OAuthResource -ModuleName ConfluencePSVII { }
                 $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force
 
                 { Set-Info -OAuthClientId 'my-client-id' -OAuthClientSecret $secret } |
@@ -228,10 +228,10 @@ InModuleScope ConfluencePS {
             }
 
             It "throws when the client credentials reach more than one site with no selector" {
-                Mock Get-OAuthResource -ModuleName ConfluencePS {
+                Mock Get-OAuthResource -ModuleName ConfluencePSVII {
                     @(
-                        [ConfluencePS.OAuthResource]@{ CloudId = '11223344-a1b2-3b33-c444-def123456789'; Name = 'Example Site'; Url = [Uri]'https://example.atlassian.net/' }
-                        [ConfluencePS.OAuthResource]@{ CloudId = '99887766-a1b2-3b33-c444-def123456789'; Name = 'Other Site'; Url = [Uri]'https://other.atlassian.net/' }
+                        [ConfluencePSVII.OAuthResource]@{ CloudId = '11223344-a1b2-3b33-c444-def123456789'; Name = 'Example Site'; Url = [Uri]'https://example.atlassian.net/' }
+                        [ConfluencePSVII.OAuthResource]@{ CloudId = '99887766-a1b2-3b33-c444-def123456789'; Name = 'Other Site'; Url = [Uri]'https://other.atlassian.net/' }
                     )
                 }
                 $secret = ConvertTo-SecureString -String 'my-secret' -AsPlainText -Force

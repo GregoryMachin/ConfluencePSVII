@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-AttachmentV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -34,10 +34,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Attachment object" {
+            It "creates a ConfluencePSVII.Attachment object" {
                 $result = ConvertTo-AttachmentV2 -InputObject $fullObject -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.Attachment]
+                $result | Should -BeOfType [ConfluencePSVII.Attachment]
             }
 
             It "does not throw on an unrecognized field" {

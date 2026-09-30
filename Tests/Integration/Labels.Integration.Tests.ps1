@@ -8,7 +8,7 @@ Describe 'Label integration tests' -Tag Integration, Cloud, DataCenter {
         $script:fixture = New-ConfluenceIntegrationFixture
 
         if ($script:fixture.IsConfigured) {
-            $script:pageSet = New-ConfluenceIntegrationPageSet -Fixture $script:fixture -SpaceNamePrefix 'ConfluencePS Labels'
+            $script:pageSet = New-ConfluenceIntegrationPageSet -Fixture $script:fixture -SpaceNamePrefix 'ConfluencePSVII Labels'
             $script:spaceKey = $script:pageSet.Space.Key
             $script:label1 = "labela$($script:pageSet.Suffix)", "labelb$($script:pageSet.Suffix)", "labelc$($script:pageSet.Suffix)"
             $script:label2 = "labelall$($script:pageSet.Suffix)"
@@ -38,9 +38,9 @@ Describe 'Label integration tests' -Tag Integration, Cloud, DataCenter {
         It 'adds labels by page ID, page pipeline, and label-set pipeline' {
             if (-not (Assert-ConfluenceIntegrationFixtureReady -Fixture $script:fixture)) { return }
 
-            $script:newLabel1 | Should -BeOfType [ConfluencePS.ContentLabelSet]
-            $script:newLabel1.Page | Should -BeOfType [ConfluencePS.Page]
-            $script:newLabel1.Labels | Should -BeOfType [ConfluencePS.Label]
+            $script:newLabel1 | Should -BeOfType [ConfluencePSVII.ContentLabelSet]
+            $script:newLabel1.Page | Should -BeOfType [ConfluencePSVII.Page]
+            $script:newLabel1.Labels | Should -BeOfType [ConfluencePSVII.Label]
             $script:newLabel1.Labels.Name | Should -BeExactly $script:label1
             @($script:newLabel2).Count | Should -Be 5
             ($script:newLabel2.Labels.Name -contains $script:label2) | Should -Be $true
@@ -64,8 +64,8 @@ Describe 'Label integration tests' -Tag Integration, Cloud, DataCenter {
 
             @($script:setResult1.Labels).Count | Should -Be 2
             @($script:setResult2.Labels).Count | Should -Be 1
-            $script:setResult1 | Should -BeOfType [ConfluencePS.ContentLabelSet]
-            $script:setResult2 | Should -BeOfType [ConfluencePS.ContentLabelSet]
+            $script:setResult1 | Should -BeOfType [ConfluencePSVII.ContentLabelSet]
+            $script:setResult2 | Should -BeOfType [ConfluencePSVII.ContentLabelSet]
             $script:setResult1.Labels.Name | Should -BeExactly $script:setLabel1
             $script:setResult2.Labels.Name | Should -BeExactly $script:setLabel2
             $script:setResult2.Labels.Name -notcontains $script:labelsBeforeSet.Labels.Name | Should -Be $true
@@ -84,11 +84,11 @@ Describe 'Label integration tests' -Tag Integration, Cloud, DataCenter {
         It 'gets labels by page ID and by page pipeline input' {
             if (-not (Assert-ConfluenceIntegrationFixtureReady -Fixture $script:fixture)) { return }
 
-            $script:getPageLabel1 | Should -BeOfType [ConfluencePS.ContentLabelSet]
-            $script:getPageLabel1.Page | Should -BeOfType [ConfluencePS.Page]
-            $script:getPageLabel1.Labels | Should -BeOfType [ConfluencePS.Label]
-            $script:getPageLabel2 | Should -BeOfType [ConfluencePS.ContentLabelSet]
-            $script:getPageLabel2.Labels | Should -BeOfType [ConfluencePS.Label]
+            $script:getPageLabel1 | Should -BeOfType [ConfluencePSVII.ContentLabelSet]
+            $script:getPageLabel1.Page | Should -BeOfType [ConfluencePSVII.Page]
+            $script:getPageLabel1.Labels | Should -BeOfType [ConfluencePSVII.Label]
+            $script:getPageLabel2 | Should -BeOfType [ConfluencePSVII.ContentLabelSet]
+            $script:getPageLabel2.Labels | Should -BeOfType [ConfluencePSVII.Label]
             @($script:getPageLabel1.Labels).Count | Should -BeGreaterOrEqual 4
             @($script:getPageLabel2.Labels | Where-Object { $_.Name -eq $script:label2 }).Count | Should -Be 4
             ($script:getPageLabel1.Labels.Name | Where-Object { $_ -in $script:label1 }).Count | Should -Be 3

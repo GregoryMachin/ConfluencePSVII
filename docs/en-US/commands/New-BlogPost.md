@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/New-BlogPost/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -73,9 +73,9 @@ The blog post will contain the text "Testing 123".
 ### -------------------------- EXAMPLE 4 --------------------------
 
 ```powershell
-$postObject = [ConfluencePS.BlogPost]@{
+$postObject = [ConfluencePSVII.BlogPost]@{
     Title = "My Title"
-    Space = [ConfluencePS.Space]@{
+    Space = [ConfluencePSVII.Space]@{
         Key="ABC"
     }
 }
@@ -86,7 +86,7 @@ New-ConfluenceBlogPost -InputObject $postObject
 $postObject | New-ConfluenceBlogPost
 ```
 
-Two different methods of creating a new blog post from an object `ConfluencePS.BlogPost`.
+Two different methods of creating a new blog post from an object `ConfluencePSVII.BlogPost`.
 
 Both examples should return identical results.
 
@@ -197,7 +197,7 @@ Accept wildcard characters: False
 
 ### -InputObject
 
-A ConfluencePS.BlogPost object from which to create a new blog post.
+A ConfluencePSVII.BlogPost object from which to create a new blog post.
 
 ```yaml
 Type: BlogPost
@@ -331,7 +331,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.BlogPost
+### ConfluencePSVII.BlogPost
 
 ## NOTES
 

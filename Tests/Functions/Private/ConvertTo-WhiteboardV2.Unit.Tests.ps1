@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-WhiteboardV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -37,10 +37,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Whiteboard object" {
+            It "creates a ConfluencePSVII.Whiteboard object" {
                 $result = ConvertTo-WhiteboardV2 -InputObject $fullObject -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.Whiteboard]
+                $result | Should -BeOfType [ConfluencePSVII.Whiteboard]
             }
 
             It "does not throw on an unrecognized field" {

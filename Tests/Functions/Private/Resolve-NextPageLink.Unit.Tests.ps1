@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Resolve-NextPageLink" -Tag 'Unit' {
         BeforeAll {
             $script:requestUri = [Uri]'https://example.atlassian.net/wiki/rest/api/content?limit=25'

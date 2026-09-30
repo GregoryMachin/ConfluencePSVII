@@ -1,4 +1,4 @@
-﻿$script:TestResourcePrefix = 'ConfluencePS-IntTest-'
+﻿$script:TestResourcePrefix = 'ConfluencePSVII-IntTest-'
 $script:_CachedIntegrationEnv = $null
 $script:_EnvLoaded = $false
 
@@ -108,7 +108,7 @@ function Resolve-ConfluenceRepositoryRoot {
 
     if (
         -not [string]::IsNullOrWhiteSpace($env:BHProjectPath) -and
-        (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'ConfluencePS.build.ps1')) -and
+        (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'ConfluencePSVII.build.ps1')) -and
         (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'Tools/build.requirements.psd1'))
     ) {
         return (Resolve-Path -LiteralPath $env:BHProjectPath).ProviderPath
@@ -117,7 +117,7 @@ function Resolve-ConfluenceRepositoryRoot {
     $candidate = (Resolve-Path -LiteralPath $PSScriptRoot).ProviderPath
     while ($candidate -and ($candidate -ne [System.IO.Path]::GetPathRoot($candidate))) {
         if (
-            (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'ConfluencePS.build.ps1')) -and
+            (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'ConfluencePSVII.build.ps1')) -and
             (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'Tools/build.requirements.psd1'))
         ) {
             return $candidate
@@ -156,7 +156,7 @@ function Initialize-IntegrationEnvironment {
     }
 
     if ($missing.Count -gt 0) {
-        if (-not $global:_ConfluencePSIntegrationEnvWarned) {
+        if (-not $global:_ConfluencePSVIIIntegrationEnvWarned) {
             Write-Warning "Integration tests ($deploymentType track) require the following environment variables: $($missing -join ', ')"
             if ($deploymentType -eq 'DataCenter') {
                 Write-Warning "Set CI_CONFLUENCE_TYPE=DataCenter and CI_CONFLUENCE_* variables. See .env.example."
@@ -164,7 +164,7 @@ function Initialize-IntegrationEnvironment {
             else {
                 Write-Warning "Copy .env.example to .env and configure your Confluence Cloud connection."
             }
-            $global:_ConfluencePSIntegrationEnvWarned = $true
+            $global:_ConfluencePSVIIIntegrationEnvWarned = $true
         }
 
         $script:_EnvLoaded = $true
@@ -254,25 +254,25 @@ function New-ConfluenceIntegrationSpaceKey {
 
 function New-ConfluenceIntegrationSpace {
     [CmdletBinding()]
-    [OutputType('ConfluencePS.Space')]
+    [OutputType('ConfluencePSVII.Space')]
     param(
         [Parameter(Mandatory)]
         [pscustomobject]$Fixture,
 
         [Parameter()]
-        [string]$NamePrefix = 'ConfluencePS Integration'
+        [string]$NamePrefix = 'ConfluencePSVII Integration'
     )
 
     $key = New-ConfluenceIntegrationSpaceKey
     $name = New-ConfluenceIntegrationResourceName -Prefix $NamePrefix
-    $space = New-ConfluenceSpace -Key $key -Name $name -Description '<p>Disposable ConfluencePS integration test space</p>' -ErrorAction Stop
+    $space = New-ConfluenceSpace -Key $key -Name $name -Description '<p>Disposable ConfluencePSVII integration test space</p>' -ErrorAction Stop
     $null = $Fixture.Spaces.Add($space.Key)
     return $space
 }
 
 function New-ConfluenceIntegrationPage {
     [CmdletBinding()]
-    [OutputType('ConfluencePS.Page')]
+    [OutputType('ConfluencePSVII.Page')]
     param(
         [Parameter(Mandatory)]
         [pscustomobject]$Fixture,
@@ -284,7 +284,7 @@ function New-ConfluenceIntegrationPage {
         [string]$TitlePrefix = 'Integration Page',
 
         [Parameter()]
-        [string]$Body = '<p>ConfluencePS integration test page</p>'
+        [string]$Body = '<p>ConfluencePSVII integration test page</p>'
     )
 
     $title = New-ConfluenceIntegrationResourceName -Prefix $TitlePrefix
@@ -316,10 +316,10 @@ function New-ConfluenceIntegrationPageSet {
         [pscustomobject]$Fixture,
 
         [Parameter()]
-        [string]$SpaceNamePrefix = 'ConfluencePS Page Set',
+        [string]$SpaceNamePrefix = 'ConfluencePSVII Page Set',
 
         [Parameter()]
-        [string]$Body = '<p>ConfluencePS integration test page</p>'
+        [string]$Body = '<p>ConfluencePSVII integration test page</p>'
     )
 
     $space = New-ConfluenceIntegrationSpace -Fixture $Fixture -NamePrefix $SpaceNamePrefix
@@ -332,11 +332,11 @@ function New-ConfluenceIntegrationPageSet {
     $page2 = New-ConfluencePage -Title "Page Orphan $nameSuffix" -SpaceKey $space.Key -Body $Body -ErrorAction Stop
     $null = $Fixture.Pages.Add($page2.ID)
 
-    $pageObject = [ConfluencePS.Page]@{
+    $pageObject = [ConfluencePSVII.Page]@{
         Title     = "Page from Object $nameSuffix"
         Body      = $Body
         Ancestors = @($homePage)
-        Space     = [ConfluencePS.Space]@{ Key = $space.Key }
+        Space     = [ConfluencePSVII.Space]@{ Key = $space.Key }
     }
     $page3 = $pageObject | New-ConfluencePage -ErrorAction Stop
     $null = $Fixture.Pages.Add($page3.ID)

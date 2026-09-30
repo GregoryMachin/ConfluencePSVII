@@ -32,7 +32,7 @@ if (-not $canParallel) {
 }
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
-$tempResultsDir = Join-Path ([System.IO.Path]::GetTempPath()) "ConfluencePS-TestResults-$(Get-Date -Format 'yyyyMMddHHmmss')"
+$tempResultsDir = Join-Path ([System.IO.Path]::GetTempPath()) "ConfluencePSVII-TestResults-$(Get-Date -Format 'yyyyMMddHHmmss')"
 if ($OutputPath -and $PSCmdlet.ShouldProcess($tempResultsDir, 'Create temporary results directory')) {
     $null = New-Item -ItemType Directory -Path $tempResultsDir -Force
 }
@@ -265,7 +265,7 @@ if ($OutputPath -and (Test-Path $tempResultsDir)) {
     if ($xmlFiles.Count -gt 0 -and $PSCmdlet.ShouldProcess($OutputPath, "Merge $($xmlFiles.Count) test result files")) {
         $mergedDoc = [xml]'<?xml version="1.0" encoding="utf-8"?><test-results></test-results>'
         $root = $mergedDoc.DocumentElement
-        $root.SetAttribute('name', 'ConfluencePS Integration Tests')
+        $root.SetAttribute('name', 'ConfluencePSVII Integration Tests')
         $root.SetAttribute('total', ($totalPassed + $totalFailed + $totalSkipped).ToString())
         $root.SetAttribute('errors', '0')
         $root.SetAttribute('failures', $totalFailed.ToString())
@@ -288,7 +288,7 @@ if ($OutputPath -and (Test-Path $tempResultsDir)) {
 
         $mainSuite = $mergedDoc.CreateElement('test-suite')
         $mainSuite.SetAttribute('type', 'Assembly')
-        $mainSuite.SetAttribute('name', 'ConfluencePS.Integration.Tests')
+        $mainSuite.SetAttribute('name', 'ConfluencePSVII.Integration.Tests')
         $mainSuite.SetAttribute('executed', 'True')
         $mainSuite.SetAttribute('result', $(if ($totalFailed -eq 0) { 'Success' } else { 'Failure' }))
         $mainSuite.SetAttribute('success', $(if ($totalFailed -eq 0) { 'True' } else { 'False' }))

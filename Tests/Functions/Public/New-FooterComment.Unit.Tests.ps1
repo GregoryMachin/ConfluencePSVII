@@ -7,10 +7,10 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "New-FooterComment" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [string]$Body)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
@@ -24,7 +24,7 @@ InModuleScope ConfluencePS {
             $script:lastUri | Should -Be "https://example.com/wiki/rest/api/content"
             $script:lastBody.type | Should -Be 'comment'
             $script:lastBody.container.id | Should -Be '196608'
-            $result | Should -BeOfType [ConfluencePS.Comment]
+            $result | Should -BeOfType [ConfluencePSVII.Comment]
         }
 
         It "adds an ancestors entry for a reply on v1" {
@@ -41,7 +41,7 @@ InModuleScope ConfluencePS {
                 $script:lastBody.pageId | Should -Be '196608'
                 $script:lastBody.body.representation | Should -Be 'storage'
                 $script:lastBody.body.value | Should -Be '<p>Hi</p>'
-                $result | Should -BeOfType [ConfluencePS.Comment]
+                $result | Should -BeOfType [ConfluencePSVII.Comment]
             }
 
             It "sends parentCommentId for a reply on v2" {

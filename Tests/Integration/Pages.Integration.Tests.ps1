@@ -10,7 +10,7 @@ Describe 'Page integration tests' -Tag Integration, Cloud, DataCenter {
         if ($script:fixture.IsConfigured) {
             $script:rawContent = 'Hi Pester!'
             $script:formattedContent = '<p>Hi Pester!</p>'
-            $script:pageSet = New-ConfluenceIntegrationPageSet -Fixture $script:fixture -SpaceNamePrefix 'ConfluencePS Pages' -Body $script:formattedContent
+            $script:pageSet = New-ConfluenceIntegrationPageSet -Fixture $script:fixture -SpaceNamePrefix 'ConfluencePSVII Pages' -Body $script:formattedContent
             $script:spaceKey = $script:pageSet.Space.Key
         }
     }
@@ -25,10 +25,10 @@ Describe 'Page integration tests' -Tag Integration, Cloud, DataCenter {
         It 'creates pages from pipeline, parameters, object input, and parent object input' {
             if (-not (Assert-ConfluenceIntegrationFixtureReady -Fixture $script:fixture)) { return }
 
-            $script:pageSet.Page1 | Should -BeOfType [ConfluencePS.Page]
-            $script:pageSet.Page2 | Should -BeOfType [ConfluencePS.Page]
-            $script:pageSet.Page3 | Should -BeOfType [ConfluencePS.Page]
-            $script:pageSet.Page4 | Should -BeOfType [ConfluencePS.Page]
+            $script:pageSet.Page1 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:pageSet.Page2 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:pageSet.Page3 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:pageSet.Page4 | Should -BeOfType [ConfluencePSVII.Page]
             $script:pageSet.Page1.ID | Should -BeOfType [UInt64]
             $script:pageSet.Page2.ID | Should -BeOfType [UInt64]
             $script:pageSet.Page1.Space.Key | Should -BeExactly $script:spaceKey
@@ -99,7 +99,7 @@ Describe 'Page integration tests' -Tag Integration, Cloud, DataCenter {
 
             . "$env:BHProjectPath/$env:BHProjectName/Private/ConvertFrom-HTMLEncoded.ps1"
 
-            $script:getByTitle | Should -BeOfType [ConfluencePS.Page]
+            $script:getByTitle | Should -BeOfType [ConfluencePSVII.Page]
             $script:getByTitle.ID | Should -BeOfType [UInt64]
             $script:getByTitle.Title | Should -BeExactly $script:pageSet.Page3.Title
             $script:getByTitle.Space.Key | Should -BeExactly $script:spaceKey
@@ -161,11 +161,11 @@ Describe 'Page integration tests' -Tag Integration, Cloud, DataCenter {
             if (-not (Assert-ConfluenceIntegrationFixtureReady -Fixture $script:fixture)) { return }
 
             @($script:allChangedPages).Count | Should -Be 9
-            $script:setPage1 | Should -BeOfType [ConfluencePS.Page]
-            $script:setPage2 | Should -BeOfType [ConfluencePS.Page]
-            $script:setPage3 | Should -BeOfType [ConfluencePS.Page]
-            $script:setPage4 | Should -BeOfType [ConfluencePS.Page]
-            $script:setPage5 | Should -BeOfType [ConfluencePS.Page]
+            $script:setPage1 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:setPage2 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:setPage3 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:setPage4 | Should -BeOfType [ConfluencePSVII.Page]
+            $script:setPage5 | Should -BeOfType [ConfluencePSVII.Page]
             $script:setPage6.Title | Should -BeExactly $script:newTitle6
             $script:setPage7.Title | Should -BeExactly $script:newTitle7
             $script:setPage9.Version.Message | Should -BeExactly $script:newVersionMessage9
@@ -216,8 +216,8 @@ Describe 'Page integration tests' -Tag Integration, Cloud, DataCenter {
 
             @($script:childPages).Count | Should -Be 2
             @($script:descendantPages).Count | Should -Be 4
-            $script:childPages | Should -BeOfType [ConfluencePS.Page]
-            $script:descendantPages | Should -BeOfType [ConfluencePS.Page]
+            $script:childPages | Should -BeOfType [ConfluencePSVII.Page]
+            $script:descendantPages | Should -BeOfType [ConfluencePSVII.Page]
         }
     }
 

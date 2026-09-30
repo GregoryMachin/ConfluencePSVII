@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-SpaceV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -35,10 +35,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Space object" {
+            It "creates a ConfluencePSVII.Space object" {
                 $result = ConvertTo-SpaceV2 -InputObject $fullObject
 
-                $result | Should -BeOfType [ConfluencePS.Space]
+                $result | Should -BeOfType [ConfluencePSVII.Space]
             }
 
             It "does not throw on an unrecognized field" {

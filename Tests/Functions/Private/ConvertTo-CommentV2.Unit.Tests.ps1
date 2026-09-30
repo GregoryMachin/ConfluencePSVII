@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-CommentV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -42,10 +42,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Comment object" {
+            It "creates a ConfluencePSVII.Comment object" {
                 $result = ConvertTo-CommentV2 -InputObject $fullObject -Type footer -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.Comment]
+                $result | Should -BeOfType [ConfluencePSVII.Comment]
             }
 
             It "does not throw on an unrecognized field" {

@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Assert-PropertyKey" -Tag 'Unit' {
         It "accepts a plain alphanumeric key" {
             { Assert-PropertyKey -Key 'myKey123' } | Should -Not -Throw

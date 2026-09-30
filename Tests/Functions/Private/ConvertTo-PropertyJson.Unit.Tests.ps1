@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-PropertyJson" -Tag 'Unit' {
         It "serializes a plain string value" {
             ConvertTo-PropertyJson -Value 'hello' | Should -Be '"hello"'

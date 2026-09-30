@@ -34,7 +34,7 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
                 $script:spaceObjectName = New-ConfluenceIntegrationResourceName -Prefix 'Space Object'
                 $script:spaceParameterName = New-ConfluenceIntegrationResourceName -Prefix 'Space Parameters'
                 $script:spaceDescription = '<p>A disposable integration test space</p>'
-                $spaceObject = [ConfluencePS.Space]@{
+                $spaceObject = [ConfluencePSVII.Space]@{
                     Key         = $script:spaceObjectKey
                     Name        = $script:spaceObjectName
                     Description = $script:spaceDescription
@@ -59,16 +59,16 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
             if (-not (Assert-ConfluenceIntegrationFixtureReady -Fixture $script:fixture)) { return }
 
             $script:spaceAlreadyExisted | Should -Be $false
-            $script:newSpaceFromObject | Should -BeOfType [ConfluencePS.Space]
-            $script:newSpaceFromParameters | Should -BeOfType [ConfluencePS.Space]
+            $script:newSpaceFromObject | Should -BeOfType [ConfluencePSVII.Space]
+            $script:newSpaceFromParameters | Should -BeOfType [ConfluencePSVII.Space]
             $script:newSpaceFromObject.ID | Should -BeOfType [UInt64]
             $script:newSpaceFromParameters.ID | Should -BeOfType [UInt64]
             $script:newSpaceFromObject.Key | Should -BeExactly $script:spaceObjectKey
             $script:newSpaceFromParameters.Key | Should -BeExactly $script:spaceParameterKey
             $script:newSpaceFromObject.Name | Should -BeExactly $script:spaceObjectName
             $script:newSpaceFromParameters.Name | Should -BeExactly $script:spaceParameterName
-            $script:newSpaceFromObject.Homepage | Should -BeOfType [ConfluencePS.Page]
-            $script:newSpaceFromParameters.Homepage | Should -BeOfType [ConfluencePS.Page]
+            $script:newSpaceFromObject.Homepage | Should -BeOfType [ConfluencePSVII.Page]
+            $script:newSpaceFromParameters.Homepage | Should -BeOfType [ConfluencePSVII.Page]
         }
     }
 
@@ -87,11 +87,11 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
             @($script:getAllSpaces).Count | Should -BeGreaterOrEqual 2
             @($script:getSpaceByKey).Count | Should -Be 1
             @($script:getSpacesByArray).Count | Should -Be 2
-            $script:getSpaceByKey | Should -BeOfType [ConfluencePS.Space]
+            $script:getSpaceByKey | Should -BeOfType [ConfluencePSVII.Space]
             $script:getSpaceByKey.Key | Should -BeExactly $script:spaceObjectKey
             $script:getSpacesByArray.Key | Should -BeExactly @($script:spaceObjectKey, $script:spaceParameterKey)
-            $script:getSpaceByKey.Icon | Should -BeOfType [ConfluencePS.Icon]
-            $script:getSpaceByKey.Homepage | Should -BeOfType [ConfluencePS.Page]
+            $script:getSpaceByKey.Icon | Should -BeOfType [ConfluencePSVII.Icon]
+            $script:getSpaceByKey.Homepage | Should -BeOfType [ConfluencePSVII.Page]
             $script:getSpaceByKey.Icon.ToString() | Should -Be $script:getSpaceByKey.Icon.Path
         }
     }
@@ -117,7 +117,7 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
         BeforeAll {
             if ($script:fixture.IsConfigured) {
                 $script:invokeMethodSpaceResults = Invoke-ConfluenceMethod -Uri "$($script:fixture.ApiUri)/space" -GetParameters @{ limit = 1 } -Credential $script:fixture.Credential -ErrorAction Stop
-                $script:invokeMethodTypedSpaceResults = Invoke-ConfluenceMethod -Uri "$($script:fixture.ApiUri)/space" -GetParameters @{ limit = 1 } -Credential $script:fixture.Credential -OutputType ([ConfluencePS.Space]) -ErrorAction Stop
+                $script:invokeMethodTypedSpaceResults = Invoke-ConfluenceMethod -Uri "$($script:fixture.ApiUri)/space" -GetParameters @{ limit = 1 } -Credential $script:fixture.Credential -OutputType ([ConfluencePSVII.Space]) -ErrorAction Stop
             }
         }
 
@@ -128,7 +128,7 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
             @($script:invokeMethodSpaceResults)[0].ID | Should -Not -BeNullOrEmpty
             @($script:invokeMethodSpaceResults)[0].Key | Should -Not -BeNullOrEmpty
             @($script:invokeMethodTypedSpaceResults).Count | Should -BeGreaterThan 0
-            @($script:invokeMethodTypedSpaceResults)[0] | Should -BeOfType [ConfluencePS.Space]
+            @($script:invokeMethodTypedSpaceResults)[0] | Should -BeOfType [ConfluencePSVII.Space]
         }
     }
 
@@ -136,7 +136,7 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
         BeforeAll {
             if ($script:fixture.IsConfigured) {
                 $script:tableInput = [PSCustomObject]@{
-                    Name  = 'ConfluencePS'
+                    Name  = 'ConfluencePSVII'
                     Scope = 'IntegrationCoverage'
                 }
                 $script:tableMarkup = $script:tableInput | ConvertTo-ConfluenceTable
@@ -150,9 +150,9 @@ Describe 'Space integration tests' -Tag Integration, Cloud, DataCenter {
             if (-not (Assert-ConfluenceIntegrationFixtureReady -Fixture $script:fixture)) { return }
 
             $script:tableMarkup | Should -Match '\|\| Name \|\| Scope \|\|'
-            $script:tableMarkup | Should -Match '\| ConfluencePS \| IntegrationCoverage \|'
-            $script:fetchedTablePage | Should -BeOfType [ConfluencePS.Page]
-            $script:fetchedTablePage.Body | Should -Match 'ConfluencePS'
+            $script:tableMarkup | Should -Match '\| ConfluencePSVII \| IntegrationCoverage \|'
+            $script:fetchedTablePage | Should -BeOfType [ConfluencePSVII.Page]
+            $script:fetchedTablePage.Body | Should -Match 'ConfluencePSVII'
             $script:fetchedTablePage.Body | Should -Match 'IntegrationCoverage'
         }
     }

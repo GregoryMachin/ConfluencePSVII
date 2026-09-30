@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Resolve-OAuthBaseUri" -Tag 'Unit' {
         It "builds the Cloud API gateway URI for a valid CloudId" {
             Resolve-OAuthBaseUri -CloudId '11223344-a1b2-3b33-c444-def123456789' |

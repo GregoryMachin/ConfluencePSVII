@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Invoke-Method/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -27,18 +27,18 @@ Invoke-ConfluenceMethod [-URi] <Uri> [-Method <WebRequestMethod>] [-Body <String
 
 ## DESCRIPTION
 
-Make a call to a REST Api endpoint with all the benefits of ConfluencePS.
+Make a call to a REST Api endpoint with all the benefits of ConfluencePSVII.
 
 This cmdlet is what the other cmdlets call under the hood.
 It handles the authentication, parses the
 response, handles exceptions from Confluence, returns specific objects and handles the differences between
 versions of Powershell and Operating Systems.
 
-ConfluencePS does not support any third-party plugins on Confluence.
-This cmdlet can be used to interact with REST Api endpoints which are not already converted in ConfluencePS.
-It allows for anyone to use the same technics as ConfluencePS uses internally for creating their own functions
+ConfluencePSVII does not support any third-party plugins on Confluence.
+This cmdlet can be used to interact with REST Api endpoints which are not already converted in ConfluencePSVII.
+It allows for anyone to use the same technics as ConfluencePSVII uses internally for creating their own functions
 or modules.
-When used by a module, the Manifest (.psd1) can define the dependency to ConfluencePS with the 'RequiredModules'
+When used by a module, the Manifest (.psd1) can define the dependency to ConfluencePSVII with the 'RequiredModules'
 property.
 This will import the module if not already loaded or even download it from the PSGallery.
 
@@ -62,10 +62,10 @@ Executes a GET request on the defined URI and returns a collection of PSCustomOb
 ### EXAMPLE 2
 
 ```powershell
-Invoke-ConfluenceMethod -Uri https://contoso.com/rest/api/content -OutputType [ConfluencePS.Page] -Credential $cred
+Invoke-ConfluenceMethod -Uri https://contoso.com/rest/api/content -OutputType [ConfluencePSVII.Page] -Credential $cred
 ```
 
-Executes a GET request on the defined URI and returns a collection of ConfluencePS.Page
+Executes a GET request on the defined URI and returns a collection of ConfluencePSVII.Page
 
 ### EXAMPLE 3
 
@@ -78,7 +78,7 @@ $params = @{
 Invoke-ConfluenceMethod @params
 ```
 
-Executes a POST request on the defined URI and returns a collection of ConfluencePS.Page.
+Executes a POST request on the defined URI and returns a collection of ConfluencePSVII.Page.
 
 This will example doesn't really do anything on the server,
 as the content API needs requires a value for the BODY.
@@ -98,7 +98,7 @@ Invoke-ConfluenceMethod @params
 ```
 
 Executes a POST request with a JSON string in the BODY on the defined URI
-and returns a collection of ConfluencePS.Page.
+and returns a collection of ConfluencePSVII.Page.
 
 ### EXAMPLE 5
 
@@ -123,7 +123,7 @@ Executes a GET request on the defined URI with a Get Parameter that is resolved 
 $params = @{
     Uri = "https://contoso.com/rest/api/content/10001/child/attachment"
     Method = "POST"
-    OutputType = [ConfluencePS.Attachment]
+    OutputType = [ConfluencePSVII.Attachment]
     InFile = "c:\temp\confidentialData.txt"
     Credential = $cred
 }
@@ -131,7 +131,7 @@ Invoke-ConfluenceMethod @params
 ```
 
 Executes a POST request on the defined URI and uploads the InFile with a multipart/form-data request.
-The response of the request will be cast to an object of type ConfluencePS.Attachment.
+The response of the request will be cast to an object of type ConfluencePSVII.Attachment.
 
 ### EXAMPLE 7
 
@@ -463,19 +463,19 @@ For more information, see about_CommonParameters (<http://go.microsoft.com/fwlin
 
 ### System.Management.Automation.PSObject
 
-### ConfluencePS.Page
+### ConfluencePSVII.Page
 
-### ConfluencePS.Space
+### ConfluencePSVII.Space
 
-### ConfluencePS.Label
+### ConfluencePSVII.Label
 
-### ConfluencePS.Icon
+### ConfluencePSVII.Icon
 
-### ConfluencePS.Version
+### ConfluencePSVII.Version
 
-### ConfluencePS.User
+### ConfluencePSVII.User
 
-### ConfluencePS.Attachment
+### ConfluencePSVII.Attachment
 
 ## NOTES
 

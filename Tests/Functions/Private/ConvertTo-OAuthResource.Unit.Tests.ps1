@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-OAuthResource" -Tag 'Unit' {
         It "converts a raw accessible-resources item to a typed OAuthResource" {
             $raw = ConvertFrom-Json '{
@@ -20,7 +20,7 @@ InModuleScope ConfluencePS {
 
             $result = $raw | ConvertTo-OAuthResource
 
-            $result | Should -BeOfType [ConfluencePS.OAuthResource]
+            $result | Should -BeOfType [ConfluencePSVII.OAuthResource]
             $result.CloudId | Should -Be '11223344-a1b2-3b33-c444-def123456789'
             $result.Name | Should -Be 'Example Site'
             $result.Url.AbsoluteUri | Should -Be 'https://example.atlassian.net/'

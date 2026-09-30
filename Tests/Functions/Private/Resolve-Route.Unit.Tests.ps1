@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Resolve-Route" -Tag 'Unit' {
         BeforeAll {
             $script:cloudBase = 'https://example.atlassian.net'

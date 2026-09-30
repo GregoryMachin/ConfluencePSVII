@@ -7,13 +7,13 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-SpaceProperty" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
             $script:lastGetParameters = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [hashtable]$GetParameters)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastGetParameters = $GetParameters
@@ -25,14 +25,14 @@ InModuleScope ConfluencePS {
             $result = Get-SpaceProperty -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -SpaceID 98307 -PropertyID 1000
 
             $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/spaces/98307/properties/1000"
-            $result | Should -BeOfType [ConfluencePS.SpaceProperty]
+            $result | Should -BeOfType [ConfluencePSVII.SpaceProperty]
         }
 
         It "routes a byKey request to the collection with no filter by default" {
             $result = Get-SpaceProperty -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -SpaceID 98307
 
             $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/spaces/98307/properties"
-            $result | Should -BeOfType [ConfluencePS.SpaceProperty]
+            $result | Should -BeOfType [ConfluencePSVII.SpaceProperty]
         }
 
         It "forwards -Key as a collection filter" {

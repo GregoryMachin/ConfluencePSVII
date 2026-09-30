@@ -8,15 +8,15 @@ function Resolve-ProjectRoot {
 
     $candidate = (Resolve-Path $script:_TestToolsDir).Path
     while ($candidate -and ($candidate -ne [System.IO.Path]::GetPathRoot($candidate))) {
-        $buildScript = Join-Path $candidate "ConfluencePS.build.ps1"
-        $manifest = Join-Path $candidate "ConfluencePS/ConfluencePS.psd1"
+        $buildScript = Join-Path $candidate "ConfluencePSVII.build.ps1"
+        $manifest = Join-Path $candidate "ConfluencePSVII/ConfluencePSVII.psd1"
         if ((Test-Path $buildScript) -and (Test-Path $manifest)) {
             return $candidate
         }
         $candidate = Split-Path $candidate -Parent
     }
 
-    throw "Could not find project root (missing ConfluencePS.build.ps1 and ConfluencePS/ConfluencePS.psd1 in parent directories of $($script:_TestToolsDir))."
+    throw "Could not find project root (missing ConfluencePSVII.build.ps1 and ConfluencePSVII/ConfluencePSVII.psd1 in parent directories of $($script:_TestToolsDir))."
 }
 
 function Initialize-TestEnvironment {
@@ -28,7 +28,7 @@ function Initialize-TestEnvironment {
     )
 
     $projectRoot = Resolve-ProjectRoot
-    $projectName = "ConfluencePS"
+    $projectName = "ConfluencePSVII"
 
     $env:BHProjectName = $projectName
     $env:BHProjectPath = $projectRoot

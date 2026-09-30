@@ -7,22 +7,22 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Test-ServerResponse" -Tag 'Unit' {
         BeforeAll {
             if (-not ("System.Net.Http.HttpResponseMessage" -as [Type])) {
                 Add-Type -AssemblyName System.Net.Http
             }
 
-            Mock Start-Sleep -ModuleName ConfluencePS {}
+            Mock Start-Sleep -ModuleName ConfluencePSVII {}
         }
 
         BeforeEach {
-            Mock Get-Random -ModuleName ConfluencePS { 1.0 }
+            Mock Get-Random -ModuleName ConfluencePSVII { 1.0 }
         }
 
         It "uses Retry-After HTTP-date as minimum retry delay" {
-            Mock Get-Date -ModuleName ConfluencePS { [DateTimeOffset]"2026-01-01T00:00:00Z" }
+            Mock Get-Date -ModuleName ConfluencePSVII { [DateTimeOffset]"2026-01-01T00:00:00Z" }
             $response = [PSCustomObject]@{
                 StatusCode = 429
                 Headers    = @{ "Retry-After" = "Thu, 01 Jan 2026 00:02:00 GMT" }
@@ -31,7 +31,7 @@ InModuleScope ConfluencePS {
             $result = Test-ServerResponse -InputObject $response -Method Get -RetryCount 0 -MaxRetries 3
 
             $result | Should -BeTrue
-            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePS -ParameterFilter {
+            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePSVII -ParameterFilter {
                 [Math]::Abs([double]$Seconds - 120.0) -lt 0.001
             } -Exactly -Times 1 -Scope It
         }
@@ -41,7 +41,7 @@ InModuleScope ConfluencePS {
             # Dictionary<string, IEnumerable<string>>, which has no public Contains(key)
             # overload -- only ContainsKey. A Hashtable-backed test headers object would
             # not have caught a regression to .Contains here.
-            Mock Get-Date -ModuleName ConfluencePS { [DateTimeOffset]"2026-01-01T00:00:00Z" }
+            Mock Get-Date -ModuleName ConfluencePSVII { [DateTimeOffset]"2026-01-01T00:00:00Z" }
             $headers = [System.Collections.Generic.Dictionary[string, string[]]]::new()
             $headers['Retry-After'] = @('Thu, 01 Jan 2026 00:02:00 GMT')
             $response = [PSCustomObject]@{
@@ -52,7 +52,7 @@ InModuleScope ConfluencePS {
             $result = Test-ServerResponse -InputObject $response -Method Get -RetryCount 0 -MaxRetries 3
 
             $result | Should -BeTrue
-            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePS -ParameterFilter {
+            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePSVII -ParameterFilter {
                 [Math]::Abs([double]$Seconds - 120.0) -lt 0.001
             } -Exactly -Times 1 -Scope It
         }
@@ -66,7 +66,7 @@ InModuleScope ConfluencePS {
             $result = Test-ServerResponse -InputObject $response -Method Get -RetryCount 0 -MaxRetries 3
 
             $result | Should -BeTrue
-            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePS -ParameterFilter {
+            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePSVII -ParameterFilter {
                 [Math]::Abs([double]$Seconds - 90.0) -lt 0.001
             } -Exactly -Times 1 -Scope It
         }
@@ -80,7 +80,7 @@ InModuleScope ConfluencePS {
             $result = Test-ServerResponse -InputObject $response -Method Get -RetryCount 2 -MaxRetries 3
 
             $result | Should -BeTrue
-            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePS -ParameterFilter {
+            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePSVII -ParameterFilter {
                 [Math]::Abs([double]$Seconds - 60.0) -lt 0.001
             } -Exactly -Times 1 -Scope It
         }
@@ -94,7 +94,7 @@ InModuleScope ConfluencePS {
             $result = Test-ServerResponse -InputObject $response -Method Post -RetryCount 0 -MaxRetries 3
 
             $result | Should -BeNullOrEmpty
-            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePS -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePSVII -Exactly -Times 0 -Scope It
         }
     }
 }

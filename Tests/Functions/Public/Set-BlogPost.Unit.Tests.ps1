@@ -7,20 +7,20 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Set-BlogPost" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [string]$Body)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
-                [ConfluencePS.BlogPost]::new()
+                [ConfluencePSVII.BlogPost]::new()
             }
         }
 
         It "reads the original blog post and increments its version on the v1 route" {
-            Mock Get-BlogPost -ModuleName ConfluencePS {
-                [ConfluencePS.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePS.Version]@{ Number = 3 } }
+            Mock Get-BlogPost -ModuleName ConfluencePSVII {
+                [ConfluencePSVII.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePSVII.Version]@{ Number = 3 } }
             }
 
             $null = Set-BlogPost -ApiUri "https://example.com/wiki/rest/api" -BlogPostID 262144 -Title "New title" -Confirm:$false
@@ -32,8 +32,8 @@ InModuleScope ConfluencePS {
 
         Context "Pipeline binding" {
             BeforeEach {
-                Mock Get-BlogPost -ModuleName ConfluencePS {
-                    [ConfluencePS.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePS.Version]@{ Number = 3 } }
+                Mock Get-BlogPost -ModuleName ConfluencePSVII {
+                    [ConfluencePSVII.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePSVII.Version]@{ Number = 3 } }
                 }
             }
 
@@ -52,8 +52,8 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Get-BlogPost -ModuleName ConfluencePS {
-                    [ConfluencePS.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePS.Version]@{ Number = 3 } }
+                Mock Get-BlogPost -ModuleName ConfluencePSVII {
+                    [ConfluencePSVII.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePSVII.Version]@{ Number = 3 } }
                 }
             }
 
@@ -65,13 +65,13 @@ InModuleScope ConfluencePS {
                 $script:lastBody.title | Should -Be 'New title'
                 $script:lastBody.version.number | Should -Be 4
                 $script:lastBody.body.representation | Should -Be 'storage'
-                $result | Should -BeOfType [ConfluencePS.BlogPost]
+                $result | Should -BeOfType [ConfluencePSVII.BlogPost]
             }
 
             It "forwards -BaseUri/-DeploymentType to the internal Get-BlogPost call" {
                 $null = Set-BlogPost -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -BlogPostID 262144 -Title "New title" -Confirm:$false
 
-                Should -Invoke -CommandName Get-BlogPost -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Get-BlogPost -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                     $BaseUri -eq 'https://example.atlassian.net' -and $DeploymentType -eq 'Cloud'
                 }
             }

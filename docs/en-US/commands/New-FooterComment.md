@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/New-FooterComment/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -60,7 +60,7 @@ Reply to comment 327679 on page 196608.
 ### -------------------------- EXAMPLE 3 --------------------------
 
 ```powershell
-$commentObject = [ConfluencePS.Comment]@{
+$commentObject = [ConfluencePSVII.Comment]@{
     PageID = 196608
     Body   = '<p>Nice work!</p>'
 }
@@ -68,7 +68,7 @@ $commentObject = [ConfluencePS.Comment]@{
 New-ConfluenceFooterComment -InputObject $commentObject
 ```
 
-Create a new footer comment from an object `ConfluencePS.Comment`.
+Create a new footer comment from an object `ConfluencePSVII.Comment`.
 
 ## PARAMETERS
 
@@ -176,7 +176,7 @@ Accept wildcard characters: False
 
 ### -InputObject
 
-A ConfluencePS.Comment object from which to create a new footer comment.
+A ConfluencePSVII.Comment object from which to create a new footer comment.
 
 ```yaml
 Type: Comment
@@ -293,7 +293,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.Comment
+### ConfluencePSVII.Comment
 
 ## NOTES
 

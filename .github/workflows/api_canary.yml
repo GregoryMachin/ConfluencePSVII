@@ -80,7 +80,7 @@ jobs:
 
       - name: Publish machine-readable canary results
         if: always()
-        run: ./Tools/Publish-ApiCanaryResult.ps1 -ResultXmlPath 'Test-Integration.xml' -Repository 'ConfluencePS' -DeploymentType 'Cloud' -OutputPath 'api-canary-read-results.json'
+        run: ./Tools/Publish-ApiCanaryResult.ps1 -ResultXmlPath 'Test-Integration.xml' -Repository 'ConfluencePSVII' -DeploymentType 'Cloud' -OutputPath 'api-canary-read-results.json'
         shell: pwsh
 
       - uses: actions/upload-artifact@v7
@@ -116,13 +116,13 @@ jobs:
 
       - name: Publish machine-readable canary results
         if: always()
-        run: ./Tools/Publish-ApiCanaryResult.ps1 -ResultXmlPath 'Test-Integration.xml' -Repository 'ConfluencePS' -DeploymentType 'Cloud' -OutputPath 'api-canary-write-results.json'
+        run: ./Tools/Publish-ApiCanaryResult.ps1 -ResultXmlPath 'Test-Integration.xml' -Repository 'ConfluencePSVII' -DeploymentType 'Cloud' -OutputPath 'api-canary-write-results.json'
         shell: pwsh
 
       # No separate guaranteed-cleanup step here: the "Smoke Write Coverage"
       # Context's own AfterAll (best-effort, removing the disposable page then
       # space) self-heals; a leftover disposable space/page from a hard
-      # workflow failure is easy to spot by its "ConfluencePS Smoke Write"/
+      # workflow failure is easy to spot by its "ConfluencePSVII Smoke Write"/
       # "SMOKE" naming convention.
 
       - uses: actions/upload-artifact@v7

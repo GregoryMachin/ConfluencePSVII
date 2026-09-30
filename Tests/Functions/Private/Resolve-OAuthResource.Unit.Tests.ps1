@@ -7,17 +7,17 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Resolve-OAuthResource" -Tag 'Unit' {
         BeforeEach {
             $script:resources = @(
-                [ConfluencePS.OAuthResource]@{
+                [ConfluencePSVII.OAuthResource]@{
                     CloudId = '11223344-a1b2-3b33-c444-def123456789'
                     Name    = 'Example Site'
                     Url     = [Uri]'https://example.atlassian.net/'
                     Scopes  = @('read:confluence-content.all')
                 },
-                [ConfluencePS.OAuthResource]@{
+                [ConfluencePSVII.OAuthResource]@{
                     CloudId = '99887766-a1b2-3b33-c444-def123456789'
                     Name    = 'Other Site'
                     Url     = [Uri]'https://other.atlassian.net/'

@@ -1,14 +1,14 @@
-# ConfluencePS Testing Guide
+# ConfluencePSVII Testing Guide
 
-This guide explains the test layout used by ConfluencePS.
+This guide explains the test layout used by ConfluencePSVII.
 
 ## Test Structure
 
-ConfluencePS uses Pester 5.7+ for new and modernized tests.
+ConfluencePSVII uses Pester 5.7+ for new and modernized tests.
 Tests are organized to mirror the module structure:
 
-- `Tests/Functions/Public/` contains unit tests for exported cmdlets in `ConfluencePS/Public/`.
-- `Tests/Functions/Private/` contains unit tests for internal helpers and converters in `ConfluencePS/Private/`.
+- `Tests/Functions/Public/` contains unit tests for exported cmdlets in `ConfluencePSVII/Public/`.
+- `Tests/Functions/Private/` contains unit tests for internal helpers and converters in `ConfluencePSVII/Private/`.
 - `Tests/Integration/` contains live Confluence Cloud and Data Center integration tests.
 
 ## Test Templates

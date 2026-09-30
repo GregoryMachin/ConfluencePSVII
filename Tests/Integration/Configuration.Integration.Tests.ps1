@@ -144,10 +144,10 @@ Describe "Integration Test Configuration" -Tag 'Integration', 'Smoke', 'Cloud', 
 
             Set-ConfluenceInfo -BaseUri $script:integrationEnvironment.CloudUrl -Credential $script:credential
             $script:smokeWriteSpaceKey = "SMOKE$([Guid]::NewGuid().ToString('N').Substring(0, 8))".ToUpperInvariant()
-            $script:smokeWriteTitle = "ConfluencePS Smoke Write $([Guid]::NewGuid().ToString('N').Substring(0, 12))"
+            $script:smokeWriteTitle = "ConfluencePSVII Smoke Write $([Guid]::NewGuid().ToString('N').Substring(0, 12))"
 
-            $script:smokeWriteSpace = New-ConfluenceSpace -Key $script:smokeWriteSpaceKey -Name "ConfluencePS Smoke Write $($script:smokeWriteSpaceKey)" -Description "Disposable smoke-test space" -ErrorAction Stop
-            $script:smokeWritePage = New-ConfluencePage -Title $script:smokeWriteTitle -SpaceKey $script:smokeWriteSpace.Key -Body "<p>ConfluencePS smoke create</p>" -ErrorAction Stop
+            $script:smokeWriteSpace = New-ConfluenceSpace -Key $script:smokeWriteSpaceKey -Name "ConfluencePSVII Smoke Write $($script:smokeWriteSpaceKey)" -Description "Disposable smoke-test space" -ErrorAction Stop
+            $script:smokeWritePage = New-ConfluencePage -Title $script:smokeWriteTitle -SpaceKey $script:smokeWriteSpace.Key -Body "<p>ConfluencePSVII smoke create</p>" -ErrorAction Stop
             $script:smokeWriteReady = $true
         }
 
@@ -179,7 +179,7 @@ Describe "Integration Test Configuration" -Tag 'Integration', 'Smoke', 'Cloud', 
                 throw "Smoke write setup did not create a writable disposable space and page."
             }
 
-            $script:smokeWritePage | Should -BeOfType [ConfluencePS.Page]
+            $script:smokeWritePage | Should -BeOfType [ConfluencePSVII.Page]
             $script:smokeWritePage.ID | Should -Not -BeNullOrEmpty
             $script:smokeWritePage.Space.Key | Should -BeExactly $script:smokeWriteSpace.Key
         }
@@ -193,11 +193,11 @@ Describe "Integration Test Configuration" -Tag 'Integration', 'Smoke', 'Cloud', 
                 throw "Smoke write setup did not create a writable disposable space and page."
             }
 
-            $script:updatedSmokeWritePage = Set-ConfluencePage -PageID $script:smokeWritePage.ID -Body "<p>ConfluencePS smoke updated</p>" -ErrorAction Stop
+            $script:updatedSmokeWritePage = Set-ConfluencePage -PageID $script:smokeWritePage.ID -Body "<p>ConfluencePSVII smoke updated</p>" -ErrorAction Stop
 
             $script:updatedSmokeWritePage.ID | Should -BeExactly $script:smokeWritePage.ID
             $script:updatedSmokeWritePage.Version.Number | Should -BeGreaterThan $script:smokeWritePage.Version.Number
-            $script:updatedSmokeWritePage.Body | Should -Match "ConfluencePS smoke updated"
+            $script:updatedSmokeWritePage.Body | Should -Match "ConfluencePSVII smoke updated"
         }
 
         It "supports label add/remove lifecycle on the smoke-write page" {

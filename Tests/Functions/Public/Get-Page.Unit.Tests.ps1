@@ -7,13 +7,13 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-Page" -Tag 'Unit' {
         BeforeEach {
             $script:lastCql = $null
             $script:lastUri = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param(
                     [string]$Uri,
                     [hashtable]$GetParameters
@@ -21,7 +21,7 @@ InModuleScope ConfluencePS {
 
                 $script:lastUri = $Uri
                 $script:lastCql = $GetParameters['cql']
-                [ConfluencePS.Page]::new()
+                [ConfluencePSVII.Page]::new()
             }
         }
 
@@ -51,16 +51,16 @@ InModuleScope ConfluencePS {
         }
 
         It "returns only current pages by default for byLabel results" {
-            Mock Invoke-Method -ModuleName ConfluencePS {
-                $currentPage = [ConfluencePS.Page]::new()
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
+                $currentPage = [ConfluencePSVII.Page]::new()
                 $currentPage.ID = 1
                 $currentPage.Status = 'current'
 
-                $trashedPage = [ConfluencePS.Page]::new()
+                $trashedPage = [ConfluencePSVII.Page]::new()
                 $trashedPage.ID = 2
                 $trashedPage.Status = 'trashed'
 
-                $archivedPage = [ConfluencePS.Page]::new()
+                $archivedPage = [ConfluencePSVII.Page]::new()
                 $archivedPage.ID = 3
                 $archivedPage.Status = 'archived'
 
@@ -74,16 +74,16 @@ InModuleScope ConfluencePS {
         }
 
         It "returns pages matching the requested byLabel status values" {
-            Mock Invoke-Method -ModuleName ConfluencePS {
-                $currentPage = [ConfluencePS.Page]::new()
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
+                $currentPage = [ConfluencePSVII.Page]::new()
                 $currentPage.ID = 1
                 $currentPage.Status = 'current'
 
-                $trashedPage = [ConfluencePS.Page]::new()
+                $trashedPage = [ConfluencePSVII.Page]::new()
                 $trashedPage.ID = 2
                 $trashedPage.Status = 'trashed'
 
-                $archivedPage = [ConfluencePS.Page]::new()
+                $archivedPage = [ConfluencePSVII.Page]::new()
                 $archivedPage.ID = 3
                 $archivedPage.Status = 'archived'
 
@@ -106,7 +106,7 @@ InModuleScope ConfluencePS {
         It "throws when Label is an empty array" {
             { $null = Get-Page -ApiUri "https://example.com/wiki/rest/api" -Label @() } | Should -Throw
 
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 0 -Scope It
         }
 
         It "sets prefixed defaults when called from inside a function" {
@@ -121,7 +121,7 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 byId routing" {
             BeforeEach {
-                Mock Invoke-Method -ModuleName ConfluencePS {
+                Mock Invoke-Method -ModuleName ConfluencePSVII {
                     param([Uri]$Uri, [hashtable]$GetParameters)
 
                     $script:lastUri = $Uri.AbsoluteUri
@@ -134,7 +134,7 @@ InModuleScope ConfluencePS {
                 $result = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100
 
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/pages/100"
-                $result | Should -BeOfType [ConfluencePS.Page]
+                $result | Should -BeOfType [ConfluencePSVII.Page]
                 $result.ID | Should -Be 100
                 $result.Body | Should -Be '<p>Hi</p>'
             }
@@ -154,7 +154,7 @@ InModuleScope ConfluencePS {
             It "requests one v2 route per PageID" {
                 $null = Get-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100, 200
 
-                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 2 -Scope It
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 2 -Scope It
             }
 
             It "falls back to the v1 route when -BaseUri is not supplied, even with -DeploymentType Cloud" {

@@ -7,14 +7,14 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Remove-Attachment" -Tag 'Unit' {
         BeforeEach {
-            $script:attachment = [ConfluencePS.Attachment]::new()
+            $script:attachment = [ConfluencePSVII.Attachment]::new()
             $script:attachment.ID = 55
             $script:attachment.PageID = 100
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
             }
@@ -47,7 +47,7 @@ InModuleScope ConfluencePS {
         It "does not call Invoke-Method when -WhatIf is set" {
             $null = Remove-Attachment -ApiUri "https://example.com/wiki/rest/api" -Attachment $script:attachment -WhatIf
 
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 0 -Scope It
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 0 -Scope It
         }
     }
 }

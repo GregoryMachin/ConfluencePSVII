@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-BlogPostV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -43,10 +43,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.BlogPost object" {
+            It "creates a ConfluencePSVII.BlogPost object" {
                 $result = ConvertTo-BlogPostV2 -InputObject $fullObject -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.BlogPost]
+                $result | Should -BeOfType [ConfluencePSVII.BlogPost]
             }
 
             It "does not throw on an unrecognized field" {

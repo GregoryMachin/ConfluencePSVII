@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Get-Folder/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -252,7 +252,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.Folder
+### ConfluencePSVII.Folder
 
 ## NOTES
 

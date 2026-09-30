@@ -7,11 +7,11 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-StorageFormat" -Tag 'Unit' {
         BeforeEach {
             $script:lastRequestBody = $null
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param(
                     [string]$Body
                 )

@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Get-ServerInformation/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -22,7 +22,7 @@ Get-ConfluenceServerInformation -ApiUri <Uri> [-Credential <PSCredential>]
 
 ## DESCRIPTION
 
-Returns the Confluence system information resource from `settings/systemInfo` as a `ConfluencePS.ServerInformation` object.
+Returns the Confluence system information resource from `settings/systemInfo` as a `ConfluencePSVII.ServerInformation` object.
 Cloud responses include Cloud-specific fields such as `CloudId`; Data Center responses are mapped to `DeploymentType = DataCenter`.
 
 ## EXAMPLES
@@ -118,7 +118,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.ServerInformation
+### ConfluencePSVII.ServerInformation
 
 ## NOTES
 

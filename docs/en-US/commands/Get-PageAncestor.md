@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Get-PageAncestor/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -28,7 +28,7 @@ the first result is the space's top-level page in that chain, and the last resul
 page's immediate parent.
 
 Only minimal metadata (ID, Status, Title) is returned for each ancestor -- no body, version,
-or space -- the same partial `ConfluencePS.Page` shape `Get-ConfluencePage`'s own `-Ancestors`
+or space -- the same partial `ConfluencePSVII.Page` shape `Get-ConfluencePage`'s own `-Ancestors`
 property has always used.
 
 ## EXAMPLES
@@ -241,7 +241,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.Page
+### ConfluencePSVII.Page
 
 ## NOTES
 

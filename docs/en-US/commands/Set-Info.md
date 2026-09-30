@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Set-Info/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -29,12 +29,12 @@ URI/auth info to all other functions in the module (e.g. Get-ConfluenceSpace).
 These session defaults can be overwritten on any single command, but using
 Set-ConfluenceInfo avoids repetitively specifying -ApiUri and -Credential parameters.
 The `-BaseUri` parameter still accepts the legacy URI or string value.
-It also accepts an AtlassianPS.Configuration server entry from the pipeline or by property name.
-When the entry includes `Product`, `DeploymentType`, `AuthenticationType`, or `CloudId`, ConfluencePS keeps that metadata in the current module session and uses it to build a deterministic REST API URI.
+It also accepts an AtlassianPSVII.Configuration server entry from the pipeline or by property name.
+When the entry includes `Product`, `DeploymentType`, `AuthenticationType`, or `CloudId`, ConfluencePSVII keeps that metadata in the current module session and uses it to build a deterministic REST API URI.
 
-`-OAuthAccessToken` and `-CloudId` configure an OAuth 2.0 (3LO) Cloud session from a caller-supplied access token, without needing an AtlassianPS.Configuration entry: they are mutually exclusive with `-BaseUri`, and both must be supplied together. Use `Get-ConfluenceOAuthResource` to discover a site's `CloudId` from the token itself. The access token is reused as this session's `-PersonalAccessToken` default, since Confluence's REST API already accepts an OAuth access token the same way it accepts a Data Center Personal Access Token: as an `Authorization: Bearer` header.
+`-OAuthAccessToken` and `-CloudId` configure an OAuth 2.0 (3LO) Cloud session from a caller-supplied access token, without needing an AtlassianPSVII.Configuration entry: they are mutually exclusive with `-BaseUri`, and both must be supplied together. Use `Get-ConfluenceOAuthResource` to discover a site's `CloudId` from the token itself. The access token is reused as this session's `-PersonalAccessToken` default, since Confluence's REST API already accepts an OAuth access token the same way it accepts a Data Center Personal Access Token: as an `Authorization: Bearer` header.
 
-`-OAuthClientId` and `-OAuthClientSecret` configure a fully non-interactive OAuth 2.0 client-credentials session for a service account: ConfluencePS exchanges the client credentials for an access token, discovers which site(s) it can reach, and configures the session the same way `-OAuthAccessToken` does. When the client credentials can reach more than one site, supply `-CloudId`, `-SiteName`, or `-SiteUrl` to pick one; otherwise the command throws rather than guessing. ConfluencePS has no session object to cache this token in, so the token exchange happens again on every `Set-ConfluenceInfo -OAuthClientId` call.
+`-OAuthClientId` and `-OAuthClientSecret` configure a fully non-interactive OAuth 2.0 client-credentials session for a service account: ConfluencePSVII exchanges the client credentials for an access token, discovers which site(s) it can reach, and configures the session the same way `-OAuthAccessToken` does. When the client credentials can reach more than one site, supply `-CloudId`, `-SiteName`, or `-SiteUrl` to pick one; otherwise the command throws rather than guessing. ConfluencePSVII has no session object to cache this token in, so the token exchange happens again on every `Set-ConfluenceInfo -OAuthClientId` call.
 
 Confluence's REST API supports passing basic authentication in headers. For
 Confluence Cloud, use your Atlassian account email address as the username and
@@ -55,7 +55,7 @@ Set-ConfluenceInfo -BaseURI 'https://yournamehere.atlassian.net/wiki' -Credentia
 Declare the URI of your Confluence Cloud instance and authenticate with an
 Atlassian account email address and API token. When prompted, enter the API
 token as the password. Cloud instances use the /wiki subdirectory.
-When explicit Cloud metadata is supplied, ConfluencePS normalizes the REST API URI to `/wiki/rest/api`.
+When explicit Cloud metadata is supplied, ConfluencePSVII normalizes the REST API URI to `/wiki/rest/api`.
 
 ### -------------------------- EXAMPLE 2 --------------------------
 
@@ -102,7 +102,7 @@ See: <https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1
 Get-AtlassianServerConfiguration -Name 'Confluence Cloud' | Set-ConfluenceInfo
 ```
 
-Configure ConfluencePS from an AtlassianPS.Configuration server entry.
+Configure ConfluencePSVII from an AtlassianPSVII.Configuration server entry.
 Explicit Cloud metadata preserves `/wiki`, and explicit Data Center metadata preserves custom context paths such as `/confluence`.
 
 ### -------------------------- EXAMPLE 7 --------------------------
@@ -341,15 +341,15 @@ https://id.atlassian.com/manage-profile/security/api-tokens. Use your Atlassian
 account email address as the credential username and paste the API token as the
 credential password. The BaseURI must include /wiki, for example
 https://yournamehere.atlassian.net/wiki.
-If an AtlassianPS.Configuration entry explicitly sets `DeploymentType = 'Cloud'`,
-ConfluencePS adds `/wiki` when it is missing.
+If an AtlassianPSVII.Configuration entry explicitly sets `DeploymentType = 'Cloud'`,
+ConfluencePSVII adds `/wiki` when it is missing.
 
 ## RELATED LINKS
 
 [https://github.com/AtlassianPS/ConfluencePS](https://github.com/AtlassianPS/ConfluencePS)
 
-[ConfluencePS PR#59: Add proper Paging to Get functions](https://github.com/AtlassianPS/ConfluencePS/pull/59)
+[ConfluencePSVII PR#59: Add proper Paging to Get functions](https://github.com/AtlassianPS/ConfluencePS/pull/59)
 
-[about_ConfluencePS_Authentication](/docs/ConfluencePS/about/authentication.html)
+[about_ConfluencePSVII_Authentication](/docs/ConfluencePS/about/authentication.html)
 
 [Manage API tokens for your Atlassian account](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/)

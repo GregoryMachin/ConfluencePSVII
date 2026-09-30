@@ -7,12 +7,12 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-InlineComment" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([string]$Uri)
                 $script:lastUri = $Uri
                 ConvertFrom-Json '{"id": "327680", "status": "current", "body": {"storage": {"value": "<p>Hi</p>"}}, "container": {"id": "196608", "type": "page"}}'
@@ -34,7 +34,7 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Invoke-Method -ModuleName ConfluencePS {
+                Mock Invoke-Method -ModuleName ConfluencePSVII {
                     param([Uri]$Uri)
                     $script:lastUri = $Uri.AbsoluteUri
                     ConvertFrom-Json '{"id": "327680", "status": "current", "pageId": "196608", "body": {"storage": {"value": "<p>Hi</p>"}}}'
@@ -45,7 +45,7 @@ InModuleScope ConfluencePS {
                 $result = Get-InlineComment -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -CommentID 327680
 
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/inline-comments/327680"
-                $result | Should -BeOfType [ConfluencePS.Comment]
+                $result | Should -BeOfType [ConfluencePSVII.Comment]
                 $result.Type | Should -Be 'inline'
             }
 

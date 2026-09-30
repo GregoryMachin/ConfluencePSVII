@@ -8,7 +8,7 @@ Describe 'Attachment integration tests' -Tag Integration, Cloud, DataCenter {
         $script:fixture = New-ConfluenceIntegrationFixture
 
         if ($script:fixture.IsConfigured) {
-            $script:pageSet = New-ConfluenceIntegrationPageSet -Fixture $script:fixture -SpaceNamePrefix 'ConfluencePS Attachments'
+            $script:pageSet = New-ConfluenceIntegrationPageSet -Fixture $script:fixture -SpaceNamePrefix 'ConfluencePSVII Attachments'
             $script:textFile = Get-Item -Path "$PSScriptRoot/../resources/Test.txt"
             $script:imageFile = Get-Item -Path "$PSScriptRoot/../resources/Test.png"
             $script:excelFile = Get-Item -Path "$PSScriptRoot/../resources/Test.xlsx"
@@ -51,7 +51,7 @@ Describe 'Attachment integration tests' -Tag Integration, Cloud, DataCenter {
             @($script:addResult4).Count | Should -Be 1
             @($script:addResult5).Count | Should -Be 2
             @($script:addResult6).Count | Should -Be 3
-            $script:addResult1 | Should -BeOfType [ConfluencePS.Attachment]
+            $script:addResult1 | Should -BeOfType [ConfluencePSVII.Attachment]
             $script:addResult1.Id | Should -Not -BeNullOrEmpty
             $script:addResult1.Title | Should -Not -BeNullOrEmpty
             $script:addResult1.Filename | Should -Not -BeNullOrEmpty
@@ -59,7 +59,7 @@ Describe 'Attachment integration tests' -Tag Integration, Cloud, DataCenter {
             $script:addResult1.FileSize | Should -Not -BeNullOrEmpty
             $script:addResult1.SpaceKey | Should -Not -BeNullOrEmpty
             $script:addResult1.PageID | Should -Not -BeNullOrEmpty
-            $script:addResult1.Version | Should -BeOfType [ConfluencePS.Version]
+            $script:addResult1.Version | Should -BeOfType [ConfluencePSVII.Version]
             $script:addResult1.Version.Number | Should -Be 1
             ([uri]$script:addResult1.URL).AbsoluteUri | Should -Not -BeNullOrEmpty
         }
@@ -93,7 +93,7 @@ Describe 'Attachment integration tests' -Tag Integration, Cloud, DataCenter {
             @($script:getResult3).Count | Should -Be 5
             @($script:getResult4).Count | Should -Be 3
             @($script:getResult5).Count | Should -Be 3
-            $script:getResult1 | Should -BeOfType [ConfluencePS.Attachment]
+            $script:getResult1 | Should -BeOfType [ConfluencePSVII.Attachment]
             $script:getResult4.Title | Should -Be ('Test.xlsx', 'Test.xlsx', 'Test.xlsx')
             $script:getResult5.MediaType | Should -Be ('text/plain', 'text/plain', 'text/plain')
         }
@@ -163,9 +163,9 @@ Describe 'Attachment integration tests' -Tag Integration, Cloud, DataCenter {
             @($script:setResult1).Count | Should -Be 1
             @($script:setResult2).Count | Should -Be 1
             @($script:setResult3).Count | Should -Be 1
-            $script:setResult1 | Should -BeOfType [ConfluencePS.Attachment]
-            $script:setResult2 | Should -BeOfType [ConfluencePS.Attachment]
-            $script:setResult3 | Should -BeOfType [ConfluencePS.Attachment]
+            $script:setResult1 | Should -BeOfType [ConfluencePSVII.Attachment]
+            $script:setResult2 | Should -BeOfType [ConfluencePSVII.Attachment]
+            $script:setResult3 | Should -BeOfType [ConfluencePSVII.Attachment]
             $script:setResult1.Version.Number | Should -Be 2
             $script:setResult2.Version.Number | Should -Be 3
             $script:setResult3.Version.Number | Should -Be 4

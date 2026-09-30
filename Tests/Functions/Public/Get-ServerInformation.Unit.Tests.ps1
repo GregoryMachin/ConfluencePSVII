@@ -7,10 +7,10 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-ServerInformation" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 $response = [PSCustomObject]@{
                     cloudId          = 'cloud-id'
                     commitHash       = 'abc123'
@@ -22,7 +22,7 @@ InModuleScope ConfluencePS {
                     defaultTimeZone  = 'UTC'
                     microsPerimeter  = 'commercial'
                 }
-                if ($OutputType -eq [ConfluencePS.ServerInformation]) { return $response | ConvertTo-ServerInformation }
+                if ($OutputType -eq [ConfluencePSVII.ServerInformation]) { return $response | ConvertTo-ServerInformation }
                 $response
             }
         }
@@ -30,25 +30,25 @@ InModuleScope ConfluencePS {
         It "calls the system info endpoint" {
             $result = Get-ServerInformation -ApiUri "https://docs.example.com/wiki/rest/api"
 
-            $result | Should -BeOfType [ConfluencePS.ServerInformation]
+            $result | Should -BeOfType [ConfluencePSVII.ServerInformation]
             $result.DeploymentType | Should -Be 'Cloud'
             $result.CloudId | Should -Be 'cloud-id'
             $result.BaseUrl.AbsoluteUri | Should -Be 'https://docs.example.com/wiki'
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Uri -eq 'https://docs.example.com/wiki/rest/api/settings/systemInfo' -and
-                $OutputType -eq [ConfluencePS.ServerInformation]
+                $OutputType -eq [ConfluencePSVII.ServerInformation]
             }
         }
 
         It "maps responses without cloudId to DataCenter" {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 $response = [PSCustomObject]@{
                     baseUrl     = 'https://docs.example.com/wiki'
                     version     = '9.2.0'
                     buildNumber = 9200
                     siteTitle   = 'Docs'
                 }
-                if ($OutputType -eq [ConfluencePS.ServerInformation]) { return $response | ConvertTo-ServerInformation }
+                if ($OutputType -eq [ConfluencePSVII.ServerInformation]) { return $response | ConvertTo-ServerInformation }
                 $response
             }
 
@@ -60,12 +60,12 @@ InModuleScope ConfluencePS {
         }
 
         It "prefers cloudId when determining deployment type" {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 $response = [PSCustomObject]@{
                     cloudId        = 'cloud-id'
                     deploymentType = 'DataCenter'
                 }
-                if ($OutputType -eq [ConfluencePS.ServerInformation]) { return $response | ConvertTo-ServerInformation }
+                if ($OutputType -eq [ConfluencePSVII.ServerInformation]) { return $response | ConvertTo-ServerInformation }
                 $response
             }
 
@@ -75,13 +75,13 @@ InModuleScope ConfluencePS {
         }
 
         It "throws when system info cannot be retrieved" {
-            Mock Invoke-Method -ModuleName ConfluencePS { throw "failed" }
+            Mock Invoke-Method -ModuleName ConfluencePSVII { throw "failed" }
 
             { Get-ServerInformation -ApiUri "https://docs.example.com/wiki/rest/api" -ErrorAction Stop } | Should -Throw
         }
 
         It "returns no output when system info returns no object" {
-            Mock Invoke-Method -ModuleName ConfluencePS {}
+            Mock Invoke-Method -ModuleName ConfluencePSVII {}
 
             $result = Get-ServerInformation -ApiUri "https://docs.example.com/wiki/rest/api"
 

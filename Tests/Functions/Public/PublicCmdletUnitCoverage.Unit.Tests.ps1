@@ -7,7 +7,7 @@ Describe 'Public cmdlet unit coverage baseline' -Tag Unit {
         . "$PSScriptRoot/../../Helpers/TestTools.ps1"
 
         $projectRoot = Resolve-ProjectRoot
-        $script:publicPath = Join-Path $projectRoot 'ConfluencePS/Public'
+        $script:publicPath = Join-Path $projectRoot 'ConfluencePSVII/Public'
         $script:baselinePath = Join-Path $PSScriptRoot 'PublicCmdletUnitCoverageBaseline.psd1'
         $script:baseline = Import-PowerShellDataFile -Path $script:baselinePath
         $script:publicCmdlets = Get-ChildItem -Path $script:publicPath -Filter '*.ps1' -File |

@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-VersionV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -24,10 +24,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Version object" {
+            It "creates a ConfluencePSVII.Version object" {
                 $result = ConvertTo-VersionV2 -InputObject $fullObject
 
-                $result | Should -BeOfType [ConfluencePS.Version]
+                $result | Should -BeOfType [ConfluencePSVII.Version]
             }
 
             It "does not throw on an unrecognized field" {

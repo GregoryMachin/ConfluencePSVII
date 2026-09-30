@@ -7,12 +7,12 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-SpacePermission" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
                 ConvertFrom-Json '{"id": "2000", "principal": {"type": "user", "id": "712020:aaaa"}, "operation": {"key": "read", "targetType": "space"}}'
@@ -23,7 +23,7 @@ InModuleScope ConfluencePS {
             $result = Get-SpacePermission -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -SpaceID 98307
 
             $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/spaces/98307/permissions"
-            $result | Should -BeOfType [ConfluencePS.SpacePermission]
+            $result | Should -BeOfType [ConfluencePSVII.SpacePermission]
         }
 
         It "sets SpaceID on the returned objects" {

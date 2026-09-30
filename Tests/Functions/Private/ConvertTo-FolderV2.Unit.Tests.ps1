@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-FolderV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -37,10 +37,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Folder object" {
+            It "creates a ConfluencePSVII.Folder object" {
                 $result = ConvertTo-FolderV2 -InputObject $fullObject -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.Folder]
+                $result | Should -BeOfType [ConfluencePSVII.Folder]
             }
 
             It "does not throw on an unrecognized field" {

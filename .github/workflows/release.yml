@@ -59,7 +59,7 @@ jobs:
         with:
           tag_name: ${{ steps.release_ref.outputs.release_tag }}
           name: ${{ steps.release_ref.outputs.release_tag }}
-          files: ./Release/ConfluencePS.zip
+          files: ./Release/ConfluencePSVII.zip
           fail_on_unmatched_files: true
           draft: false
           prerelease: ${{ contains(steps.release_ref.outputs.release_tag, 'alpha') || contains(steps.release_ref.outputs.release_tag, 'beta') || contains(steps.release_ref.outputs.release_tag, 'rc') }}
@@ -73,4 +73,4 @@ jobs:
           token: ${{ secrets.HOMEPAGE_PAT }}
           repository: AtlassianPS/AtlassianPS.github.io
           event-type: module-release
-          client-payload: "{\"module\": \"ConfluencePS\", \"version\": \"${{ steps.release_ref.outputs.release_tag }}\"}"
+          client-payload: "{\"module\": \"ConfluencePSVII\", \"version\": \"${{ steps.release_ref.outputs.release_tag }}\"}"

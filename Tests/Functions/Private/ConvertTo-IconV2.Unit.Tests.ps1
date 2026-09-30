@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-IconV2" -Tag 'Unit' {
         Context "Full v2 shape with dimensions present" {
             BeforeAll {
@@ -24,8 +24,8 @@ InModuleScope ConfluencePS {
                 $script:result = ConvertTo-IconV2 -InputObject (ConvertFrom-Json -InputObject $json)
             }
 
-            It "creates a ConfluencePS.Icon object" {
-                $script:result | Should -BeOfType [ConfluencePS.Icon]
+            It "creates a ConfluencePSVII.Icon object" {
+                $script:result | Should -BeOfType [ConfluencePSVII.Icon]
             }
 
             It "prefers path over apiDownloadLink" {

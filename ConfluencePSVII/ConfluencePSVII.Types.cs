@@ -1,0 +1,305 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections;
+// using System.Linq;
+
+namespace ConfluencePSVII
+{
+
+    public class Icon
+    {
+        public String Path { get; set; }
+        public Int32 Width { get; set; }
+        public Int32 Height { get; set; }
+        public Boolean IsDefault { get; set; }
+
+        public override string ToString()
+        {
+            return Path;
+        }
+    }
+
+    public class User
+    {
+        public String UserName { get; set; }
+        public String DisplayName { get; set; }
+        public String UserKey { get; set; }
+        public Icon ProfilePicture { get; set; }
+
+        public override string ToString()
+        {
+            return UserName;
+        }
+    }
+
+    public class Version
+    {
+        public User By { get; set; }
+        public DateTime When { get; set; }
+        public String FriendlyWhen { get; set; }
+        public Int32 Number { get; set; }
+        public String Message { get; set; }
+        public Boolean MinorEdit { get; set; }
+
+        public override string ToString()
+        {
+            return Number.ToString();
+        }
+    }
+
+    public class Space
+    {
+        public UInt64 Id { get; set; }
+        public String Key { get; set; }
+        public String Name { get; set; }
+        public Icon Icon { get; set; }
+        public String Type { get; set; }
+        public String Description { get; set; }
+        public Page Homepage { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + Key + "] " + Name;
+        }
+    }
+
+    public class Page
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public Space Space { get; set; }
+        public Version Version { get; set; }
+        public String Body { get; set; }
+        public Page[] Ancestors { get; set; }
+        public String URL { get; set; }
+        public String ShortURL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Title;
+        }
+    }
+
+    public class BlogPost
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public Space Space { get; set; }
+        public Version Version { get; set; }
+        public String Body { get; set; }
+        public String URL { get; set; }
+        public String ShortURL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Title;
+        }
+    }
+
+    public class Comment
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Body { get; set; }
+        public Version Version { get; set; }
+        public UInt64 PageID { get; set; }
+        public UInt64 ParentID { get; set; }
+        public String Type { get; set; }
+        public String URL { get; set; }
+        public String ShortURL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Type;
+        }
+    }
+
+    public class Database
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public Space Space { get; set; }
+        public UInt64 ParentID { get; set; }
+        public Version Version { get; set; }
+        public String URL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Title;
+        }
+    }
+
+    public class Folder
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public Space Space { get; set; }
+        public UInt64 ParentID { get; set; }
+        public Version Version { get; set; }
+        public String URL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Title;
+        }
+    }
+
+    public class Whiteboard
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public Space Space { get; set; }
+        public UInt64 ParentID { get; set; }
+        public Version Version { get; set; }
+        public String URL { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Title;
+        }
+    }
+
+    public class InlineTask
+    {
+        public UInt64 ID { get; set; }
+        public UInt64 LocalID { get; set; }
+        public UInt64 PageID { get; set; }
+        public String Status { get; set; }
+        public String Body { get; set; }
+        public User CreatedBy { get; set; }
+        public User AssignedTo { get; set; }
+        public User CompletedBy { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? DueAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public Version Version { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + ID + "] " + Status;
+        }
+    }
+
+    public class SpaceProperty
+    {
+        public UInt64 ID { get; set; }
+        public UInt64 SpaceID { get; set; }
+        public String Key { get; set; }
+        public Object Value { get; set; }
+        public Version Version { get; set; }
+
+        public override string ToString()
+        {
+            return Key;
+        }
+    }
+
+    public class SpacePermission
+    {
+        public UInt64 ID { get; set; }
+        public UInt64 SpaceID { get; set; }
+        public String PrincipalType { get; set; }
+        public String PrincipalID { get; set; }
+        public String OperationKey { get; set; }
+        public String OperationTargetType { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + PrincipalType + " " + PrincipalID + "] " + OperationKey;
+        }
+    }
+
+    public class SpaceRoleAssignment
+    {
+        public UInt64 SpaceID { get; set; }
+        public String PrincipalType { get; set; }
+        public String PrincipalID { get; set; }
+        public String RoleID { get; set; }
+        public String RoleName { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + PrincipalType + " " + PrincipalID + "] " + RoleName;
+        }
+    }
+
+    public class Label
+    {
+        public UInt64 ID { get; set; }
+        public String Prefix { get; set; }
+        public String Name { get; set; }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+
+    public class ContentLabelSet
+    {
+        public Page Page { get; set; }
+        public Label[] Labels { get; set; }
+    }
+
+    public class Attachment
+    {
+        public UInt64 ID { get; set; }
+        public String Status { get; set; }
+        public String Title { get; set; }
+        public String Filename { get; set; }
+        public String MediaType { get; set; }
+        public UInt32 FileSize { get; set; }
+        public String Comment { get; set; }
+        public String SpaceKey { get; set; }
+        public UInt64 PageID { get; set; }
+        public Version Version { get; set; }
+        public String URL { get; set; }
+
+        public override string ToString()
+        {
+            return "[att$ID] $Title";
+        }
+    }
+
+    public class OAuthResource
+    {
+        public String CloudId { get; set; }
+        public String Name { get; set; }
+        public Uri Url { get; set; }
+        public String[] Scopes { get; set; }
+        public Uri AvatarUrl { get; set; }
+
+        public override string ToString()
+        {
+            return "[" + CloudId + "] " + Name;
+        }
+    }
+
+    public class ServerInformation
+    {
+        public String DeploymentType { get; set; }
+        public String CloudId { get; set; }
+        public String CommitHash { get; set; }
+        public Uri BaseUrl { get; set; }
+        public Uri FallbackBaseUrl { get; set; }
+        public String Edition { get; set; }
+        public String SiteTitle { get; set; }
+        public String DefaultLocale { get; set; }
+        public String DefaultTimeZone { get; set; }
+        public String MicrosPerimeter { get; set; }
+        public String Version { get; set; }
+        public Int32 BuildNumber { get; set; }
+        public DateTime BuildDate { get; set; }
+        public DateTime ServerTime { get; set; }
+
+        public override string ToString()
+        {
+            return DeploymentType;
+        }
+    }
+}

@@ -7,10 +7,10 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "New-InlineComment" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [string]$Body)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
@@ -27,7 +27,7 @@ InModuleScope ConfluencePS {
             $script:lastBody.inlineCommentProperties.textSelection | Should -Be 'the exact phrase'
             $script:lastBody.inlineCommentProperties.textSelectionMatchCount | Should -Be 1
             $script:lastBody.inlineCommentProperties.textSelectionMatchIndex | Should -Be 0
-            $result | Should -BeOfType [ConfluencePS.Comment]
+            $result | Should -BeOfType [ConfluencePSVII.Comment]
             $result.Type | Should -Be 'inline'
         }
 

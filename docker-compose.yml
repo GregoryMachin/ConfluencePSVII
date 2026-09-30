@@ -1,6 +1,6 @@
 services:
   confluence:
-    # Mirrors the JiraPS Server-track approach: use the moveworkforward
+    # Mirrors the JiraPSVII Server-track approach: use the moveworkforward
     # atlas-run-standalone image family because it already wraps AMPS and
     # boots a disposable local Data Center-compatible Confluence quickly for CI.
     #
@@ -8,7 +8,7 @@ services:
     # override CONFLUENCE_IMAGE in .env (for example:
     # moveworkforward/atlas-run-standalone:confluence-9).
     image: ${CONFLUENCE_IMAGE:-moveworkforward/atlas-run-standalone@sha256:b298cc0a5eb90aac8f6cc3e14d2d809feef217149a8efc2bbc94c2e1f1452077}
-    container_name: confluenceps-confluence-dc
+    container_name: confluencepsvii-confluence-dc
     ports:
       - "1990:1990"
     # Keep the AMPS process alive in detached mode (`docker compose up -d`).

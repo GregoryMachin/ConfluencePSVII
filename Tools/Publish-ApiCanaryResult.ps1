@@ -7,7 +7,7 @@
 .DESCRIPTION
     Used by .github/workflows/api_canary.yml (Phase 9 Task 60) after each scheduled
     canary run. Parses every `test-case` in the Pester-produced NUnit 2.5 XML report
-    and formats one AtlassianPS.Standards.ConvertTo-ApiCanaryResult record per test
+    and formats one AtlassianPSVII.Standards.ConvertTo-ApiCanaryResult record per test
     case, then writes the array as a single JSON file for the workflow to upload as
     an artifact.
 
@@ -23,7 +23,7 @@
     Path to the NUnit 2.5 XML file produced by Invoke-Build -Task TestIntegration.
 
 .PARAMETER Repository
-    Repository name recorded on every canary result, for example 'ConfluencePS'.
+    Repository name recorded on every canary result, for example 'ConfluencePSVII'.
 
 .PARAMETER DeploymentType
     'Cloud' or 'DataCenter', recorded on every canary result.
@@ -32,9 +32,9 @@
     Path to write the resulting JSON array to.
 
 .NOTES
-    Calls AtlassianPS.Standards' ConvertTo-ApiCanaryResult (imported via the version
+    Calls AtlassianPSVII.Standards' ConvertTo-ApiCanaryResult (imported via the version
     Tools/build.requirements.psd1 pins), rather than duplicating its schema by hand:
-    this repository's pin now points at a locally built AtlassianPS.Standards release
+    this repository's pin now points at a locally built AtlassianPSVII.Standards release
     that actually contains it. Message/Metadata are passed through empty, since
     neither carries anything sensitive here; that function's redaction only matters
     once a caller starts passing real diagnostic text or metadata through them.
@@ -59,7 +59,7 @@ param(
     [String]$OutputPath
 )
 
-Import-Module AtlassianPS.Standards -Force -ErrorAction Stop
+Import-Module AtlassianPSVII.Standards -Force -ErrorAction Stop
 
 if (-not (Test-Path -LiteralPath $ResultXmlPath -PathType Leaf)) {
     Write-Warning "Canary result XML '$ResultXmlPath' was not found (the test run likely failed before producing output). Writing an empty result set."
@@ -88,7 +88,7 @@ $results = @(
             default { 'Failed' }
         }
 
-        ConvertTo-AtlassianPSApiCanaryResult `
+        ConvertTo-AtlassianPSVIIApiCanaryResult `
             -Repository $Repository `
             -Operation $testCase.name `
             -DeploymentType $DeploymentType `

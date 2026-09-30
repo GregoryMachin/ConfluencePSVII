@@ -6,7 +6,7 @@ BeforeDiscovery {
     $script:moduleToTest = Initialize-TestEnvironment
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "%FUNCTION-NAME%" -Tag 'Unit' {
         BeforeAll {
             . "$PSScriptRoot/../../Helpers/TestTools.ps1"
@@ -41,7 +41,7 @@ InModuleScope ConfluencePS {
                 }
 
                 It "adds the expected custom type name" {
-                    $script:result.PSObject.TypeNames[0] | Should -Be 'ConfluencePS.%RESOURCE%'
+                    $script:result.PSObject.TypeNames[0] | Should -Be 'ConfluencePSVII.%RESOURCE%'
                 }
             }
 
@@ -72,7 +72,7 @@ InModuleScope ConfluencePS {
                     $pipelineResult = $script:sampleObject | %FUNCTION-NAME%
 
                     $pipelineResult | Should -Not -BeNullOrEmpty
-                    $pipelineResult.PSObject.TypeNames[0] | Should -Be 'ConfluencePS.%RESOURCE%'
+                    $pipelineResult.PSObject.TypeNames[0] | Should -Be 'ConfluencePSVII.%RESOURCE%'
                 }
 
                 It 'handles array input' {

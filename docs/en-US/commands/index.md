@@ -2,9 +2,9 @@
 layout: documentation
 permalink: /docs/ConfluencePS/commands/
 ---
-# ConfluencePS commands
+# ConfluencePSVII commands
 
-ConfluencePS exports these commands with the `Confluence` default command prefix.
+ConfluencePSVII exports these commands with the `Confluence` default command prefix.
 The documentation pages use the source function names that back the exported commands.
 
 | Exported command | Documentation |
@@ -32,5 +32,5 @@ The documentation pages use the source function names that back the exported com
 | `Set-ConfluenceLabel` | [Set-Label](/docs/ConfluencePS/commands/Set-Label/) |
 | `Set-ConfluencePage` | [Set-Page](/docs/ConfluencePS/commands/Set-Page/) |
 
-For module overview and setup, see [about_ConfluencePS](/docs/ConfluencePS/).
-For Cloud, Data Center, Server, and anonymous authentication examples, see [about_ConfluencePS_Authentication](/docs/ConfluencePS/about/authentication.html).
+For module overview and setup, see [about_ConfluencePSVII](/docs/ConfluencePS/).
+For Cloud, Data Center, Server, and anonymous authentication examples, see [about_ConfluencePSVII_Authentication](/docs/ConfluencePS/about/authentication.html).

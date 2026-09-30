@@ -1,11 +1,11 @@
 ﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "4.10" }
 
-Describe 'AtlassianPS.Standards version consistency' -Tag Unit {
+Describe 'AtlassianPSVII.Standards version consistency' -Tag Unit {
     BeforeAll {
         function Get-RepositoryRoot {
             if (
                 $env:BHProjectPath -and
-                (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'ConfluencePS.build.ps1'))
+                (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'ConfluencePSVII.build.ps1'))
             ) {
                 return (Resolve-Path -LiteralPath $env:BHProjectPath).ProviderPath
             }
@@ -13,7 +13,7 @@ Describe 'AtlassianPS.Standards version consistency' -Tag Unit {
             $candidate = (Resolve-Path -LiteralPath $PSScriptRoot).ProviderPath
             while ($candidate -and ($candidate -ne [System.IO.Path]::GetPathRoot($candidate))) {
                 if (
-                    (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'ConfluencePS.build.ps1')) -and
+                    (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'ConfluencePSVII.build.ps1')) -and
                     (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'Tools/build.requirements.psd1'))
                 ) {
                     return $candidate
@@ -32,7 +32,7 @@ Describe 'AtlassianPS.Standards version consistency' -Tag Unit {
         $buildRequirementsPath = Join-Path -Path $projectRoot -ChildPath 'Tools/build.requirements.psd1'
         $buildRequirements = Import-PowerShellDataFile -Path $buildRequirementsPath
         $standardsRequirement = $buildRequirements |
-            Where-Object { $_.ModuleName -eq 'AtlassianPS.Standards' } |
+            Where-Object { $_.ModuleName -eq 'AtlassianPSVII.Standards' } |
             Select-Object -First 1
 
         if (-not $standardsRequirement -or -not $standardsRequirement.RequiredVersion) {
@@ -53,7 +53,7 @@ Describe 'AtlassianPS.Standards version consistency' -Tag Unit {
 
             $buildRequirements = @($statement.PipelineElements[0].Expression.SafeGetValue())
             $standardsRequirement = $buildRequirements |
-                Where-Object { $_.ModuleName -eq 'AtlassianPS.Standards' } |
+                Where-Object { $_.ModuleName -eq 'AtlassianPSVII.Standards' } |
                 Select-Object -First 1
         }
 
@@ -92,7 +92,7 @@ Describe 'AtlassianPS.Standards version consistency' -Tag Unit {
         $matchedVersions[0] | Should -Be $standardsVersion
     }
 
-    It 'reads AtlassianPS.Standards version from build.requirements in tool scripts' {
+    It 'reads AtlassianPSVII.Standards version from build.requirements in tool scripts' {
         $projectRoot = Get-RepositoryRoot
 
         $setupScriptContent = Get-Content -LiteralPath (Join-Path -Path $projectRoot -ChildPath 'Tools/setup.ps1') -Raw
@@ -106,6 +106,6 @@ Describe 'AtlassianPS.Standards version consistency' -Tag Unit {
         $updateScriptContent | Should -Not -Match '\$standardsVersion\s*=\s*'''
         $updateScriptContent | Should -Match '-RequiredVersion\s+\$standardsVersion'
         $updateScriptContent | Should -Match '\$PSCmdlet\.ShouldProcess\('
-        $updateScriptContent | Should -Match 'AtlassianPS\.Standards\\Update-AtlassianPSDependencyReference'
+        $updateScriptContent | Should -Match 'AtlassianPSVII\.Standards\\Update-AtlassianPSVIIDependencyReference'
     }
 }

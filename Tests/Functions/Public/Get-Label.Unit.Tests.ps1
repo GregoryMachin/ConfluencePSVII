@@ -7,36 +7,36 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-Label" -Tag 'Unit' {
         BeforeEach {
-            Mock Get-Page -ModuleName ConfluencePS {
-                $page = [ConfluencePS.Page]::new()
+            Mock Get-Page -ModuleName ConfluencePSVII {
+                $page = [ConfluencePSVII.Page]::new()
                 $page.ID = @($PageID)[0]
                 $page
             }
         }
 
         It "uses the v1 label route by default" {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
-                [ConfluencePS.Label]::new()
+                [ConfluencePSVII.Label]::new()
             }
 
             $result = Get-Label -ApiUri "https://example.com/wiki/rest/api" -PageID 100
 
             $script:lastUri | Should -Be "https://example.com/wiki/rest/api/content/100/label"
-            $result | Should -BeOfType [ConfluencePS.ContentLabelSet]
+            $result | Should -BeOfType [ConfluencePSVII.ContentLabelSet]
             $result.Page.ID | Should -Be 100
         }
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Invoke-Method -ModuleName ConfluencePS {
+                Mock Invoke-Method -ModuleName ConfluencePSVII {
                     param([Uri]$Uri)
                     $script:lastUri = $Uri.AbsoluteUri
-                    [ConfluencePS.Label]::new()
+                    [ConfluencePSVII.Label]::new()
                 }
             }
 
@@ -49,7 +49,7 @@ InModuleScope ConfluencePS {
             It "forwards -BaseUri and -DeploymentType to the internal Get-Page lookup" {
                 $null = Get-Label -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 100
 
-                Should -Invoke -CommandName Get-Page -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Get-Page -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                     $BaseUri -eq "https://example.atlassian.net" -and $DeploymentType -eq 'Cloud'
                 }
             }

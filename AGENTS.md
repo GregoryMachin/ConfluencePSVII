@@ -1,4 +1,4 @@
-# AI Instructions for ConfluencePS
+# AI Instructions for ConfluencePSVII
 
 > **Single source of truth for AI coding assistants.**
 > Tool-specific entry-point files in this repository reference this file.
@@ -6,7 +6,7 @@
 ## Quick Reference (Critical Rules)
 
 1. **One functionality per commit**: implementation, tests, docs, and changelog move together.
-2. **Keep REST calls behind ConfluencePS abstractions**: command implementations should route HTTP work through `Invoke-Method` (and its wrapper stack), not ad-hoc web calls.
+2. **Keep REST calls behind ConfluencePSVII abstractions**: command implementations should route HTTP work through `Invoke-Method` (and its wrapper stack), not ad-hoc web calls.
 3. **Preserve compatibility**: keep existing Cloud/Data Center behavior and public cmdlet parameter/output contracts unless the task explicitly changes them.
 4. **Instruction-only changes still require local validation**: `.github/workflows/ci.yml` path filters can skip AI-instruction-only updates.
 5. **Use the right test loop**: use targeted `Invoke-Pester` during iteration, then run full `Invoke-Build -Task Build, Test` before completion.
@@ -18,15 +18,15 @@
 |------|-------------|----------------------|
 | GitHub Copilot | `.github/copilot-instructions.md` | `AGENTS.md`, `.github/ai-context/powershell-rules.md` |
 | GitHub Copilot (file rules) | `.github/instructions/confluence-api-compatibility.instructions.md` | `.github/ai-context/powershell-rules.md` |
-| Cursor | `.cursor/rules/confluenceps.mdc` | `AGENTS.md`, `.github/ai-context/powershell-rules.md` |
+| Cursor | `.cursor/rules/confluencepsvii.mdc` | `AGENTS.md`, `.github/ai-context/powershell-rules.md` |
 | Claude Code | `CLAUDE.md` | `AGENTS.md`, `.github/ai-context/powershell-rules.md` |
 | Gemini/Antigravity | `GEMINI.md` | `AGENTS.md`, `.github/ai-context/powershell-rules.md` |
 
 ## Repository Map
 
-- Module source: `ConfluencePS/Public/*.ps1`, `ConfluencePS/Private/*.ps1`
-- REST wrapper entrypoint: `ConfluencePS/Public/Invoke-Method.ps1`
-- Build entrypoint: `ConfluencePS.build.ps1`
+- Module source: `ConfluencePSVII/Public/*.ps1`, `ConfluencePSVII/Private/*.ps1`
+- REST wrapper entrypoint: `ConfluencePSVII/Public/Invoke-Method.ps1`
+- Build entrypoint: `ConfluencePSVII.build.ps1`
 - Test suites: `Tests/*.Tests.ps1`, `Tests/Functions/Public/*.Unit.Tests.ps1`, `Tests/Functions/Private/*.Unit.Tests.ps1`
 - Docs/help sources: `docs/en-US/commands/*.md`, `docs/en-US/classes/*.md`
 - Build helpers: `Tools/setup.ps1`, `Tools/BuildTools.psm1`
@@ -85,7 +85,7 @@ Invoke-Build -Task Build, Test
 Examples:
 
 ```powershell
-# After editing ConfluencePS/Public/Invoke-Method.ps1
+# After editing ConfluencePSVII/Public/Invoke-Method.ps1
 Invoke-Build -Task Lint
 Invoke-Pester -Path 'Tests/Functions/Public/Invoke-Method.Unit.Tests.ps1'
 
@@ -129,7 +129,7 @@ Before merging: ensure the Windows PowerShell 5.1 CI test job is green.
 ## Instruction Maintenance
 
 - `AGENTS.md` is canonical for project-wide agent behavior.
-- Keep the quick-reference section in sync across `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`, and `.cursor/rules/confluenceps.mdc`.
+- Keep the quick-reference section in sync across `CLAUDE.md`, `GEMINI.md`, `.github/copilot-instructions.md`, and `.cursor/rules/confluencepsvii.mdc`.
 - Keep `.github/instructions/confluence-api-compatibility.instructions.md` aligned with `.github/ai-context/powershell-rules.md`.
 
 ## Coding Standards

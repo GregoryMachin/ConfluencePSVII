@@ -1,0 +1,26 @@
+﻿function ConvertTo-User {
+    <#
+    .SYNOPSIS
+    Extracted the conversion to private function in order to have a single place to
+    select the properties to use when casting to custom object type
+    #>
+    [CmdletBinding()]
+    [OutputType( [ConfluencePSVII.User] )]
+    param (
+        # object to convert
+        [Parameter( Position = 0, ValueFromPipeline = $true )]
+        $InputObject
+    )
+
+    process {
+        foreach ($object in $InputObject) {
+            Write-Verbose "[$($MyInvocation.MyCommand.Name)] Converting Object to User"
+            [ConfluencePSVII.User](ConvertTo-Hashtable -InputObject ($object | Select-Object `
+                        username,
+                    userKey,
+                    @{Name = "profilePicture"; Expression = { ConvertTo-Icon $_.profilePicture } },
+                    displayname
+                ))
+        }
+    }
+}

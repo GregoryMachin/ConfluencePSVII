@@ -1,6 +1,6 @@
-# ConfluencePS Integration Tests
+# ConfluencePSVII Integration Tests
 
-This directory contains integration tests that exercise ConfluencePS against a real Confluence API.
+This directory contains integration tests that exercise ConfluencePSVII against a real Confluence API.
 
 ## Test Tracks
 

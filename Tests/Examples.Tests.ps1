@@ -8,8 +8,8 @@ BeforeDiscovery {
 
 Describe "Validation of example codes in the documentation" -Tag Documentation, NotImplemented -Skip {
     BeforeAll {
-        $script:commands = Get-Command -Module ConfluencePS -CommandType Cmdlet, Function
-        $script:module = Get-Module ConfluencePS
+        $script:commands = Get-Command -Module ConfluencePSVII -CommandType Cmdlet, Function
+        $script:module = Get-Module ConfluencePSVII
     }
 
     Describe "Examples" {

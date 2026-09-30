@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Get-PageVersion/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -35,9 +35,9 @@ Get-ConfluencePageVersion -ApiUri <Uri> [-BaseUri <Uri>] [-DeploymentType <Strin
 ## DESCRIPTION
 
 Without -VersionNumber, returns the full version history of a page as a list of
-`ConfluencePS.Version` objects -- useful for auditing who changed a page and when.
+`ConfluencePSVII.Version` objects -- useful for auditing who changed a page and when.
 
-With -VersionNumber, returns that single historical revision as a `ConfluencePS.Page` object.
+With -VersionNumber, returns that single historical revision as a `ConfluencePSVII.Page` object.
 Pass -IncludeBody to also fetch that revision's content, for example to compare it against the
 current page or to plan a rollback.
 
@@ -293,9 +293,9 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.Version
+### ConfluencePSVII.Version
 
-### ConfluencePS.Page
+### ConfluencePSVII.Page
 
 ## NOTES
 

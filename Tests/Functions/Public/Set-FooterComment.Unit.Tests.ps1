@@ -7,17 +7,17 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Set-FooterComment" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [string]$Body)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
                 ConvertFrom-Json '{"id": "327680", "status": "current", "body": {"storage": {"value": "<p>Updated</p>"}}}'
             }
-            Mock Get-FooterComment -ModuleName ConfluencePS {
-                [ConfluencePS.Comment]@{ ID = 327680; Body = '<p>Old</p>'; Version = [ConfluencePS.Version]@{ Number = 2 } }
+            Mock Get-FooterComment -ModuleName ConfluencePSVII {
+                [ConfluencePSVII.Comment]@{ ID = 327680; Body = '<p>Old</p>'; Version = [ConfluencePSVII.Version]@{ Number = 2 } }
             }
         }
 
@@ -26,7 +26,7 @@ InModuleScope ConfluencePS {
 
             $script:lastUri | Should -Be "https://example.com/wiki/rest/api/content/327680"
             $script:lastBody.version.number | Should -Be 3
-            $result | Should -BeOfType [ConfluencePS.Comment]
+            $result | Should -BeOfType [ConfluencePSVII.Comment]
         }
 
         Context "Pipeline binding" {
@@ -50,13 +50,13 @@ InModuleScope ConfluencePS {
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/footer-comments/327680"
                 $script:lastBody.id | Should -Be '327680'
                 $script:lastBody.version.number | Should -Be 3
-                $result | Should -BeOfType [ConfluencePS.Comment]
+                $result | Should -BeOfType [ConfluencePSVII.Comment]
             }
 
             It "forwards -BaseUri/-DeploymentType to the internal Get-FooterComment call" {
                 $null = Set-FooterComment -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -CommentID 327680 -Body "<p>Updated</p>" -Confirm:$false
 
-                Should -Invoke -CommandName Get-FooterComment -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Get-FooterComment -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                     $BaseUri -eq 'https://example.atlassian.net' -and $DeploymentType -eq 'Cloud'
                 }
             }

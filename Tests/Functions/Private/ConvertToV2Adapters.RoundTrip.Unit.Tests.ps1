@@ -7,14 +7,14 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "V1/v2 adapter round-trip compatibility" -Tag 'Unit' {
         <#
             These tests prove that feeding a v1-shaped fixture through the existing v1
             converter and a v2-shaped fixture through the new v2 adapter for the same
             resource yields the same output type with the same core properties populated,
             so a route migration (Task 44+) does not change what a script consuming
-            ConfluencePS objects sees.
+            ConfluencePSVII objects sees.
         #>
 
         Context "Page" {
@@ -41,9 +41,9 @@ InModuleScope ConfluencePS {
                 $script:v2Result = ConvertTo-PageV2 -InputObject (ConvertFrom-Json -InputObject $v2Json)
             }
 
-            It "both produce a ConfluencePS.Page" {
-                $v1Result | Should -BeOfType [ConfluencePS.Page]
-                $v2Result | Should -BeOfType [ConfluencePS.Page]
+            It "both produce a ConfluencePSVII.Page" {
+                $v1Result | Should -BeOfType [ConfluencePSVII.Page]
+                $v2Result | Should -BeOfType [ConfluencePSVII.Page]
             }
 
             It "both agree on ID, Status, Title, and Body" {
@@ -82,9 +82,9 @@ InModuleScope ConfluencePS {
                 $script:v2Result = ConvertTo-BlogPostV2 -InputObject (ConvertFrom-Json -InputObject $v2Json)
             }
 
-            It "both produce a ConfluencePS.BlogPost" {
-                $v1Result | Should -BeOfType [ConfluencePS.BlogPost]
-                $v2Result | Should -BeOfType [ConfluencePS.BlogPost]
+            It "both produce a ConfluencePSVII.BlogPost" {
+                $v1Result | Should -BeOfType [ConfluencePSVII.BlogPost]
+                $v2Result | Should -BeOfType [ConfluencePSVII.BlogPost]
             }
 
             It "both agree on ID, Status, Title, and Body" {
@@ -123,9 +123,9 @@ InModuleScope ConfluencePS {
                 $script:v2Result = ConvertTo-CommentV2 -InputObject (ConvertFrom-Json -InputObject $v2Json) -Type footer
             }
 
-            It "both produce a ConfluencePS.Comment" {
-                $v1Result | Should -BeOfType [ConfluencePS.Comment]
-                $v2Result | Should -BeOfType [ConfluencePS.Comment]
+            It "both produce a ConfluencePSVII.Comment" {
+                $v1Result | Should -BeOfType [ConfluencePSVII.Comment]
+                $v2Result | Should -BeOfType [ConfluencePSVII.Comment]
             }
 
             It "both agree on ID, Status, Body, and PageID" {
@@ -169,9 +169,9 @@ InModuleScope ConfluencePS {
                 $script:v2Result = ConvertTo-SpaceV2 -InputObject (ConvertFrom-Json -InputObject $v2Json)
             }
 
-            It "both produce a ConfluencePS.Space" {
-                $v1Result | Should -BeOfType [ConfluencePS.Space]
-                $v2Result | Should -BeOfType [ConfluencePS.Space]
+            It "both produce a ConfluencePSVII.Space" {
+                $v1Result | Should -BeOfType [ConfluencePSVII.Space]
+                $v2Result | Should -BeOfType [ConfluencePSVII.Space]
             }
 
             It "both agree on Id, Key, Name, Type, and Description" {
@@ -208,9 +208,9 @@ InModuleScope ConfluencePS {
                 $script:v2Result = ConvertTo-AttachmentV2 -InputObject (ConvertFrom-Json -InputObject $v2Json)
             }
 
-            It "both produce a ConfluencePS.Attachment" {
-                $v1Result | Should -BeOfType [ConfluencePS.Attachment]
-                $v2Result | Should -BeOfType [ConfluencePS.Attachment]
+            It "both produce a ConfluencePSVII.Attachment" {
+                $v1Result | Should -BeOfType [ConfluencePSVII.Attachment]
+                $v2Result | Should -BeOfType [ConfluencePSVII.Attachment]
             }
 
             It "both agree on ID, Title, MediaType, FileSize, and PageID" {

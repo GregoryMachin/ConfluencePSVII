@@ -1,0 +1,45 @@
+﻿#region Dependencies
+# Load the ConfluencePSVII namespace from C#
+if (!("ConfluencePSVII.Space" -as [Type])) {
+    Add-Type -Path (Join-Path $PSScriptRoot ConfluencePSVII.Types.cs) -ReferencedAssemblies Microsoft.CSharp, Microsoft.PowerShell.Commands.Utility, System.Management.Automation
+}
+
+# Load Web assembly when needed
+# PowerShell Core has the assembly preloaded
+if (!("System.Web.HttpUtility" -as [Type])) {
+    Add-Type -Assembly System.Web
+}
+#endregion Dependencies
+
+$script:ConfluenceRequestContext = @{
+    BaseUri            = $null
+    ApiUri             = $null
+    Product            = $null
+    DeploymentType     = $null
+    AuthenticationType = $null
+    CloudId            = $null
+}
+
+#region LoadFunctions
+$PublicFunctions = @( Get-ChildItem -Path $PSScriptRoot\Public\*.ps1 -ErrorAction SilentlyContinue )
+$PrivateFunctions = @( Get-ChildItem -Path $PSScriptRoot\Private\*.ps1 -ErrorAction SilentlyContinue )
+
+# Dot source the functions
+ForEach ($File in @($PublicFunctions + $PrivateFunctions)) {
+    Try {
+        . $File.FullName
+    }
+    Catch {
+        $errorItem = [System.Management.Automation.ErrorRecord]::new(
+            ([System.ArgumentException]"Function not found"),
+            'Load.Function',
+            [System.Management.Automation.ErrorCategory]::ObjectNotFound,
+            $File
+        )
+        $errorItem.ErrorDetails = "Failed to import function $($File.BaseName)"
+        $PSCmdlet.ThrowTerminatingError($errorItem)
+    }
+}
+
+Export-ModuleMember -Function $PublicFunctions.BaseName
+#endregion LoadFunctions

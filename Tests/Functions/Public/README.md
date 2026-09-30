@@ -1,6 +1,6 @@
 # Public Function Tests
 
-This directory contains unit tests for public exported ConfluencePS cmdlets in `ConfluencePS/Public/*.ps1`.
+This directory contains unit tests for public exported ConfluencePSVII cmdlets in `ConfluencePSVII/Public/*.ps1`.
 
 ## Naming
 
@@ -8,8 +8,8 @@ Use one file per public cmdlet named `<CmdletName>.Unit.Tests.ps1`.
 
 Examples:
 
-- `Invoke-Method.Unit.Tests.ps1` tests `ConfluencePS/Public/Invoke-Method.ps1`
-- `Get-Page.Unit.Tests.ps1` tests `ConfluencePS/Public/Get-Page.ps1`
+- `Invoke-Method.Unit.Tests.ps1` tests `ConfluencePSVII/Public/Invoke-Method.ps1`
+- `Get-Page.Unit.Tests.ps1` tests `ConfluencePSVII/Public/Get-Page.ps1`
 
 ## Structure
 
@@ -22,6 +22,6 @@ Public cmdlet tests should usually include:
 ## Helpers
 
 Dot-source shared test helpers with `../../Helpers/<HelperName>.ps1` from files in this directory.
-Use `Initialize-TestEnvironment` in `BeforeDiscovery`, then test inside `InModuleScope ConfluencePS`.
+Use `Initialize-TestEnvironment` in `BeforeDiscovery`, then test inside `InModuleScope ConfluencePSVII`.
 
 See [`.template.ps1`](.template.ps1) for a starting point.

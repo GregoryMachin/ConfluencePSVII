@@ -17,8 +17,8 @@ Read this file first, then follow canonical sources:
 
 ## File Locations
 
-- Public functions: `ConfluencePS/Public/`
-- Private functions: `ConfluencePS/Private/`
-- REST wrapper: `ConfluencePS/Public/Invoke-Method.ps1`
+- Public functions: `ConfluencePSVII/Public/`
+- Private functions: `ConfluencePSVII/Private/`
+- REST wrapper: `ConfluencePSVII/Public/Invoke-Method.ps1`
 - Tests: `Tests/*.Tests.ps1`, `Tests/Functions/Public/*.Unit.Tests.ps1`, `Tests/Functions/Private/*.Unit.Tests.ps1`
 - Docs: `docs/en-US/commands/`, `docs/en-US/classes/`

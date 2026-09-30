@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-SpacePropertyV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -27,10 +27,10 @@ InModuleScope ConfluencePS {
             $script:fullObject = ConvertFrom-Json -InputObject $fullJson
         }
 
-        It "creates a ConfluencePS.SpaceProperty object" {
+        It "creates a ConfluencePSVII.SpaceProperty object" {
             $result = ConvertTo-SpacePropertyV2 -InputObject $fullObject -SpaceID 98307
 
-            $result | Should -BeOfType [ConfluencePS.SpaceProperty]
+            $result | Should -BeOfType [ConfluencePSVII.SpaceProperty]
         }
 
         It "casts the numeric-string id to UInt64" {

@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/New-Space/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -50,7 +50,7 @@ Create a new blank space with an optional description and verbose output.
 ### -------------------------- EXAMPLE 2 --------------------------
 
 ```powershell
-$spaceObject = [ConfluencePS.Space]@{
+$spaceObject = [ConfluencePSVII.Space]@{
     Key         = "HOTH"
     Name        = "Planet Hoth"
     Description = "It's really cold"
@@ -62,7 +62,7 @@ New-ConfluenceSpace -InputObject $spaceObject
 $spaceObject | New-ConfluenceSpace
 ```
 
-Two different methods of creating a new space from an object `ConfluencePS.Space`.
+Two different methods of creating a new space from an object `ConfluencePSVII.Space`.
 
 Both examples should return identical results.
 
@@ -271,7 +271,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.Space
+### ConfluencePSVII.Space
 
 ## NOTES
 

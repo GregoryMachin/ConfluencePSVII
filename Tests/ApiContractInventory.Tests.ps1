@@ -8,12 +8,12 @@ BeforeDiscovery {
     Import-Module $moduleToTest -Force -ErrorAction Stop
 }
 
-Describe 'ConfluencePS API contract inventory' -Tag Unit, Documentation {
+Describe 'ConfluencePSVII API contract inventory' -Tag Unit, Documentation {
     BeforeDiscovery {
         $script:inventoryPath = Join-Path $projectRoot 'docs/api-contract-inventory.md'
         $script:inventoryLines = Get-Content -LiteralPath $inventoryPath
         $script:exportedCommands = @(
-            (Get-Module 'ConfluencePS').ExportedFunctions.Keys | Sort-Object
+            (Get-Module 'ConfluencePSVII').ExportedFunctions.Keys | Sort-Object
         )
 
         $script:inventoryRows = @(
@@ -32,15 +32,15 @@ Describe 'ConfluencePS API contract inventory' -Tag Unit, Documentation {
         )
 
         $sourceFiles = @(
-            Get-ChildItem -Path (Join-Path $projectRoot 'ConfluencePS/Public') -Filter '*.ps1' -File
-            Get-ChildItem -Path (Join-Path $projectRoot 'ConfluencePS/Private') -Filter '*.ps1' -File
+            Get-ChildItem -Path (Join-Path $projectRoot 'ConfluencePSVII/Public') -Filter '*.ps1' -File
+            Get-ChildItem -Path (Join-Path $projectRoot 'ConfluencePSVII/Private') -Filter '*.ps1' -File
         )
 
         $script:expectedSourceByCommand = @{}
         foreach ($sourceFile in $sourceFiles) {
             $nameParts = $sourceFile.BaseName -split '-', 2
             $exportedName = '{0}-Confluence{1}' -f $nameParts[0], $nameParts[1]
-            $relativeSource = '../ConfluencePS/{0}/{1}' -f $sourceFile.Directory.Name, $sourceFile.Name
+            $relativeSource = '../ConfluencePSVII/{0}/{1}' -f $sourceFile.Directory.Name, $sourceFile.Name
             $script:expectedSourceByCommand[$exportedName] = $relativeSource
         }
 

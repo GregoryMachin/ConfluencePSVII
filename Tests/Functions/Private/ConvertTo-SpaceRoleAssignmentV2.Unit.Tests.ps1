@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-SpaceRoleAssignmentV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -19,10 +19,10 @@ InModuleScope ConfluencePS {
             $script:fullObject = ConvertFrom-Json -InputObject $fullJson
         }
 
-        It "creates a ConfluencePS.SpaceRoleAssignment object" {
+        It "creates a ConfluencePSVII.SpaceRoleAssignment object" {
             $result = ConvertTo-SpaceRoleAssignmentV2 -InputObject $fullObject -SpaceID 98307
 
-            $result | Should -BeOfType [ConfluencePS.SpaceRoleAssignment]
+            $result | Should -BeOfType [ConfluencePSVII.SpaceRoleAssignment]
         }
 
         It "sets SpaceID from the caller-supplied parameter" {

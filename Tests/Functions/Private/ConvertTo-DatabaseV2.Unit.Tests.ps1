@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-DatabaseV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -37,10 +37,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.Database object" {
+            It "creates a ConfluencePSVII.Database object" {
                 $result = ConvertTo-DatabaseV2 -InputObject $fullObject -BaseUri $baseUri
 
-                $result | Should -BeOfType [ConfluencePS.Database]
+                $result | Should -BeOfType [ConfluencePSVII.Database]
             }
 
             It "does not throw on an unrecognized field" {

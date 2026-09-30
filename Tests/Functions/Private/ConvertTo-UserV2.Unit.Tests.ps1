@@ -7,12 +7,12 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-UserV2" -Tag 'Unit' {
         It "wraps an account ID in UserKey and leaves other properties unset" {
             $result = ConvertTo-UserV2 -AccountId '712020:aaaa-bbbb-cccc'
 
-            $result | Should -BeOfType [ConfluencePS.User]
+            $result | Should -BeOfType [ConfluencePSVII.User]
             $result.UserKey | Should -Be '712020:aaaa-bbbb-cccc'
             $result.UserName | Should -BeNullOrEmpty
             $result.DisplayName | Should -BeNullOrEmpty

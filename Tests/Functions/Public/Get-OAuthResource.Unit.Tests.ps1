@@ -7,13 +7,13 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-OAuthResource" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
             $script:lastPersonalAccessToken = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [String]$PersonalAccessToken)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastPersonalAccessToken = $PersonalAccessToken
@@ -50,7 +50,7 @@ InModuleScope ConfluencePS {
         It "filters to a single resource by -CloudId" {
             $result = Get-OAuthResource -OAuthAccessToken $script:token -CloudId '11223344-a1b2-3b33-c444-def123456789'
 
-            $result | Should -BeOfType [ConfluencePS.OAuthResource]
+            $result | Should -BeOfType [ConfluencePSVII.OAuthResource]
             $result.Name | Should -Be 'Example Site'
         }
 

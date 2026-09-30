@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-Label" -Tag 'Unit' {
         Context "v1 shape (GET /content/{id}/label)" {
             BeforeAll {
@@ -15,8 +15,8 @@ InModuleScope ConfluencePS {
                 $script:result = ConvertTo-Label -InputObject (ConvertFrom-Json -InputObject $json)
             }
 
-            It "creates a ConfluencePS.Label object" {
-                $script:result | Should -BeOfType [ConfluencePS.Label]
+            It "creates a ConfluencePSVII.Label object" {
+                $script:result | Should -BeOfType [ConfluencePSVII.Label]
             }
 
             It "maps id, name, and prefix" {
@@ -35,8 +35,8 @@ InModuleScope ConfluencePS {
                 $script:result = ConvertTo-Label -InputObject (ConvertFrom-Json -InputObject $json)
             }
 
-            It "creates a ConfluencePS.Label object from the v2 shape too" {
-                $script:result | Should -BeOfType [ConfluencePS.Label]
+            It "creates a ConfluencePSVII.Label object from the v2 shape too" {
+                $script:result | Should -BeOfType [ConfluencePSVII.Label]
             }
 
             It "maps id, name, and prefix" {

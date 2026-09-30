@@ -1,4 +1,4 @@
-# ConfluencePS PowerShell Rules
+# ConfluencePSVII PowerShell Rules
 
 Practical coding/build/test rules shared across AI entry points.
 
@@ -48,10 +48,10 @@ DataCenter track requires `CI_CONFLUENCE_TYPE=DataCenter`, `CI_CONFLUENCE_URL`, 
 
 ## Source and Test Layout
 
-- Public cmdlets: `ConfluencePS/Public/*.ps1`
-- Private helpers/converters: `ConfluencePS/Private/*.ps1`
-- REST wrapper entrypoint: `ConfluencePS/Public/Invoke-Method.ps1`
-- Build script: `ConfluencePS.build.ps1`
+- Public cmdlets: `ConfluencePSVII/Public/*.ps1`
+- Private helpers/converters: `ConfluencePSVII/Private/*.ps1`
+- REST wrapper entrypoint: `ConfluencePSVII/Public/Invoke-Method.ps1`
+- Build script: `ConfluencePSVII.build.ps1`
 - Tests: `Tests/*.Tests.ps1`, `Tests/Functions/Public/*.Unit.Tests.ps1`, `Tests/Functions/Private/*.Unit.Tests.ps1`
 - Docs/help sources: `docs/en-US/commands/*.md`, `docs/en-US/classes/*.md`
 

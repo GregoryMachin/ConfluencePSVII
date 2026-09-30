@@ -7,18 +7,18 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-Space" -Tag 'Unit' {
         BeforeEach {
             $script:lastGetParameters = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param(
                     [hashtable]$GetParameters
                 )
 
                 $script:lastGetParameters = $GetParameters
-                [ConfluencePS.Space]::new()
+                [ConfluencePSVII.Space]::new()
             }
         }
 
@@ -30,7 +30,7 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Invoke-Method -ModuleName ConfluencePS {
+                Mock Invoke-Method -ModuleName ConfluencePSVII {
                     param([Uri]$Uri, [hashtable]$GetParameters)
 
                     $script:lastUri = $Uri.AbsoluteUri
@@ -43,7 +43,7 @@ InModuleScope ConfluencePS {
                 $result = Get-Space -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud
 
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/spaces"
-                $result | Should -BeOfType [ConfluencePS.Space]
+                $result | Should -BeOfType [ConfluencePSVII.Space]
                 $result.Key | Should -Be 'TEST'
                 $script:lastGetParameters.ContainsKey('keys') | Should -BeFalse
             }
@@ -52,7 +52,7 @@ InModuleScope ConfluencePS {
                 $null = Get-Space -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -SpaceKey TEST, OTHER
 
                 $script:lastGetParameters['keys'] | Should -Be 'TEST,OTHER'
-                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It
+                Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It
             }
 
             It "requests description-format and include-icon" {

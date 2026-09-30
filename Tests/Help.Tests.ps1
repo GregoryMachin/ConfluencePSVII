@@ -21,7 +21,7 @@ Describe "Help tests" -Tag "Documentation", "Build" {
             Write-Warning "Tests are being run outside of the 'Release' folder. Some tests may be skipped."
         }
 
-        $script:publicFunctions = (Get-ChildItem "$projectRoot/ConfluencePS/Public/*.ps1").BaseName
+        $script:publicFunctions = (Get-ChildItem "$projectRoot/ConfluencePSVII/Public/*.ps1").BaseName
 
         $commandToDocNameMap = @{}
         foreach ($functionName in $publicFunctions) {
@@ -30,7 +30,7 @@ Describe "Help tests" -Tag "Documentation", "Build" {
         }
 
         Import-Module $moduleToTest -Force -ErrorAction Stop
-        $script:commands = Get-Command -Module ConfluencePS -CommandType Cmdlet, Function |
+        $script:commands = Get-Command -Module ConfluencePSVII -CommandType Cmdlet, Function |
             Where-Object { $_.Name -in $commandToDocNameMap.Keys } |
             ForEach-Object {
                 @{
@@ -124,7 +124,7 @@ Describe "Help tests" -Tag "Documentation", "Build" {
 
                 It "defines the frontmatter for the homepage" {
                     $markdownFile | Should -Not -BeNullOrEmpty
-                    $markdownFile | Should -FileContentMatch "Module Name: ConfluencePS"
+                    $markdownFile | Should -FileContentMatch "Module Name: ConfluencePSVII"
                     $markdownFile | Should -FileContentMatchExactly "layout: documentation"
                     $markdownFile | Should -FileContentMatch "permalink: /docs/ConfluencePS/commands/$docName/"
                 }

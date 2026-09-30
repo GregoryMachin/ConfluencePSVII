@@ -7,14 +7,14 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-BlogPost" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
             $script:lastCql = $null
             $script:lastGetParameters = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param(
                     [string]$Uri,
                     [hashtable]$GetParameters
@@ -23,7 +23,7 @@ InModuleScope ConfluencePS {
                 $script:lastUri = $Uri
                 $script:lastGetParameters = $GetParameters
                 $script:lastCql = $GetParameters['cql']
-                [ConfluencePS.BlogPost]::new()
+                [ConfluencePSVII.BlogPost]::new()
             }
         }
 
@@ -50,15 +50,15 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Invoke-Method -ModuleName ConfluencePS {
+                Mock Invoke-Method -ModuleName ConfluencePSVII {
                     param([Uri]$Uri, [hashtable]$GetParameters)
 
                     $script:lastUri = $Uri.AbsoluteUri
                     $script:lastGetParameters = $GetParameters
                     ConvertFrom-Json '{"id": "262144", "status": "current", "title": "Example Blog Post", "body": {"storage": {"value": "<p>Hi</p>"}}}'
                 }
-                Mock Get-Space -ModuleName ConfluencePS {
-                    [ConfluencePS.Space]@{ Id = 98307 }
+                Mock Get-Space -ModuleName ConfluencePSVII {
+                    [ConfluencePSVII.Space]@{ Id = 98307 }
                 }
             }
 
@@ -66,7 +66,7 @@ InModuleScope ConfluencePS {
                 $result = Get-BlogPost -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -BlogPostID 262144
 
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/blogposts/262144"
-                $result | Should -BeOfType [ConfluencePS.BlogPost]
+                $result | Should -BeOfType [ConfluencePSVII.BlogPost]
                 $result.ID | Should -Be 262144
                 $result.Body | Should -Be '<p>Hi</p>'
             }
@@ -76,7 +76,7 @@ InModuleScope ConfluencePS {
 
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/blogposts"
                 $script:lastGetParameters['space-id'] | Should -Be 98307
-                Should -Invoke -CommandName Get-Space -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Get-Space -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                     $SpaceKey -eq 'TEST' -and $DeploymentType -eq 'Cloud'
                 }
             }

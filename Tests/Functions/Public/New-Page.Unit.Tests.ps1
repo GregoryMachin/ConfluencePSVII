@@ -7,14 +7,14 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "New-Page" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [string]$Body)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
-                [ConfluencePS.Page]::new()
+                [ConfluencePSVII.Page]::new()
             }
         }
 
@@ -27,8 +27,8 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Get-Space -ModuleName ConfluencePS {
-                    [ConfluencePS.Space]@{ Id = 98307 }
+                Mock Get-Space -ModuleName ConfluencePSVII {
+                    [ConfluencePSVII.Space]@{ Id = 98307 }
                 }
             }
 
@@ -40,25 +40,25 @@ InModuleScope ConfluencePS {
                 $script:lastBody.title | Should -Be 'Example'
                 $script:lastBody.body.representation | Should -Be 'storage'
                 $script:lastBody.body.value | Should -Be '<p>Hi</p>'
-                $result | Should -BeOfType [ConfluencePS.Page]
+                $result | Should -BeOfType [ConfluencePSVII.Page]
             }
 
             It "resolves -SpaceKey to a numeric spaceId via Get-Space" {
                 $null = New-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -Title "Example" -SpaceKey "TEST" -Body "<p>Hi</p>" -Confirm:$false
 
                 $script:lastBody.spaceId | Should -Be '98307'
-                Should -Invoke -CommandName Get-Space -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Get-Space -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                     $SpaceKey -eq 'TEST' -and $DeploymentType -eq 'Cloud'
                 }
             }
 
             It "uses -Space.Id directly without calling Get-Space when already known" {
-                $space = [ConfluencePS.Space]@{ Id = 55555; Key = 'TEST' }
+                $space = [ConfluencePSVII.Space]@{ Id = 55555; Key = 'TEST' }
 
                 $null = New-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -Title "Example" -Space $space -Body "<p>Hi</p>" -Confirm:$false
 
                 $script:lastBody.spaceId | Should -Be '55555'
-                Should -Invoke -CommandName Get-Space -ModuleName ConfluencePS -Exactly -Times 0 -Scope It
+                Should -Invoke -CommandName Get-Space -ModuleName ConfluencePSVII -Exactly -Times 0 -Scope It
             }
 
             It "sends parentId instead of an ancestors array" {

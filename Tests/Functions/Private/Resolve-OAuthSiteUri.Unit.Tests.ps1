@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Resolve-OAuthSiteUri" -Tag 'Unit' {
         It "normalizes a root-path atlassian.net URL" {
             Resolve-OAuthSiteUri -Url 'https://example.atlassian.net' | Should -Be 'https://example.atlassian.net/'

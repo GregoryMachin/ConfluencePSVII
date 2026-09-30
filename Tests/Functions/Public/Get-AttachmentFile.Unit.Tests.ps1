@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-AttachmentFile" -Tag 'Unit' {
         BeforeAll {
             function New-TestAttachment {
@@ -17,7 +17,7 @@ InModuleScope ConfluencePS {
                     [string]$URL = "https://example.com/wiki/download/attachments/123/Test.txt"
                 )
 
-                $attachment = [ConfluencePS.Attachment]::new()
+                $attachment = [ConfluencePSVII.Attachment]::new()
                 $attachment.ID = $ID
                 $attachment.PageID = $PageID
                 $attachment.URL = $URL
@@ -28,8 +28,8 @@ InModuleScope ConfluencePS {
         }
 
         BeforeEach {
-            Mock Get-ServerInformation -ModuleName ConfluencePS { [ConfluencePS.ServerInformation]@{ DeploymentType = 'Cloud' } }
-            Mock Invoke-Method -ModuleName ConfluencePS {}
+            Mock Get-ServerInformation -ModuleName ConfluencePSVII { [ConfluencePSVII.ServerInformation]@{ DeploymentType = 'Cloud' } }
+            Mock Invoke-Method -ModuleName ConfluencePSVII {}
         }
 
         It "uses the REST download endpoint for Cloud API paths on custom domains" {
@@ -38,7 +38,7 @@ InModuleScope ConfluencePS {
             $result = Get-AttachmentFile -ApiUri "https://docs.example.com/wiki/rest/api" -Attachment $attachment
 
             $result | Should -Be $true
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Uri -eq "https://docs.example.com/wiki/rest/api/content/123/child/attachment/456/download" -and
                 $Headers.Accept -eq "*/*"
             }
@@ -47,12 +47,12 @@ InModuleScope ConfluencePS {
         It "preserves Data Center attachment URLs" {
             $attachment = New-TestAttachment -URL "http://localhost:1990/confluence/download/attachments/123/Test.txt"
 
-            Mock Get-ServerInformation -ModuleName ConfluencePS { [ConfluencePS.ServerInformation]@{ DeploymentType = 'DataCenter' } }
+            Mock Get-ServerInformation -ModuleName ConfluencePSVII { [ConfluencePSVII.ServerInformation]@{ DeploymentType = 'DataCenter' } }
 
             $result = Get-AttachmentFile -ApiUri "http://localhost:1990/confluence/rest/api" -Attachment $attachment
 
             $result | Should -Be $true
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Uri -eq "http://localhost:1990/confluence/download/attachments/123/Test.txt" -and
                 $Headers.Accept -eq "*/*"
             }
@@ -61,12 +61,12 @@ InModuleScope ConfluencePS {
         It "preserves Data Center attachment URLs when Data Center is hosted under /wiki" {
             $attachment = New-TestAttachment -URL "https://docs.example.com/wiki/download/attachments/123/Test.txt"
 
-            Mock Get-ServerInformation -ModuleName ConfluencePS { [ConfluencePS.ServerInformation]@{ DeploymentType = 'DataCenter' } }
+            Mock Get-ServerInformation -ModuleName ConfluencePSVII { [ConfluencePSVII.ServerInformation]@{ DeploymentType = 'DataCenter' } }
 
             $result = Get-AttachmentFile -ApiUri "https://docs.example.com/wiki/rest/api" -Attachment $attachment
 
             $result | Should -Be $true
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Uri -eq "https://docs.example.com/wiki/download/attachments/123/Test.txt" -and
                 $Headers.Accept -eq "*/*"
             }
@@ -75,12 +75,12 @@ InModuleScope ConfluencePS {
         It "preserves attachment URLs when server information returns no object" {
             $attachment = New-TestAttachment -URL "https://docs.example.com/wiki/download/attachments/123/Test.txt"
 
-            Mock Get-ServerInformation -ModuleName ConfluencePS {}
+            Mock Get-ServerInformation -ModuleName ConfluencePSVII {}
 
             $result = Get-AttachmentFile -ApiUri "https://docs.example.com/wiki/rest/api" -Attachment $attachment
 
             $result | Should -Be $true
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Uri -eq "https://docs.example.com/wiki/download/attachments/123/Test.txt" -and
                 $Headers.Accept -eq "*/*"
             }
@@ -89,12 +89,12 @@ InModuleScope ConfluencePS {
         It "preserves attachment URLs when server information cannot be retrieved" {
             $attachment = New-TestAttachment -URL "http://localhost:1990/confluence/download/attachments/123/Test.txt"
 
-            Mock Get-ServerInformation -ModuleName ConfluencePS { throw "systemInfo unavailable" }
+            Mock Get-ServerInformation -ModuleName ConfluencePSVII { throw "systemInfo unavailable" }
 
             $result = Get-AttachmentFile -ApiUri "http://localhost:1990/confluence/rest/api" -Attachment $attachment
 
             $result | Should -Be $true
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                 $Uri -eq "http://localhost:1990/confluence/download/attachments/123/Test.txt" -and
                 $Headers.Accept -eq "*/*"
             }
@@ -109,7 +109,7 @@ InModuleScope ConfluencePS {
             $result = $attachments | Get-AttachmentFile -ApiUri "https://docs.example.com/wiki/rest/api"
 
             $result | Should -Be ($true, $true)
-            Should -Invoke -CommandName Get-ServerInformation -ModuleName ConfluencePS -Exactly -Times 1 -Scope It
+            Should -Invoke -CommandName Get-ServerInformation -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It
         }
     }
 }

@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-InlineTaskV2" -Tag 'Unit' {
         BeforeAll {
             $script:fullJson = @'
@@ -40,10 +40,10 @@ InModuleScope ConfluencePS {
         }
 
         Context "Object conversion" {
-            It "creates a ConfluencePS.InlineTask object" {
+            It "creates a ConfluencePSVII.InlineTask object" {
                 $result = ConvertTo-InlineTaskV2 -InputObject $fullObject
 
-                $result | Should -BeOfType [ConfluencePS.InlineTask]
+                $result | Should -BeOfType [ConfluencePSVII.InlineTask]
             }
 
             It "does not throw on an unrecognized field" {

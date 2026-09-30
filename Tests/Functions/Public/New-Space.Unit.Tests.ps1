@@ -7,14 +7,14 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "New-Space" -Tag 'Unit' {
         BeforeEach {
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [string]$Body)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
-                [ConfluencePS.Space]::new()
+                [ConfluencePSVII.Space]::new()
             }
         }
 
@@ -35,7 +35,7 @@ InModuleScope ConfluencePS {
                 $script:lastBody.name | Should -Be "Test Space"
                 $script:lastBody.description.representation | Should -Be 'plain'
                 $script:lastBody.description.value | Should -Be "A space"
-                $result | Should -BeOfType [ConfluencePS.Space]
+                $result | Should -BeOfType [ConfluencePSVII.Space]
             }
 
             It "omits the description field when no description is supplied" {
@@ -45,7 +45,7 @@ InModuleScope ConfluencePS {
             }
 
             It "accepts a Space object through -InputObject" {
-                $space = [ConfluencePS.Space]@{ Key = "OBJ"; Name = "Object Space"; Description = "From object" }
+                $space = [ConfluencePSVII.Space]@{ Key = "OBJ"; Name = "Object Space"; Description = "From object" }
 
                 $null = New-Space -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -InputObject $space -Confirm:$false
 

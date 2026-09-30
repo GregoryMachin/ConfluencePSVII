@@ -6,7 +6,7 @@ BeforeDiscovery {
     $script:moduleToTest = Initialize-TestEnvironment
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "%FUNCTION-NAME%" -Tag 'Unit' {
         BeforeAll {
             . "$PSScriptRoot/../../Helpers/TestTools.ps1"
@@ -25,7 +25,7 @@ InModuleScope ConfluencePS {
             #endregion Definitions
 
             #region Mocks
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 throw "Unhandled Invoke-Method call: $Method $Uri"
             }
             #endregion Mocks
@@ -65,7 +65,7 @@ InModuleScope ConfluencePS {
             #>
             Context 'API calls' {
                 It 'calls Invoke-Method with the expected request shape' {
-                    Mock Invoke-Method -ModuleName ConfluencePS -ParameterFilter {
+                    Mock Invoke-Method -ModuleName ConfluencePSVII -ParameterFilter {
                         $Method -eq 'Get' -and $Uri -like "$script:apiUri/*"
                     } {
                         ConvertFrom-Json -InputObject $resourceJson
@@ -73,7 +73,7 @@ InModuleScope ConfluencePS {
 
                     { %FUNCTION-NAME% -ApiUri $script:apiUri -Credential $script:credential } | Should -Not -Throw
 
-                    Should -Invoke Invoke-Method -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                    Should -Invoke Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                         $Method -eq 'Get' -and $Uri -like "$script:apiUri/*"
                     }
                 }
@@ -81,7 +81,7 @@ InModuleScope ConfluencePS {
 
             Context 'Output conversion' {
                 It 'returns the expected output shape' {
-                    Mock Invoke-Method -ModuleName ConfluencePS {
+                    Mock Invoke-Method -ModuleName ConfluencePSVII {
                         ConvertFrom-Json -InputObject $resourceJson
                     }
 
@@ -105,7 +105,7 @@ InModuleScope ConfluencePS {
 
             Context 'Positive cases' {
                 It 'accepts valid input' {
-                    Mock Invoke-Method -ModuleName ConfluencePS {
+                    Mock Invoke-Method -ModuleName ConfluencePSVII {
                         ConvertFrom-Json -InputObject $resourceJson
                     }
 
@@ -115,7 +115,7 @@ InModuleScope ConfluencePS {
 
             Context 'Pipeline support' {
                 It 'accepts pipeline input when supported' {
-                    Mock Invoke-Method -ModuleName ConfluencePS {
+                    Mock Invoke-Method -ModuleName ConfluencePSVII {
                         ConvertFrom-Json -InputObject $resourceJson
                     }
 
@@ -125,13 +125,13 @@ InModuleScope ConfluencePS {
 
             Context 'Multiple items' {
                 It 'processes every item in a collection when supported' {
-                    Mock Invoke-Method -ModuleName ConfluencePS {
+                    Mock Invoke-Method -ModuleName ConfluencePSVII {
                         ConvertFrom-Json -InputObject $resourceJson
                     }
 
                     { %FUNCTION-NAME% -%PARAMETER% @('one', 'two') -ApiUri $script:apiUri -Credential $script:credential } | Should -Not -Throw
 
-                    Should -Invoke Invoke-Method -ModuleName ConfluencePS -Exactly -Times 2 -Scope It
+                    Should -Invoke Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 2 -Scope It
                 }
             }
         }

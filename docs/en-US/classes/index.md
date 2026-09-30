@@ -3,15 +3,15 @@ layout: documentation
 permalink: /docs/ConfluencePS/classes/
 hide: true
 ---
-# ConfluencePS classes
+# ConfluencePSVII classes
 
 | Class | Documentation |
 |---|---|
-| `ConfluencePS.Attachment` | [ConfluencePS.Attachment](/docs/ConfluencePS/classes/ConfluencePS.Attachment/) |
-| `ConfluencePS.ContentLabelSet` | [ConfluencePS.ContentLabelSet](/docs/ConfluencePS/classes/ConfluencePS.ContentLabelSet/) |
-| `ConfluencePS.Icon` | [ConfluencePS.Icon](/docs/ConfluencePS/classes/ConfluencePS.Icon/) |
-| `ConfluencePS.Label` | [ConfluencePS.Label](/docs/ConfluencePS/classes/ConfluencePS.Label/) |
-| `ConfluencePS.Page` | [ConfluencePS.Page](/docs/ConfluencePS/classes/ConfluencePS.Page/) |
-| `ConfluencePS.Space` | [ConfluencePS.Space](/docs/ConfluencePS/classes/ConfluencePS.Space/) |
-| `ConfluencePS.User` | [ConfluencePS.User](/docs/ConfluencePS/classes/ConfluencePS.User/) |
-| `ConfluencePS.Version` | [ConfluencePS.Version](/docs/ConfluencePS/classes/ConfluencePS.Version/) |
+| `ConfluencePSVII.Attachment` | [ConfluencePSVII.Attachment](/docs/ConfluencePS/classes/ConfluencePSVII.Attachment/) |
+| `ConfluencePSVII.ContentLabelSet` | [ConfluencePSVII.ContentLabelSet](/docs/ConfluencePS/classes/ConfluencePSVII.ContentLabelSet/) |
+| `ConfluencePSVII.Icon` | [ConfluencePSVII.Icon](/docs/ConfluencePS/classes/ConfluencePSVII.Icon/) |
+| `ConfluencePSVII.Label` | [ConfluencePSVII.Label](/docs/ConfluencePS/classes/ConfluencePSVII.Label/) |
+| `ConfluencePSVII.Page` | [ConfluencePSVII.Page](/docs/ConfluencePS/classes/ConfluencePSVII.Page/) |
+| `ConfluencePSVII.Space` | [ConfluencePSVII.Space](/docs/ConfluencePS/classes/ConfluencePSVII.Space/) |
+| `ConfluencePSVII.User` | [ConfluencePSVII.User](/docs/ConfluencePS/classes/ConfluencePSVII.User/) |
+| `ConfluencePSVII.Version` | [ConfluencePSVII.Version](/docs/ConfluencePS/classes/ConfluencePSVII.Version/) |

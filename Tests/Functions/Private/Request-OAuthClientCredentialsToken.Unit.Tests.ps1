@@ -7,7 +7,7 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Request-OAuthClientCredentialsToken" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
@@ -17,7 +17,7 @@ InModuleScope ConfluencePS {
         }
 
         It "exchanges client credentials for an access token" {
-            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+            Mock Invoke-WebRequest -ModuleName ConfluencePSVII {
                 param($Uri, $Body)
                 $script:lastUri = $Uri
                 $script:lastBody = [Text.Encoding]::UTF8.GetString($Body)
@@ -45,7 +45,7 @@ InModuleScope ConfluencePS {
         }
 
         It "redacts the client secret from an exchange-failure error message" {
-            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+            Mock Invoke-WebRequest -ModuleName ConfluencePSVII {
                 throw [System.Net.WebException]::new('Request failed: super-secret-value is invalid')
             }
 
@@ -61,7 +61,7 @@ InModuleScope ConfluencePS {
         }
 
         It "throws when the response has no access token" {
-            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+            Mock Invoke-WebRequest -ModuleName ConfluencePSVII {
                 [PSCustomObject]@{ Content = '{"expires_in":3600}' }
             }
 

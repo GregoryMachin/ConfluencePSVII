@@ -7,13 +7,13 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-InlineTask" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
             $script:lastGetParameters = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri, [hashtable]$GetParameters)
                 $script:lastUri = $Uri.AbsoluteUri
                 $script:lastGetParameters = $GetParameters
@@ -25,13 +25,13 @@ InModuleScope ConfluencePS {
             $result = Get-InlineTask -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -TaskID 589824
 
             $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/tasks/589824"
-            $result | Should -BeOfType [ConfluencePS.InlineTask]
+            $result | Should -BeOfType [ConfluencePSVII.InlineTask]
         }
 
         It "requests one v2 route per TaskID" {
             $null = Get-InlineTask -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -TaskID 589824, 589825
 
-            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePS -Exactly -Times 2 -Scope It
+            Should -Invoke -CommandName Invoke-Method -ModuleName ConfluencePSVII -Exactly -Times 2 -Scope It
         }
 
         Context "byFilter" {
@@ -39,7 +39,7 @@ InModuleScope ConfluencePS {
                 $result = Get-InlineTask -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net"
 
                 $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/tasks"
-                $result | Should -BeOfType [ConfluencePS.InlineTask]
+                $result | Should -BeOfType [ConfluencePSVII.InlineTask]
             }
 
             It "forwards -PageID and -SpaceID filters" {

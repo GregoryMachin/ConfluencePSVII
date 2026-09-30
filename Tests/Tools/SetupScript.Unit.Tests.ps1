@@ -5,7 +5,7 @@ Describe 'Tools/setup.ps1' -Tag Unit {
         function Get-RepositoryRoot {
             if (
                 $env:BHProjectPath -and
-                (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'ConfluencePS.build.ps1'))
+                (Test-Path -LiteralPath (Join-Path -Path $env:BHProjectPath -ChildPath 'ConfluencePSVII.build.ps1'))
             ) {
                 return (Resolve-Path -LiteralPath $env:BHProjectPath).ProviderPath
             }
@@ -13,7 +13,7 @@ Describe 'Tools/setup.ps1' -Tag Unit {
             $candidate = (Resolve-Path -LiteralPath $PSScriptRoot).ProviderPath
             while ($candidate -and ($candidate -ne [System.IO.Path]::GetPathRoot($candidate))) {
                 if (
-                    (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'ConfluencePS.build.ps1')) -and
+                    (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'ConfluencePSVII.build.ps1')) -and
                     (Test-Path -LiteralPath (Join-Path -Path $candidate -ChildPath 'Tools/setup.ps1'))
                 ) {
                     return $candidate
@@ -52,8 +52,8 @@ Describe 'Tools/setup.ps1' -Tag Unit {
         $sourceToolsPath = Join-Path -Path $projectRoot -ChildPath 'Tools'
         $harnessRoot = Join-Path -Path $TestDrive -ChildPath ([Guid]::NewGuid().ToString())
         $toolsPath = Join-Path -Path $harnessRoot -ChildPath 'Tools'
-        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePS'
-        $mockModulePath = Join-Path -Path $harnessRoot -ChildPath 'mockModules/AtlassianPS.Standards/0.1.6'
+        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePSVII'
+        $mockModulePath = Join-Path -Path $harnessRoot -ChildPath 'mockModules/AtlassianPSVII.Standards/0.1.6'
         $scriptPath = Join-Path -Path $toolsPath -ChildPath 'setup.ps1'
         $installCapturePath = Join-Path -Path $TestDrive -ChildPath 'setup-install.json'
         $syncCapturePath = Join-Path -Path $TestDrive -ChildPath 'setup-sync.txt'
@@ -68,21 +68,21 @@ Describe 'Tools/setup.ps1' -Tag Unit {
 
         Set-Content -LiteralPath (Join-Path -Path $toolsPath -ChildPath 'build.requirements.psd1') -Value @'
 @(
-    @{ ModuleName = "AtlassianPS.Standards"; RequiredVersion = "0.1.6" }
+    @{ ModuleName = "AtlassianPSVII.Standards"; RequiredVersion = "0.1.6" }
     @{ ModuleName = "InvokeBuild"; RequiredVersion = "5.14.23" }
 )
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePS.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePSVII.psd1') -Value @'
 @{
-    RootModule      = 'ConfluencePS.psm1'
+    RootModule      = 'ConfluencePSVII.psm1'
     ModuleVersion   = '2.5'
     RequiredModules = @()
 }
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPS.Standards.psm1') -Value @"
-function Install-AtlassianPSDependencyRequirement {
+        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPSVII.Standards.psm1') -Value @"
+function Install-AtlassianPSVIIDependencyRequirement {
     [CmdletBinding()]
     param(
         [String]`$BuildRequirementsPath,
@@ -95,7 +95,7 @@ function Install-AtlassianPSDependencyRequirement {
     } | ConvertTo-Json -Compress | Set-Content -LiteralPath '$escapedInstallCapturePath'
 }
 
-function Sync-AtlassianPSScriptAnalyzerSettings {
+function Sync-AtlassianPSVIIScriptAnalyzerSettings {
     [CmdletBinding()]
     param(
         [String]`$DestinationPath
@@ -105,12 +105,12 @@ function Sync-AtlassianPSScriptAnalyzerSettings {
     return `$DestinationPath
 }
 
-Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-AtlassianPSScriptAnalyzerSettings
+Export-ModuleMember -Function Install-AtlassianPSVIIDependencyRequirement, Sync-AtlassianPSVIIScriptAnalyzerSettings
 "@
 
-        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPS.Standards.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPSVII.Standards.psd1') -Value @'
 @{
-    RootModule        = 'AtlassianPS.Standards.psm1'
+    RootModule        = 'AtlassianPSVII.Standards.psm1'
     ModuleVersion     = '0.1.6'
     GUID              = '87eec220-b38f-4f70-bf4d-0cac17c9a3dd'
     FunctionsToExport = @('*')
@@ -138,14 +138,14 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
         }
         finally {
             $env:PSModulePath = $originalModulePath
-            Remove-Module -Name 'AtlassianPS.Standards' -Force -ErrorAction SilentlyContinue
+            Remove-Module -Name 'AtlassianPSVII.Standards' -Force -ErrorAction SilentlyContinue
         }
 
         $capturedInstall = Get-Content -LiteralPath $installCapturePath -Raw | ConvertFrom-Json
         $capturedSyncPath = (Get-Content -LiteralPath $syncCapturePath -Raw).TrimEnd("`r", "`n")
 
         $capturedInstall.BuildRequirementsPath | Should -Be (Join-Path -Path $harnessRoot -ChildPath 'Tools/build.requirements.psd1')
-        $capturedInstall.ManifestPath | Should -Be (Join-Path -Path $harnessRoot -ChildPath 'ConfluencePS/ConfluencePS.psd1')
+        $capturedInstall.ManifestPath | Should -Be (Join-Path -Path $harnessRoot -ChildPath 'ConfluencePSVII/ConfluencePSVII.psd1')
         $capturedSyncPath | Should -Be (Join-Path -Path $harnessRoot -ChildPath 'PSScriptAnalyzerSettings.psd1')
     }
 
@@ -154,8 +154,8 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
         $sourceToolsPath = Join-Path -Path $projectRoot -ChildPath 'Tools'
         $harnessRoot = Join-Path -Path $TestDrive -ChildPath ([Guid]::NewGuid().ToString())
         $toolsPath = Join-Path -Path $harnessRoot -ChildPath 'Tools'
-        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePS'
-        $mockModulePath = Join-Path -Path $harnessRoot -ChildPath 'mockModules/AtlassianPS.Standards/9.9.9'
+        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePSVII'
+        $mockModulePath = Join-Path -Path $harnessRoot -ChildPath 'mockModules/AtlassianPSVII.Standards/9.9.9'
         $scriptPath = Join-Path -Path $toolsPath -ChildPath 'setup.ps1'
 
         $null = New-Item -Path $toolsPath -ItemType Directory -Force
@@ -166,20 +166,20 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
 
         Set-Content -LiteralPath (Join-Path -Path $toolsPath -ChildPath 'build.requirements.psd1') -Value @'
 @(
-    @{ ModuleName = "AtlassianPS.Standards"; RequiredVersion = "9.9.9" }
+    @{ ModuleName = "AtlassianPSVII.Standards"; RequiredVersion = "9.9.9" }
 )
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePS.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePSVII.psd1') -Value @'
 @{
-    RootModule      = 'ConfluencePS.psm1'
+    RootModule      = 'ConfluencePSVII.psm1'
     ModuleVersion   = '2.5'
     RequiredModules = @()
 }
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPS.Standards.psm1') -Value @'
-function Install-AtlassianPSDependencyRequirement {
+        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPSVII.Standards.psm1') -Value @'
+function Install-AtlassianPSVIIDependencyRequirement {
     [CmdletBinding()]
     param(
         [String]$BuildRequirementsPath,
@@ -192,7 +192,7 @@ function Install-AtlassianPSDependencyRequirement {
     }
 }
 
-function Sync-AtlassianPSScriptAnalyzerSettings {
+function Sync-AtlassianPSVIIScriptAnalyzerSettings {
     [CmdletBinding()]
     param(
         [String]$DestinationPath
@@ -201,12 +201,12 @@ function Sync-AtlassianPSScriptAnalyzerSettings {
     return $DestinationPath
 }
 
-Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-AtlassianPSScriptAnalyzerSettings
+Export-ModuleMember -Function Install-AtlassianPSVIIDependencyRequirement, Sync-AtlassianPSVIIScriptAnalyzerSettings
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPS.Standards.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPSVII.Standards.psd1') -Value @'
 @{
-    RootModule        = 'AtlassianPS.Standards.psm1'
+    RootModule        = 'AtlassianPSVII.Standards.psm1'
     ModuleVersion     = '9.9.9'
     GUID              = '4f0a5fe2-b109-4d78-a2b0-dff2e309e5fd'
     FunctionsToExport = @('*')
@@ -232,11 +232,11 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
         }
         finally {
             $env:PSModulePath = $originalModulePath
-            Remove-Module -Name 'AtlassianPS.Standards' -Force -ErrorAction SilentlyContinue
+            Remove-Module -Name 'AtlassianPSVII.Standards' -Force -ErrorAction SilentlyContinue
         }
 
         Assert-MockCalled -CommandName Install-Module -Exactly -Times 1 -ParameterFilter {
-            $Name -eq 'AtlassianPS.Standards' -and
+            $Name -eq 'AtlassianPSVII.Standards' -and
             $RequiredVersion -eq '9.9.9' -and
             $Scope -eq 'CurrentUser' -and
             $Repository -eq 'PSGallery' -and
@@ -251,7 +251,7 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
         $sourceToolsPath = Join-Path -Path $projectRoot -ChildPath 'Tools'
         $harnessRoot = Join-Path -Path $TestDrive -ChildPath ([Guid]::NewGuid().ToString())
         $toolsPath = Join-Path -Path $harnessRoot -ChildPath 'Tools'
-        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePS'
+        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePSVII'
         $scriptPath = Join-Path -Path $toolsPath -ChildPath 'setup.ps1'
 
         $null = New-Item -Path $toolsPath -ItemType Directory -Force
@@ -261,13 +261,13 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
 
         Set-Content -LiteralPath (Join-Path -Path $toolsPath -ChildPath 'build.requirements.psd1') -Value @'
 @(
-    @{ ModuleName = "AtlassianPS.Standards"; RequiredVersion = "0.1.6" }
+    @{ ModuleName = "AtlassianPSVII.Standards"; RequiredVersion = "0.1.6" }
 )
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePS.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePSVII.psd1') -Value @'
 @{
-    RootModule      = 'ConfluencePS.psm1'
+    RootModule      = 'ConfluencePSVII.psm1'
     ModuleVersion   = '2.5'
     RequiredModules = @()
 }
@@ -285,8 +285,8 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
         $sourceToolsPath = Join-Path -Path $projectRoot -ChildPath 'Tools'
         $harnessRoot = Join-Path -Path $TestDrive -ChildPath ([Guid]::NewGuid().ToString())
         $toolsPath = Join-Path -Path $harnessRoot -ChildPath 'Tools'
-        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePS'
-        $mockModulePath = Join-Path -Path $harnessRoot -ChildPath 'mockModules/AtlassianPS.Standards/0.1.6'
+        $modulePath = Join-Path -Path $harnessRoot -ChildPath 'ConfluencePSVII'
+        $mockModulePath = Join-Path -Path $harnessRoot -ChildPath 'mockModules/AtlassianPSVII.Standards/0.1.6'
         $scriptPath = Join-Path -Path $toolsPath -ChildPath 'setup.ps1'
 
         $null = New-Item -Path $toolsPath -ItemType Directory -Force
@@ -297,21 +297,21 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
 
         Set-Content -LiteralPath (Join-Path -Path $toolsPath -ChildPath 'build.requirements.psd1') -Value @'
 @(
-    @{ ModuleName = "AtlassianPS.Standards"; RequiredVersion = "0.1.6" }
+    @{ ModuleName = "AtlassianPSVII.Standards"; RequiredVersion = "0.1.6" }
     @{ ModuleName = "InvokeBuild"; RequiredVersion = "5.14.23" }
 )
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePS.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $modulePath -ChildPath 'ConfluencePSVII.psd1') -Value @'
 @{
-    RootModule      = 'ConfluencePS.psm1'
+    RootModule      = 'ConfluencePSVII.psm1'
     ModuleVersion   = '2.5'
     RequiredModules = @()
 }
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPS.Standards.psm1') -Value @'
-function Install-AtlassianPSDependencyRequirement {
+        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPSVII.Standards.psm1') -Value @'
+function Install-AtlassianPSVIIDependencyRequirement {
     [CmdletBinding()]
     param(
         [String]$BuildRequirementsPath,
@@ -321,7 +321,7 @@ function Install-AtlassianPSDependencyRequirement {
     Write-Error -Message "simulated setup failure"
 }
 
-function Sync-AtlassianPSScriptAnalyzerSettings {
+function Sync-AtlassianPSVIIScriptAnalyzerSettings {
     [CmdletBinding()]
     param(
         [String]$DestinationPath
@@ -330,12 +330,12 @@ function Sync-AtlassianPSScriptAnalyzerSettings {
     return $DestinationPath
 }
 
-Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-AtlassianPSScriptAnalyzerSettings
+Export-ModuleMember -Function Install-AtlassianPSVIIDependencyRequirement, Sync-AtlassianPSVIIScriptAnalyzerSettings
 '@
 
-        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPS.Standards.psd1') -Value @'
+        Set-Content -LiteralPath (Join-Path -Path $mockModulePath -ChildPath 'AtlassianPSVII.Standards.psd1') -Value @'
 @{
-    RootModule        = 'AtlassianPS.Standards.psm1'
+    RootModule        = 'AtlassianPSVII.Standards.psm1'
     ModuleVersion     = '0.1.6'
     GUID              = '73dc51ab-a3ad-4f90-b04f-b091f67fcdb2'
     FunctionsToExport = @('*')
@@ -363,7 +363,7 @@ Export-ModuleMember -Function Install-AtlassianPSDependencyRequirement, Sync-Atl
         }
         finally {
             $env:PSModulePath = $originalModulePath
-            Remove-Module -Name 'AtlassianPS.Standards' -Force -ErrorAction SilentlyContinue
+            Remove-Module -Name 'AtlassianPSVII.Standards' -Force -ErrorAction SilentlyContinue
         }
     }
 }

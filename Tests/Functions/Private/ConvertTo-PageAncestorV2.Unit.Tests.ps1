@@ -7,14 +7,14 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "ConvertTo-PageAncestorV2" -Tag 'Unit' {
-        It "creates a ConfluencePS.Page object with only Id, Status, and Title" {
+        It "creates a ConfluencePSVII.Page object with only Id, Status, and Title" {
             $json = ConvertFrom-Json -InputObject '{"id": "163840", "status": "current", "title": "Parent Page", "spaceId": "98307"}'
 
             $result = ConvertTo-PageAncestorV2 -InputObject $json
 
-            $result | Should -BeOfType [ConfluencePS.Page]
+            $result | Should -BeOfType [ConfluencePSVII.Page]
             $result.ID | Should -Be 163840
             $result.ID | Should -BeOfType [UInt64]
             $result.Status | Should -Be 'current'

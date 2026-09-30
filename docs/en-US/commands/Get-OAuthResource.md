@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/Get-OAuthResource/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -43,7 +43,7 @@ Get-ConfluenceOAuthResource -OAuthAccessToken <SecureString> -SiteUrl <Uri>
 
 Calls Atlassian's `https://api.atlassian.com/oauth/token/accessible-resources` endpoint to list
 every Atlassian Cloud resource (typically a Confluence site) the given OAuth 2.0 (3LO) access
-token is authorized to reach, and returns the resulting `ConfluencePS.OAuthResource` objects.
+token is authorized to reach, and returns the resulting `ConfluencePSVII.OAuthResource` objects.
 
 This is an Atlassian identity endpoint, external to any single Confluence site: there is no
 -BaseUri or -DeploymentType parameter, and the request is never resolved through
@@ -159,7 +159,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.OAuthResource
+### ConfluencePSVII.OAuthResource
 
 ## NOTES
 

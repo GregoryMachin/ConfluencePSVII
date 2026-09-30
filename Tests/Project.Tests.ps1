@@ -11,10 +11,10 @@ BeforeDiscovery {
 
 Describe "General project validation" -Tag Unit {
     BeforeDiscovery {
-        $script:module = Get-Module 'ConfluencePS'
+        $script:module = Get-Module 'ConfluencePSVII'
 
-        $script:publicFunctionFiles = (Get-ChildItem "$moduleRoot/ConfluencePS/Public/*.ps1").BaseName
-        $script:privateFunctionFiles = (Get-ChildItem "$moduleRoot/ConfluencePS/Private/*.ps1").BaseName
+        $script:publicFunctionFiles = (Get-ChildItem "$moduleRoot/ConfluencePSVII/Public/*.ps1").BaseName
+        $script:privateFunctionFiles = (Get-ChildItem "$moduleRoot/ConfluencePSVII/Private/*.ps1").BaseName
         $script:expectedPublicExportNames = @($publicFunctionFiles | ForEach-Object { $_ -replace "\-", "-$($module.Prefix)" })
 
         # Source manifests use wildcard exports. Trust the module's actual resolved
@@ -49,7 +49,7 @@ Describe "General project validation" -Tag Unit {
                 $commandInModule = $module.Invoke({
                         param($name)
                         Get-Command -Name $name -CommandType Function -ErrorAction SilentlyContinue |
-                            Where-Object { $_.ModuleName -eq 'ConfluencePS' }
+                            Where-Object { $_.ModuleName -eq 'ConfluencePSVII' }
                     }, $functionName)
 
                 $commandInModule | Should -Not -BeNullOrEmpty -Because "private function '$functionName' should be loaded"
@@ -70,7 +70,7 @@ Describe "General project validation" -Tag Unit {
     Describe "Project stucture" {
         It "only exports functions from the Public folder" {
             foreach ($exportedFunctionName in $exportedFunctionNames) {
-                $expectedPublicExportNames | Should -Contain $exportedFunctionName -Because "exported function '$exportedFunctionName' should have a corresponding file in ConfluencePS/Public/"
+                $expectedPublicExportNames | Should -Contain $exportedFunctionName -Because "exported function '$exportedFunctionName' should have a corresponding file in ConfluencePSVII/Public/"
             }
         }
 
@@ -85,7 +85,7 @@ Describe "General project validation" -Tag Unit {
             # baseline: unlike the Public-folder-consistency checks above (which only catch a
             # folder/export mismatch), this catches an unreviewed addition or removal of a
             # public command, since updating the manifest is the explicit approval step.
-            $manifestData = Import-PowerShellDataFile -Path "$moduleRoot/ConfluencePS/ConfluencePS.psd1"
+            $manifestData = Import-PowerShellDataFile -Path "$moduleRoot/ConfluencePSVII/ConfluencePSVII.psd1"
             $manifestData.FunctionsToExport | Should -Not -Be '*'
             Compare-Object -ReferenceObject ($manifestData.FunctionsToExport | Sort-Object) -DifferenceObject ($publicFunctionFiles | Sort-Object) |
                 Should -BeNullOrEmpty

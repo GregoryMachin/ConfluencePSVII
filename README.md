@@ -1,21 +1,21 @@
 ---
 layout: module
-permalink: /module/ConfluencePS/
+permalink: /module/ConfluencePSVII/
 ---
-# [ConfluencePS](https://atlassianps.org/module/ConfluencePS)
+# [ConfluencePSVII](https://atlassianps.org/module/ConfluencePS)
 
 [![GitHub release](https://img.shields.io/github/release/AtlassianPS/ConfluencePS.svg?style=for-the-badge)](https://github.com/AtlassianPS/ConfluencePS/releases/latest)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/AtlassianPS/ConfluencePS/ci.yml?style=for-the-badge)](https://github.com/AtlassianPS/ConfluencePS/actions/workflows/ci.yml)
 [![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/ConfluencePS.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/ConfluencePS)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)
 
-Automate your documentation! ConfluencePS is a PowerShell module that interacts with Atlassian's [Confluence] wiki product.
+Automate your documentation! ConfluencePSVII is a PowerShell module that interacts with Atlassian's [Confluence] wiki product.
 
-Need to add 100 new pages based on some dumb CSV file? Are you trying to figure out how to delete all pages labeled 'deleteMe'? Are you sick of manually editing the same page every single day? ConfluencePS has you covered!
+Need to add 100 new pages based on some dumb CSV file? Are you trying to figure out how to delete all pages labeled 'deleteMe'? Are you sick of manually editing the same page every single day? ConfluencePSVII has you covered!
 
-ConfluencePS communicates with Atlassian's actively supported [REST API] via basic authentication. The REST implementation is the only way to interact with their cloud-hosted instances via API, and will eventually be the only way to interact with server installations.
+ConfluencePSVII communicates with Atlassian's actively supported [REST API] via basic authentication. The REST implementation is the only way to interact with their cloud-hosted instances via API, and will eventually be the only way to interact with server installations.
 
-Join the conversation on [![SlackLogo][] AtlassianPS.Slack.com](https://atlassianps.org/slack)
+Join the conversation on [![SlackLogo][] AtlassianPSVII.Slack.com](https://atlassianps.org/slack)
 
 [SlackLogo]: https://atlassianps.org/assets/img/Slack_Mark_Web_28x28.png
 <!--more-->
@@ -26,17 +26,17 @@ Join the conversation on [![SlackLogo][] AtlassianPS.Slack.com](https://atlassia
 
 ### Installation
 
-Install ConfluencePS from the [PowerShell Gallery]! `Install-Module` requires PowerShellGet (included in PS v5, or download for v3/v4 via the gallery link)
+Install ConfluencePSVII from the [PowerShell Gallery]! `Install-Module` requires PowerShellGet (included in PS v5, or download for v3/v4 via the gallery link)
 
 ```powershell
 # One time only install: (requires an admin PowerShell window)
-Install-Module ConfluencePS
+Install-Module ConfluencePSVII
 
 # Check for updates occasionally:
-Update-Module ConfluencePS
+Update-Module ConfluencePSVII
 
 # To use each session:
-Import-Module ConfluencePS
+Import-Module ConfluencePSVII
 $credential = Get-Credential -UserName 'me@example.com'
 Set-ConfluenceInfo -BaseURI 'https://YourCloudWiki.atlassian.net/wiki' -Credential $credential
 ```
@@ -47,9 +47,9 @@ You can find the full documentation on our [homepage](https://atlassianps.org/do
 
 ```powershell
 # Review the help at any time!
-Get-Help about_ConfluencePS
-Get-Help about_ConfluencePS_Authentication
-Get-Command -Module ConfluencePS
+Get-Help about_ConfluencePSVII
+Get-Help about_ConfluencePSVII_Authentication
+Get-Command -Module ConfluencePSVII
 Get-Help Get-ConfluencePage -Full   # or any other command
 ```
 
@@ -58,7 +58,7 @@ For Cloud, Data Center, Server, and anonymous authentication examples, see the [
 
 ### Contribute
 
-Want to contribute to AtlassianPS? Great!
+Want to contribute to AtlassianPSVII? Great!
 We appreciate [everyone](https://atlassianps.org/#people) who invests their time to make our modules the best they can be.
 
 Check out our guidelines on [Contributing](https://atlassianps.org/docs/Contributing/) to our modules and documentation.

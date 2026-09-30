@@ -7,12 +7,12 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Get-SpaceRoleAssignment" -Tag 'Unit' {
         BeforeEach {
             $script:lastUri = $null
 
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param([Uri]$Uri)
                 $script:lastUri = $Uri.AbsoluteUri
                 ConvertFrom-Json '{"principal": {"type": "user", "id": "712020:aaaa"}, "role": {"id": "role-admin", "name": "Admin"}}'
@@ -23,7 +23,7 @@ InModuleScope ConfluencePS {
             $result = Get-SpaceRoleAssignment -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -SpaceID 98307
 
             $script:lastUri | Should -Be "https://example.atlassian.net/wiki/api/v2/spaces/98307/role-assignments"
-            $result | Should -BeOfType [ConfluencePS.SpaceRoleAssignment]
+            $result | Should -BeOfType [ConfluencePSVII.SpaceRoleAssignment]
         }
 
         It "sets SpaceID on the returned objects" {

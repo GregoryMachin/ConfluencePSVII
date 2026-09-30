@@ -7,26 +7,26 @@ BeforeDiscovery {
     Import-Module $script:moduleToTest -Force -ErrorAction Stop
 }
 
-InModuleScope ConfluencePS {
+InModuleScope ConfluencePSVII {
     Describe "Set-Page" -Tag 'Unit' {
         BeforeAll {
             $script:lastRequestBody = $null
-            Mock Invoke-Method -ModuleName ConfluencePS {
+            Mock Invoke-Method -ModuleName ConfluencePSVII {
                 param(
                     [string]$Body
                 )
 
                 $script:lastRequestBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
-                [ConfluencePS.Page]::new()
+                [ConfluencePSVII.Page]::new()
             }
         }
 
         It "includes version.message from input object even when unchanged" {
-            $page = [ConfluencePS.Page]::new()
+            $page = [ConfluencePSVII.Page]::new()
             $page.ID = 42
             $page.Title = "Page title"
             $page.Body = "<p>Body</p>"
-            $page.Version = [ConfluencePS.Version]::new()
+            $page.Version = [ConfluencePSVII.Version]::new()
             $page.Version.Number = 7
             $page.Version.Message = "Same message on purpose"
 
@@ -37,11 +37,11 @@ InModuleScope ConfluencePS {
         }
 
         It "omits version.message when input object message is not provided" {
-            $page = [ConfluencePS.Page]::new()
+            $page = [ConfluencePSVII.Page]::new()
             $page.ID = 43
             $page.Title = "Page title"
             $page.Body = "<p>Body</p>"
-            $page.Version = [ConfluencePS.Version]::new()
+            $page.Version = [ConfluencePSVII.Version]::new()
             $page.Version.Number = 2
 
             $null = Set-Page -ApiUri "https://example.com/wiki/rest/api" -InputObject $page -Confirm:$false
@@ -52,12 +52,12 @@ InModuleScope ConfluencePS {
 
         Context "Pipeline binding" {
             BeforeEach {
-                Mock Get-Page -ModuleName ConfluencePS {
-                    $page = [ConfluencePS.Page]::new()
+                Mock Get-Page -ModuleName ConfluencePSVII {
+                    $page = [ConfluencePSVII.Page]::new()
                     $page.ID = 55
                     $page.Title = "Original title"
                     $page.Body = "<p>Original body</p>"
-                    $page.Version = [ConfluencePS.Version]::new()
+                    $page.Version = [ConfluencePSVII.Version]::new()
                     $page.Version.Number = 3
                     $page
                 }
@@ -78,18 +78,18 @@ InModuleScope ConfluencePS {
 
         Context "Cloud v2 routing" {
             BeforeEach {
-                Mock Invoke-Method -ModuleName ConfluencePS {
+                Mock Invoke-Method -ModuleName ConfluencePSVII {
                     param([Uri]$Uri, [string]$Body)
                     $script:lastUri = $Uri.AbsoluteUri
                     $script:lastRequestBody = ConvertFrom-Json -InputObject $Body -ErrorAction Stop
                     ConvertFrom-Json '{"id": "42", "status": "current", "title": "Example"}'
                 }
-                Mock Get-Page -ModuleName ConfluencePS {
-                    $page = [ConfluencePS.Page]::new()
+                Mock Get-Page -ModuleName ConfluencePSVII {
+                    $page = [ConfluencePSVII.Page]::new()
                     $page.ID = 42
                     $page.Title = "Original title"
                     $page.Body = "<p>Original body</p>"
-                    $page.Version = [ConfluencePS.Version]::new()
+                    $page.Version = [ConfluencePSVII.Version]::new()
                     $page.Version.Number = 7
                     $page
                 }
@@ -103,23 +103,23 @@ InModuleScope ConfluencePS {
                 $script:lastRequestBody.title | Should -Be 'New title'
                 $script:lastRequestBody.body.representation | Should -Be 'storage'
                 $script:lastRequestBody.version.number | Should -Be 8
-                $result | Should -BeOfType [ConfluencePS.Page]
+                $result | Should -BeOfType [ConfluencePSVII.Page]
             }
 
             It "forwards -BaseUri and -DeploymentType to the internal Get-Page lookup" {
                 $null = Set-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -PageID 42 -Title "New title" -Confirm:$false
 
-                Should -Invoke -CommandName Get-Page -ModuleName ConfluencePS -Exactly -Times 1 -Scope It -ParameterFilter {
+                Should -Invoke -CommandName Get-Page -ModuleName ConfluencePSVII -Exactly -Times 1 -Scope It -ParameterFilter {
                     $BaseUri -eq "https://example.atlassian.net" -and $DeploymentType -eq 'Cloud'
                 }
             }
 
             It "routes byObject updates to the v2 pages route" {
-                $page = [ConfluencePS.Page]::new()
+                $page = [ConfluencePSVII.Page]::new()
                 $page.ID = 99
                 $page.Title = "Object title"
                 $page.Body = "<p>Object body</p>"
-                $page.Version = [ConfluencePS.Version]::new()
+                $page.Version = [ConfluencePSVII.Version]::new()
                 $page.Version.Number = 1
 
                 $null = Set-Page -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -InputObject $page -Confirm:$false

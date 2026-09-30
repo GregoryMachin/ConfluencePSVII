@@ -1,7 +1,7 @@
 ---
-external help file: ConfluencePS-help.xml
+external help file: ConfluencePSVII-help.xml
 online version: https://atlassianps.org/docs/ConfluencePS/commands/New-Page/
-Module Name: ConfluencePS
+Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
 layout: documentation
@@ -90,9 +90,9 @@ The wiki page will contain the text "Testing 123".
 ### -------------------------- EXAMPLE 6 --------------------------
 
 ```powershell
-$pageObject = [ConfluencePS.Page]@{
+$pageObject = [ConfluencePSVII.Page]@{
     Title = "My Title"
-    Space = [ConfluencePS.Space]@{
+    Space = [ConfluencePSVII.Space]@{
         Key="ABC"
     }
 }
@@ -103,7 +103,7 @@ New-ConfluencePage -InputObject $pageObject
 $pageObject | New-ConfluencePage
 ```
 
-Two different methods of creating a new page from an object `ConfluencePS.Page`.
+Two different methods of creating a new page from an object `ConfluencePSVII.Page`.
 
 Both examples should return identical results.
 
@@ -214,7 +214,7 @@ Accept wildcard characters: False
 
 ### -InputObject
 
-A ConfluencePS.Page object from which to create a new page.
+A ConfluencePSVII.Page object from which to create a new page.
 
 ```yaml
 Type: Page
@@ -264,7 +264,7 @@ Accept wildcard characters: False
 
 ### -Parent
 
-Supply a ConfluencePS.Page object to use as the parent page.
+Supply a ConfluencePSVII.Page object to use as the parent page.
 
 ```yaml
 Type: Page
@@ -384,7 +384,7 @@ Accept wildcard characters: False
 
 ## OUTPUTS
 
-### ConfluencePS.Page
+### ConfluencePSVII.Page
 
 ## NOTES
 
