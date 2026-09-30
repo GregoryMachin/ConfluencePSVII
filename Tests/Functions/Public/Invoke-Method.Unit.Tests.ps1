@@ -453,6 +453,42 @@ namespace ConfluencePS.Tests {
             } -Exactly -Times 1 -Scope It
         }
 
+        It "stops pagination once a page returns no results, even if the server still advertises a next link" {
+            # Confluence Server/Data Center can keep sending a `_links.next` after a
+            # collection is genuinely exhausted (a real observed quirk); an empty
+            # page must end pagination regardless of what the server advertises,
+            # or every follow-up page being empty-but-linked would recurse forever.
+            $script:invokeCount = 0
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                $script:invokeCount++
+                if ($script:invokeCount -eq 1) {
+                    return New-FakeWebResponse -StatusCode 200 -Json '{"results":[{"id":1}],"_links":{"base":"https://example.com","next":"/wiki/rest/api/content?start=1"}}'
+                }
+                New-FakeWebResponse -StatusCode 200 -Json '{"results":[],"_links":{"base":"https://example.com","next":"/wiki/rest/api/content?start=2"}}'
+            }
+
+            $result = Invoke-Method -Uri "https://example.com/wiki/rest/api/content" -ErrorAction Stop
+
+            @($result).Count | Should -Be 1
+            $script:invokeCount | Should -Be 2
+        }
+
+        It "throws a clear error instead of looping indefinitely when pagination never terminates" {
+            $script:invokeCount = 0
+            Mock Invoke-WebRequest -ModuleName ConfluencePS {
+                $script:invokeCount++
+                New-FakeWebResponse -StatusCode 200 -Json (
+                    '{{"results":[{{"id":{0}}}],"_links":{{"base":"https://example.com","next":"/wiki/rest/api/content?start={0}"}}}}' -f $script:invokeCount
+                )
+            }
+
+            # Start one page short of the cap (an internal, DontShow-only parameter) so the
+            # test reaches the boundary in a couple of iterations instead of thousands.
+            { Invoke-Method -Uri "https://example.com/wiki/rest/api/content" -PageDepth 9999 -ErrorAction Stop } | Should -Throw "*exceeded the maximum*"
+
+            $script:invokeCount | Should -Be 2
+        }
+
         It "stops following pagination links once -First is satisfied" {
             $script:invokeCount = 0
             Mock Invoke-WebRequest -ModuleName ConfluencePS {

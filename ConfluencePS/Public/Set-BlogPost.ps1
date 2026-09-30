@@ -38,6 +38,7 @@
         [Parameter(
             Mandatory = $true,
             ValueFromPipeline = $true,
+            ValueFromPipelineByPropertyName = $true,
             ParameterSetName = 'byParameters'
         )]
         [ValidateRange(1, [UInt64]::MaxValue)]

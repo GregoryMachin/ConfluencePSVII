@@ -36,6 +36,27 @@ InModuleScope ConfluencePS {
             } -Exactly -Times 1 -Scope It
         }
 
+        It "uses Retry-After from a real Invoke-WebRequest-style Dictionary" {
+            # Invoke-WebRequest's own .Headers property (not a Hashtable) is a generic
+            # Dictionary<string, IEnumerable<string>>, which has no public Contains(key)
+            # overload -- only ContainsKey. A Hashtable-backed test headers object would
+            # not have caught a regression to .Contains here.
+            Mock Get-Date -ModuleName ConfluencePS { [DateTimeOffset]"2026-01-01T00:00:00Z" }
+            $headers = [System.Collections.Generic.Dictionary[string, string[]]]::new()
+            $headers['Retry-After'] = @('Thu, 01 Jan 2026 00:02:00 GMT')
+            $response = [PSCustomObject]@{
+                StatusCode = 429
+                Headers    = $headers
+            }
+
+            $result = Test-ServerResponse -InputObject $response -Method Get -RetryCount 0 -MaxRetries 3
+
+            $result | Should -BeTrue
+            Should -Invoke -CommandName Start-Sleep -ModuleName ConfluencePS -ParameterFilter {
+                [Math]::Abs([double]$Seconds - 120.0) -lt 0.001
+            } -Exactly -Times 1 -Scope It
+        }
+
         It "uses Retry-After from HttpResponseHeaders RetryAfter property" {
             $response = [System.Net.Http.HttpResponseMessage]::new(
                 [System.Enum]::ToObject([System.Net.HttpStatusCode], 429)

@@ -35,7 +35,7 @@
 
         $rawValues = @()
         if ($Headers -is [System.Collections.IDictionary]) {
-            if ($Headers.Contains('Link')) {
+            if ($Headers.ContainsKey('Link')) {
                 $rawValues = @($Headers['Link'])
             }
         }

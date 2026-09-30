@@ -29,6 +29,20 @@ InModuleScope ConfluencePS {
             $result | Should -BeOfType [ConfluencePS.Comment]
         }
 
+        Context "Pipeline binding" {
+            It "accepts -CommentID from the pipeline by property name alongside -Body" {
+                # Piping an object while also passing -Body forces parameter-set
+                # resolution to 'byParameters'; CommentID must still bind from the
+                # piped object's ID property in that case, not just from
+                # -CommentID/pipeline-by-value.
+                $pipedComment = [PSCustomObject]@{ ID = 327680 }
+
+                $null = $pipedComment | Set-InlineComment -ApiUri "https://example.com/wiki/rest/api" -Body "<p>Updated</p>" -Confirm:$false
+
+                $script:lastUri | Should -Be "https://example.com/wiki/rest/api/content/327680"
+            }
+        }
+
         Context "Cloud v2 routing" {
             It "routes to the dedicated v2 inline-comments route and increments the version" {
                 $result = Set-InlineComment -ApiUri "https://example.atlassian.net/wiki/rest/api" -BaseUri "https://example.atlassian.net" -DeploymentType Cloud -CommentID 327680 -Body "<p>Updated</p>" -Confirm:$false

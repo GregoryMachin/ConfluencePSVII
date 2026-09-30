@@ -47,7 +47,7 @@
             $headers = $InputObject.Headers
 
             if ($headers -is [System.Collections.IDictionary]) {
-                if ($headers.Contains("Retry-After")) {
+                if ($headers.ContainsKey("Retry-After")) {
                     $hasRetryAfterHeader = $true
                     $retryAfterHeader = [string]$headers["Retry-After"]
                 }

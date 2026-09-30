@@ -30,6 +30,26 @@ InModuleScope ConfluencePS {
             $script:lastBody.title | Should -Be 'New title'
         }
 
+        Context "Pipeline binding" {
+            BeforeEach {
+                Mock Get-BlogPost -ModuleName ConfluencePS {
+                    [ConfluencePS.BlogPost]@{ ID = 262144; Title = 'Old title'; Body = '<p>Old</p>'; Version = [ConfluencePS.Version]@{ Number = 3 } }
+                }
+            }
+
+            It "accepts -BlogPostID from the pipeline by property name alongside -Title" {
+                # Piping an object while also passing -Title forces parameter-set
+                # resolution to 'byParameters' (the only set with -Title); BlogPostID
+                # must still bind from the piped object's ID property in that case,
+                # not just from -BlogPostID/pipeline-by-value.
+                $pipedBlogPost = [PSCustomObject]@{ ID = 262144 }
+
+                $null = $pipedBlogPost | Set-BlogPost -ApiUri "https://example.com/wiki/rest/api" -Title "New title" -Confirm:$false
+
+                $script:lastBody.title | Should -Be "New title"
+            }
+        }
+
         Context "Cloud v2 routing" {
             BeforeEach {
                 Mock Get-BlogPost -ModuleName ConfluencePS {

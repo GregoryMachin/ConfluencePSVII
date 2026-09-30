@@ -50,6 +50,32 @@ InModuleScope ConfluencePS {
             $script:lastRequestBody.version.PSObject.Properties.Name | Should -Not -Contain "message"
         }
 
+        Context "Pipeline binding" {
+            BeforeEach {
+                Mock Get-Page -ModuleName ConfluencePS {
+                    $page = [ConfluencePS.Page]::new()
+                    $page.ID = 55
+                    $page.Title = "Original title"
+                    $page.Body = "<p>Original body</p>"
+                    $page.Version = [ConfluencePS.Version]::new()
+                    $page.Version.Number = 3
+                    $page
+                }
+            }
+
+            It "accepts -PageID from the pipeline by property name alongside -Title" {
+                # Piping an object while also passing -Title forces parameter-set
+                # resolution to 'byParameters' (the only set with -Title); PageID
+                # must still bind from the piped object's ID property in that case,
+                # not just from -PageID/pipeline-by-value.
+                $pipedPage = [PSCustomObject]@{ ID = 55 }
+
+                $null = $pipedPage | Set-Page -ApiUri "https://example.com/wiki/rest/api" -Title "New title" -Confirm:$false
+
+                $script:lastRequestBody.title | Should -Be "New title"
+            }
+        }
+
         Context "Cloud v2 routing" {
             BeforeEach {
                 Mock Invoke-Method -ModuleName ConfluencePS {

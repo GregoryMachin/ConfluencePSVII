@@ -90,6 +90,19 @@ InModuleScope ConfluencePS {
             $result.AbsoluteUri | Should -BeExactly 'https://example.atlassian.net/wiki/api/v2/pages?cursor=next'
         }
 
+        It "falls back to a Link header on a real Invoke-WebRequest-style Dictionary" {
+            # Invoke-WebRequest's own .Headers property (not a Hashtable) is a generic
+            # Dictionary<string, IEnumerable<string>>, which has no public Contains(key)
+            # overload -- only ContainsKey. A Hashtable-backed test headers object would
+            # not have caught a regression to .Contains here.
+            $headers = [System.Collections.Generic.Dictionary[string, string[]]]::new()
+            $headers['Link'] = @('<https://example.atlassian.net/wiki/api/v2/pages?cursor=next>; rel="next"')
+
+            $result = Resolve-NextPageLink -RequestUri $requestUri -ResponseBody $null -Headers $headers
+
+            $result.AbsoluteUri | Should -BeExactly 'https://example.atlassian.net/wiki/api/v2/pages?cursor=next'
+        }
+
         It "reads a Link header exposed through TryGetValues" {
             $headers = [PSCustomObject]@{}
             $headers | Add-Member -MemberType ScriptMethod -Name TryGetValues -Value {

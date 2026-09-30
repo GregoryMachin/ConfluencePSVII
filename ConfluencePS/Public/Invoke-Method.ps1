@@ -1,4 +1,4 @@
-﻿function Invoke-Method {
+function Invoke-Method {
     [CmdletBinding(SupportsPaging = $true)]
     [OutputType(
         [PSObject],
@@ -65,8 +65,8 @@
 
         $Caller = $PSCmdlet,
 
-        # Internal pagination bookkeeping, forwarded automatically between recursive calls.
-        # Not for direct use.
+        # Internal pagination bookkeeping, forwarded automatically between pagination loop
+        # iterations. Not for direct use.
         [Parameter(DontShow)]
         [UInt64]
         $ResultsEmitted = 0,
@@ -96,176 +96,194 @@
     }
 
     Process {
-        Write-DebugMessage "[$($MyInvocation.MyCommand.Name)] ParameterSetName: $($PsCmdlet.ParameterSetName)"
-        Write-DebugMessage "[$($MyInvocation.MyCommand.Name)] PSBoundParameters: $($PSBoundParameters | Out-String)"
+        # Pagination used to be implemented by having this function call itself for each
+        # additional page, one nested PowerShell call frame per page. A sufficiently long
+        # (or, per a real-world Confluence Server/Data Center quirk, never-terminating)
+        # pagination chain would then crash with an uncatchable "call depth overflow"
+        # instead of a normal, catchable error. Everything below now runs inside an
+        # iterative loop instead: updating state and `continue pageLoop` fetches the next
+        # page without growing the call stack, and every path that does not paginate
+        # further ends with `break pageLoop`.
+        :pageLoop while ($true) {
+            # `-Skip`/`-IncludeTotalCount` and $ResultsEmitted/$PageDepth's own defaults
+            # only ever apply to the very first page; every later iteration reuses the
+            # same $PSCmdlet.PagingParameters, so those two must be gated explicitly.
+            $isFirstPage = ($PageDepth -eq 1)
 
-        # load DefaultParameters for Invoke-WebRequest
-        # as the global PSDefaultParameterValues is not used
-        $PSDefaultParameterValues = $global:PSDefaultParameterValues
-        $convertFromJsonSupportsAsHashtable = (Get-Command -Name ConvertFrom-Json).Parameters.ContainsKey("AsHashtable")
+            Write-DebugMessage "[$($MyInvocation.MyCommand.Name)] ParameterSetName: $($PsCmdlet.ParameterSetName)"
+            Write-DebugMessage "[$($MyInvocation.MyCommand.Name)] PSBoundParameters: $($PSBoundParameters | Out-String)"
 
-        $splatParameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Uri", "Method", "InFile", "OutFile")
-        $splatParameters['Headers'] = $_headers
-        $splatParameters['ContentType'] = "application/json; charset=utf-8"
-        $splatParameters['UseBasicParsing'] = $true
-        $splatParameters['ErrorAction'] = 'Stop'
-        $splatParameters['Verbose'] = $false     # Overwrites verbose output
-        if (Test-ShouldPreserveAuthorizationOnRedirect -Uri $Uri -OutFile $OutFile -Credential $Credential -PersonalAccessToken $PersonalAccessToken) {
-            $secureCreds = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(
-                    $('{0}:{1}' -f $Credential.UserName, $Credential.GetNetworkCredential().Password)
-                ))
-            $splatParameters['Headers']['Authorization'] = "Basic $($secureCreds)"
-            $null = $splatParameters.Remove('Credential')
-        }
-        if ($TimeoutSec -gt 0) {
-            $splatParameters["TimeoutSec"] = $TimeoutSec
-        }
-        if (
-            ($PSVersionTable.PSVersion.Major -ge 6) -and
-            ($Uri.Scheme -eq "http") -and
-            ($Credential -or $PersonalAccessToken) -and
-            ($Uri.Host -in @("localhost", "127.0.0.1", "::1"))
-        ) {
-            $allowUnencryptedAuthentication = (
-                @('1', 'true', 'yes') -contains "$($env:CONFLUENCE_ALLOW_UNENCRYPTED_AUTH)".Trim().ToLowerInvariant()
-            ) -and (
-                @('localhost', '127.0.0.1', '::1') -contains $Uri.Host
-            )
+            # load DefaultParameters for Invoke-WebRequest
+            # as the global PSDefaultParameterValues is not used
+            $PSDefaultParameterValues = $global:PSDefaultParameterValues
+            $convertFromJsonSupportsAsHashtable = (Get-Command -Name ConvertFrom-Json).Parameters.ContainsKey("AsHashtable")
 
-            if ($allowUnencryptedAuthentication) {
-                $splatParameters["AllowUnencryptedAuthentication"] = $true
+            $splatParameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Uri", "Method", "InFile", "OutFile")
+            $splatParameters['Headers'] = $_headers
+            $splatParameters['ContentType'] = "application/json; charset=utf-8"
+            $splatParameters['UseBasicParsing'] = $true
+            $splatParameters['ErrorAction'] = 'Stop'
+            $splatParameters['Verbose'] = $false     # Overwrites verbose output
+            if (Test-ShouldPreserveAuthorizationOnRedirect -Uri $Uri -OutFile $OutFile -Credential $Credential -PersonalAccessToken $PersonalAccessToken) {
+                $secureCreds = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(
+                        $('{0}:{1}' -f $Credential.UserName, $Credential.GetNetworkCredential().Password)
+                    ))
+                $splatParameters['Headers']['Authorization'] = "Basic $($secureCreds)"
+                $null = $splatParameters.Remove('Credential')
             }
-        }
-
-        #add 'start' query parameter if Paging with Skip is being used
-        if (($PSCmdlet.PagingParameters) -and ($PSCmdlet.PagingParameters.Skip)) {
-            $GetParameters["start"] = $PSCmdlet.PagingParameters.Skip
-        }
-        $paginationGetParameters = $null
-        if ($GetParameters) {
-            $paginationGetParameters = $GetParameters.Clone()
-        }
-        # Append GET parameters to Uri, aka query Parameters
-        if ($GetParameters -and ($Uri.Query -eq "")) {
-            Write-Debug "[$($MyInvocation.MyCommand.Name)] Using `$GetParameters: $($GetParameters | Out-String)"
-            $splatParameters['Uri'] = [uri]"$Uri$(ConvertTo-GetParameter $GetParameters)"
-            # Prevent recursive appends
-            $PSBoundParameters.Remove('GetParameters') | Out-Null
-            $GetParameters = $null
-        }
-
-        if ($_headers.ContainsKey("Content-Type")) {
-            $splatParameters["ContentType"] = $_headers["Content-Type"]
-            $_headers.Remove("Content-Type")
-            $splatParameters["Headers"] = $_headers
-        }
-
-        if ($Body) {
-            if ($RawBody) {
-                $splatParameters["Body"] = $Body
+            if ($TimeoutSec -gt 0) {
+                $splatParameters["TimeoutSec"] = $TimeoutSec
             }
-            else {
-                # Encode Body to preserve special chars
-                # http://stackoverflow.com/questions/15290185/invoke-webrequest-issue-with-special-characters-in-json
-                $splatParameters["Body"] = [System.Text.Encoding]::UTF8.GetBytes($Body)
+            if (
+                ($PSVersionTable.PSVersion.Major -ge 6) -and
+                ($Uri.Scheme -eq "http") -and
+                ($Credential -or $PersonalAccessToken) -and
+                ($Uri.Host -in @("localhost", "127.0.0.1", "::1"))
+            ) {
+                $allowUnencryptedAuthentication = (
+                    @('1', 'true', 'yes') -contains "$($env:CONFLUENCE_ALLOW_UNENCRYPTED_AUTH)".Trim().ToLowerInvariant()
+                ) -and (
+                    @('localhost', '127.0.0.1', '::1') -contains $Uri.Host
+                )
+
+                if ($allowUnencryptedAuthentication) {
+                    $splatParameters["AllowUnencryptedAuthentication"] = $true
+                }
             }
-        }
 
-        # Invoke the API
-        Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoking method $Method to URI $URi"
-        Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoke-WebRequest with: $(([PSCustomObject]$splatParameters) | Out-String)"
-        $webException = $null
-        $retryCount = 0
-        $maxRetries = 3
-        $getResponseBody = {
-            param($Response)
+            #add 'start' query parameter if Paging with Skip is being used
+            if ($isFirstPage -and ($PSCmdlet.PagingParameters) -and ($PSCmdlet.PagingParameters.Skip)) {
+                $GetParameters["start"] = $PSCmdlet.PagingParameters.Skip
+            }
+            $paginationGetParameters = $null
+            if ($GetParameters) {
+                $paginationGetParameters = $GetParameters.Clone()
+            }
+            # Append GET parameters to Uri, aka query Parameters
+            if ($GetParameters -and ($Uri.Query -eq "")) {
+                Write-Debug "[$($MyInvocation.MyCommand.Name)] Using `$GetParameters: $($GetParameters | Out-String)"
+                $splatParameters['Uri'] = [uri]"$Uri$(ConvertTo-GetParameter $GetParameters)"
+                # Prevent recursive appends
+                $PSBoundParameters.Remove('GetParameters') | Out-Null
+                $GetParameters = $null
+            }
 
-            if (-not $Response) {
+            if ($_headers.ContainsKey("Content-Type")) {
+                $splatParameters["ContentType"] = $_headers["Content-Type"]
+                $_headers.Remove("Content-Type")
+                $splatParameters["Headers"] = $_headers
+            }
+
+            if ($Body) {
+                if ($RawBody) {
+                    $splatParameters["Body"] = $Body
+                }
+                else {
+                    # Encode Body to preserve special chars
+                    # http://stackoverflow.com/questions/15290185/invoke-webrequest-issue-with-special-characters-in-json
+                    $splatParameters["Body"] = [System.Text.Encoding]::UTF8.GetBytes($Body)
+                }
+            }
+
+            # Invoke the API
+            Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoking method $Method to URI $URi"
+            Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoke-WebRequest with: $(([PSCustomObject]$splatParameters) | Out-String)"
+            $webException = $null
+            $retryCount = 0
+            $maxRetries = 3
+            $getResponseBody = {
+                param($Response)
+
+                if (-not $Response) {
+                    return $null
+                }
+
+                if ($Response.Content) {
+                    if ($Response.Content -is [string]) {
+                        return [string]$Response.Content
+                    }
+
+                    if ($Response.Content -is [System.Net.Http.HttpContent]) {
+                        try {
+                            return $Response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                        }
+                        catch {
+                        }
+                    }
+
+                    if ($Response.Content.PSObject.Methods.Name -contains "ReadAsStringAsync") {
+                        try {
+                            return $Response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+                        }
+                        catch {
+                        }
+                    }
+                }
+
+                if (($Response | Get-Member -Name "RawContentStream") -and $Response.RawContentStream) {
+                    try {
+                        return [Text.Encoding]::UTF8.GetString($Response.RawContentStream.ToArray())
+                    }
+                    catch {
+                    }
+                }
+
+                if ($Response | Get-Member -Name "GetResponseStream") {
+                    try {
+                        $readStream = New-Object -TypeName System.IO.StreamReader -ArgumentList ($Response.GetResponseStream())
+                        $body = $readStream.ReadToEnd()
+                        $readStream.Close()
+                        return $body
+                    }
+                    catch {
+                    }
+                }
+
                 return $null
             }
 
-            if ($Response.Content) {
-                if ($Response.Content -is [string]) {
-                    return [string]$Response.Content
-                }
+            do {
+                $responseBody = $null
 
-                if ($Response.Content -is [System.Net.Http.HttpContent]) {
-                    try {
-                        return $Response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-                    }
-                    catch {
-                    }
-                }
-
-                if ($Response.Content.PSObject.Methods.Name -contains "ReadAsStringAsync") {
-                    try {
-                        return $Response.Content.ReadAsStringAsync().GetAwaiter().GetResult()
-                    }
-                    catch {
-                    }
-                }
-            }
-
-            if (($Response | Get-Member -Name "RawContentStream") -and $Response.RawContentStream) {
                 try {
-                    return [Text.Encoding]::UTF8.GetString($Response.RawContentStream.ToArray())
+                    $webResponse = Invoke-WebRequest @splatParameters
+                    $webException = $null
                 }
                 catch {
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] Failed to get an answer from the server"
+                    $webException = $_
+                    if ($webException.ErrorDetails) {
+                        # In PowerShellCore (v6+), the response body is available as string
+                        $responseBody = $webException.ErrorDetails.Message
+                    }
+                    $webResponse = $webException.Exception.Response
+
+                    if (-not $webResponse) {
+                        throw $webException
+                    }
+
+                    if (-not $responseBody) {
+                        $responseBody = & $getResponseBody $webResponse
+                    }
+                }
+
+                # Test response Headers if Confluence requires a CAPTCHA
+                Test-Captcha -InputObject $webResponse
+
+                $shouldRetry = Test-ServerResponse -InputObject $webResponse -Method $Method -RetryCount $retryCount -MaxRetries $maxRetries
+                if ($shouldRetry) {
+                    $retryCount++
                 }
             }
+            while ($shouldRetry)
 
-            if ($Response | Get-Member -Name "GetResponseStream") {
-                try {
-                    $readStream = New-Object -TypeName System.IO.StreamReader -ArgumentList ($Response.GetResponseStream())
-                    $body = $readStream.ReadToEnd()
-                    $readStream.Close()
-                    return $body
-                }
-                catch {
-                }
+            Write-Debug "[$($MyInvocation.MyCommand.Name)] Executed WebRequest. Access `$webResponse to see details"
+
+            if (-not $webResponse) {
+                Write-Verbose "[$($MyInvocation.MyCommand.Name)] No Web result object was returned from. This is unusual!"
+                break pageLoop
             }
 
-            return $null
-        }
-
-        do {
-            $responseBody = $null
-
-            try {
-                $webResponse = Invoke-WebRequest @splatParameters
-                $webException = $null
-            }
-            catch {
-                Write-Verbose "[$($MyInvocation.MyCommand.Name)] Failed to get an answer from the server"
-                $webException = $_
-                if ($webException.ErrorDetails) {
-                    # In PowerShellCore (v6+), the response body is available as string
-                    $responseBody = $webException.ErrorDetails.Message
-                }
-                $webResponse = $webException.Exception.Response
-
-                if (-not $webResponse) {
-                    throw $webException
-                }
-
-                if (-not $responseBody) {
-                    $responseBody = & $getResponseBody $webResponse
-                }
-            }
-
-            # Test response Headers if Confluence requires a CAPTCHA
-            Test-Captcha -InputObject $webResponse
-
-            $shouldRetry = Test-ServerResponse -InputObject $webResponse -Method $Method -RetryCount $retryCount -MaxRetries $maxRetries
-            if ($shouldRetry) {
-                $retryCount++
-            }
-        }
-        while ($shouldRetry)
-
-        Write-Debug "[$($MyInvocation.MyCommand.Name)] Executed WebRequest. Access `$webResponse to see details"
-
-        if ($webResponse) {
             # In PowerShellCore (v6+) the StatusCode of an exception is somewhere else
             if (-not ($statusCode = $webResponse.StatusCode)) {
                 $statusCode = $webresponse.Exception.Response.StatusCode
@@ -333,141 +351,166 @@
 
                 $errorItem.ErrorDetails = [System.Management.Automation.ErrorDetails]::new(($errorMessages -join [Environment]::NewLine))
                 $Caller.WriteError($errorItem)
+                break pageLoop
             }
-            else {
-                if ($webResponse.Content) {
-                    try {
-                        # API returned a Content: lets work with it
-                        $jsonResponseBody = [Text.Encoding]::UTF8.GetString($webResponse.RawContentStream.ToArray())
-                        $convertFromJsonParameters = @{
-                            InputObject = $jsonResponseBody
-                            ErrorAction = 'Stop'
-                        }
-                        try {
-                            $response = ConvertFrom-Json @convertFromJsonParameters
-                        }
-                        catch {
-                            if (-not $convertFromJsonSupportsAsHashtable) {
-                                throw
-                            }
 
-                            # Confluence occasionally sends duplicate keys that differ only by case.
-                            $convertFromJsonParameters['AsHashtable'] = $true
-                            $response = ConvertFrom-Json @convertFromJsonParameters
-                        }
+            if (-not $webResponse.Content) {
+                # No content, although statusCode < 400
+                # This could be wanted behavior of the API
+                Write-Verbose "[$($MyInvocation.MyCommand.Name)] No content was returned from."
+                break pageLoop
+            }
 
-                        if ($null -ne $response.errors) {
-                            Write-Verbose "[$($MyInvocation.MyCommand.Name)] An error response was received from; resolving"
-                            # This could be handled nicely in an function such as:
-                            # ResolveError $response -WriteError
-                            Write-Error $($response.errors | Out-String)
-                        }
-                        else {
-                            if ($PSCmdlet.PagingParameters.IncludeTotalCount) {
-                                [double]$Accuracy = 0.0
-                                $PSCmdlet.PagingParameters.NewTotalCount($response.size, $Accuracy)
-                            }
-                            # None paginated results / first page of pagination
-                            $result = $response
-                            $hasResults = $false
-                            if ($response -is [System.Collections.IDictionary]) {
-                                $hasResults = $response.Contains("results")
-                            }
-                            elseif (($response) -and ($response | Get-Member -Name results)) {
-                                $hasResults = $true
-                            }
-                            if ($hasResults) {
-                                $result = $response.results
-                            }
-
-                            # Trim this page to whatever is still needed to satisfy -First, and
-                            # remember how many items have been emitted across every page so a
-                            # recursive call further down the pagination chain can do the same.
-                            $resultItems = @($result)
-                            $emitCount = $resultItems.Count
-                            $satisfiedFirst = $false
-                            $first = $PSCmdlet.PagingParameters.First
-                            if ($first -lt [UInt64]::MaxValue) {
-                                $remaining = if ($first -gt $ResultsEmitted) { $first - $ResultsEmitted } else { 0 }
-                                if ($remaining -lt $emitCount) {
-                                    $resultItems = @($resultItems | Select-Object -First $remaining)
-                                    $emitCount = $resultItems.Count
-                                }
-                                if (($ResultsEmitted + $emitCount) -ge $first) {
-                                    $satisfiedFirst = $true
-                                }
-                            }
-
-                            if ($OutputType) {
-                                # Results shall be casted to custom objects (see ValidateSet)
-                                Write-Verbose "[$($MyInvocation.MyCommand.Name)] Outputting results as $($OutputType.FullName)"
-                                $converter = "ConvertTo-$($OutputType.Name)"
-                                $resultItems | & $converter
-                            }
-                            else {
-                                $resultItems
-                            }
-                            $ResultsEmitted += $emitCount
-
-                            # Detect if the result is paginated, from either the body or a
-                            # `Link` response header (Confluence Cloud v2 may use either).
-                            $nextUri = Resolve-NextPageLink -RequestUri $Uri -ResponseBody $response -Headers $webResponse.Headers
-
-                            if ($nextUri -and $satisfiedFirst) {
-                                Write-Verbose "[$($MyInvocation.MyCommand.Name)] -First is satisfied; not following the remaining pagination link."
-                            }
-                            elseif ($nextUri -and $nextUri.AbsoluteUri -eq $Uri.AbsoluteUri) {
-                                Write-Warning "[$($MyInvocation.MyCommand.Name)] Confluence returned the same pagination link again; stopping to avoid an infinite loop."
-                            }
-                            elseif ($nextUri) {
-                                if ($PageDepth -ge 10000) {
-                                    throw "Confluence pagination exceeded the maximum of 10000 pages."
-                                }
-
-                                Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoking pagination"
-
-                                # Remove Parameters that don't need propagation
-                                $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):GetParameters")
-                                $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):IncludeTotalCount")
-
-                                $parameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Method", "Headers", "OutputType", "TimeoutSec", "First")
-                                $parameters['Uri'] = $nextUri
-                                $parameters['ResultsEmitted'] = $ResultsEmitted
-                                $parameters['PageDepth'] = $PageDepth + 1
-                                if ($paginationGetParameters) {
-                                    $parameters['GetParameters'] = $paginationGetParameters
-                                    $nextUriBuilder = [System.UriBuilder]$parameters['Uri']
-                                    $nextQueryParameters = [System.Web.HttpUtility]::ParseQueryString($nextUriBuilder.Query)
-                                    foreach ($key in $paginationGetParameters.Keys) {
-                                        if ($nextQueryParameters.AllKeys -notcontains $key) {
-                                            $nextQueryParameters[[string]$key] = [string]$paginationGetParameters[$key]
-                                        }
-                                    }
-                                    $nextUriBuilder.Query = $nextQueryParameters.ToString()
-                                    $parameters['Uri'] = $nextUriBuilder.Uri
-                                }
-
-                                # The next-page URI (and any cursor it carries) is deliberately
-                                # not logged, even at -Verbose.
-                                Write-Verbose "[$($MyInvocation.MyCommand.Name)] Following pagination link to the next page"
-
-                                Invoke-Method @parameters
-                            }
-                        }
+            try {
+                # API returned a Content: lets work with it
+                $jsonResponseBody = [Text.Encoding]::UTF8.GetString($webResponse.RawContentStream.ToArray())
+                $convertFromJsonParameters = @{
+                    InputObject = $jsonResponseBody
+                    ErrorAction = 'Stop'
+                }
+                try {
+                    $response = ConvertFrom-Json @convertFromJsonParameters
+                }
+                catch {
+                    if (-not $convertFromJsonSupportsAsHashtable) {
+                        throw
                     }
-                    catch {
-                        throw $_
+
+                    # Confluence occasionally sends duplicate keys that differ only by case.
+                    $convertFromJsonParameters['AsHashtable'] = $true
+                    $response = ConvertFrom-Json @convertFromJsonParameters
+                }
+
+                if ($null -ne $response.errors) {
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] An error response was received from; resolving"
+                    # This could be handled nicely in an function such as:
+                    # ResolveError $response -WriteError
+                    Write-Error $($response.errors | Out-String)
+                    break pageLoop
+                }
+
+                if ($isFirstPage -and $PSCmdlet.PagingParameters.IncludeTotalCount) {
+                    [double]$Accuracy = 0.0
+                    $PSCmdlet.PagingParameters.NewTotalCount($response.size, $Accuracy)
+                }
+                # None paginated results / first page of pagination
+                $result = $response
+                $hasResults = $false
+                if ($response -is [System.Collections.IDictionary]) {
+                    $hasResults = $response.Contains("results")
+                }
+                elseif (($response) -and ($response | Get-Member -Name results)) {
+                    $hasResults = $true
+                }
+                if ($hasResults) {
+                    $result = $response.results
+                }
+
+                # Trim this page to whatever is still needed to satisfy -First, and
+                # remember how many items have been emitted across every page so the
+                # next iteration of the pagination loop can do the same.
+                $resultItems = @($result)
+                $emitCount = $resultItems.Count
+                $satisfiedFirst = $false
+                $first = $PSCmdlet.PagingParameters.First
+                if ($first -lt [UInt64]::MaxValue) {
+                    $remaining = if ($first -gt $ResultsEmitted) { $first - $ResultsEmitted } else { 0 }
+                    if ($remaining -lt $emitCount) {
+                        $resultItems = @($resultItems | Select-Object -First $remaining)
+                        $emitCount = $resultItems.Count
                     }
+                    if (($ResultsEmitted + $emitCount) -ge $first) {
+                        $satisfiedFirst = $true
+                    }
+                }
+
+                if ($OutputType) {
+                    # Results shall be casted to custom objects (see ValidateSet)
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] Outputting results as $($OutputType.FullName)"
+                    $converter = "ConvertTo-$($OutputType.Name)"
+                    $resultItems | & $converter
                 }
                 else {
-                    # No content, although statusCode < 400
-                    # This could be wanted behavior of the API
-                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] No content was returned from."
+                    $resultItems
+                }
+                $ResultsEmitted += $emitCount
+
+                # Detect if the result is paginated, from either the body or a
+                # `Link` response header (Confluence Cloud v2 may use either).
+                $nextUri = Resolve-NextPageLink -RequestUri $Uri -ResponseBody $response -Headers $webResponse.Headers
+
+                if ($nextUri -and $emitCount -eq 0) {
+                    # Some Confluence Server/Data Center versions keep advertising a
+                    # `_links.next` even once a collection is exhausted (an empty page
+                    # still carries a next link that itself resolves to another empty
+                    # page, forever). An empty page is the reliable end-of-collection
+                    # signal, regardless of what the server claims about a next page.
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] This page returned no results; not following the advertised pagination link."
+                    break pageLoop
+                }
+                elseif ($nextUri -and $satisfiedFirst) {
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] -First is satisfied; not following the remaining pagination link."
+                    break pageLoop
+                }
+                elseif ($nextUri -and $nextUri.AbsoluteUri -eq $Uri.AbsoluteUri) {
+                    Write-Warning "[$($MyInvocation.MyCommand.Name)] Confluence returned the same pagination link again; stopping to avoid an infinite loop."
+                    break pageLoop
+                }
+                elseif ($nextUri) {
+                    if ($PageDepth -ge 10000) {
+                        throw "Confluence pagination exceeded the maximum of 10000 pages."
+                    }
+
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] Invoking pagination"
+
+                    # Remove Parameters that don't need propagation
+                    $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):GetParameters")
+                    $script:PSDefaultParameterValues.Remove("$($MyInvocation.MyCommand.Name):IncludeTotalCount")
+
+                    $parameters = Copy-CommonParameter -InputObject $PSBoundParameters -AdditionalParameter @("Method", "Headers", "OutputType", "TimeoutSec", "First")
+                    $parameters['Uri'] = $nextUri
+                    $parameters['ResultsEmitted'] = $ResultsEmitted
+                    $parameters['PageDepth'] = $PageDepth + 1
+                    if ($paginationGetParameters) {
+                        $parameters['GetParameters'] = $paginationGetParameters
+                        $nextUriBuilder = [System.UriBuilder]$parameters['Uri']
+                        $nextQueryParameters = [System.Web.HttpUtility]::ParseQueryString($nextUriBuilder.Query)
+                        foreach ($key in $paginationGetParameters.Keys) {
+                            if ($nextQueryParameters.AllKeys -notcontains $key) {
+                                $nextQueryParameters[[string]$key] = [string]$paginationGetParameters[$key]
+                            }
+                        }
+                        $nextUriBuilder.Query = $nextQueryParameters.ToString()
+                        $parameters['Uri'] = $nextUriBuilder.Uri
+                    }
+
+                    # The next-page URI (and any cursor it carries) is deliberately
+                    # not logged, even at -Verbose.
+                    Write-Verbose "[$($MyInvocation.MyCommand.Name)] Following pagination link to the next page"
+
+                    # Advance to the next page in place instead of recursing: reuses
+                    # $parameters exactly as a recursive call would have received them
+                    # (Copy-CommonParameter already excludes Body/RawBody/InFile/OutFile,
+                    # which a follow-up pagination GET must never resend), just without
+                    # growing the call stack. A paginated `results` response only ever
+                    # comes from a bodyless GET in the first place, so $Body/$RawBody/
+                    # $InFile/$OutFile are already unset here; $Body also carries
+                    # [ValidateNotNullOrEmpty()], which would reject an explicit reset.
+                    $PSBoundParameters = $parameters
+                    $Uri = $parameters['Uri']
+                    $GetParameters = if ($parameters.ContainsKey('GetParameters')) { $parameters['GetParameters'] } else { $null }
+                    $ResultsEmitted = $parameters['ResultsEmitted']
+                    $PageDepth = $parameters['PageDepth']
+                    continue pageLoop
+                }
+                else {
+                    # No further pagination link was advertised; this was the last (or only) page.
+                    break pageLoop
                 }
             }
-        }
-        else {
-            Write-Verbose "[$($MyInvocation.MyCommand.Name)] No Web result object was returned from. This is unusual!"
+            catch {
+                throw $_
+            }
         }
     }
 
