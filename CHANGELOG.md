@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## 4.0.0 - 2026-10-01
+
+### Changed
+
+- **Breaking:** forked from `ConfluencePS` 3.0 and renamed to `ConfluencePSVII`: new module name and GUID; .NET types moved to the `ConfluencePSVII` namespace (for example `[ConfluencePSVII.Page]`). Command names (`*-Confluence*`) are unchanged.
+- Build now pins `AtlassianPSVII.Standards` 1.0.0.
+
 ### Fixed
 
 - Fixed `Invoke-ConfluenceMethod` throwing `Cannot find an overload for "Contains" and the argument count: "1"` on essentially every real HTTP response. `Resolve-NextPageLink` (pagination) and `Test-ServerResponse` (429/503 retry) both called `.Contains(key)` on `$webResponse.Headers` to check for a `Link`/`Retry-After` header. That property's actual runtime type -- `Invoke-WebRequest`'s own `Headers`, not a `Hashtable` -- is a generic `Dictionary<string, IEnumerable<string>>`, which only exposes `ContainsKey`, not `Contains`; the existing unit tests used `Hashtable`/`@{}` stand-ins for headers, which do have a public `Contains` and so never caught this. Switched both call sites to `.ContainsKey(...)` and added regression tests against a real `Dictionary<string, string[]>` to both `Resolve-NextPageLink.Unit.Tests.ps1` and `Test-ServerResponse.Unit.Tests.ps1`.
