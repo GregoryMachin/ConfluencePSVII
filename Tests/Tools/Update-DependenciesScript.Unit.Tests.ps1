@@ -1,4 +1,4 @@
-﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "4.10" }
+﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "6.2"; MaximumVersion = "6.999" }
 
 Describe 'Tools/update.dependencies.ps1' -Tag Unit {
     BeforeAll {
@@ -188,7 +188,7 @@ Export-ModuleMember -Function Update-AtlassianPSVIIDependencyReference
 
         $result = & $scriptPath -WhatIf
 
-        Assert-MockCalled -CommandName Install-Module -Exactly -Times 0 -Scope It
+        Should -Invoke -CommandName Install-Module -Exactly -Times 0 -Scope It
         $result.Skipped | Should -BeTrue
     }
 

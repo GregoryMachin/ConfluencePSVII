@@ -1,4 +1,4 @@
-﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "4.10" }
+﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "6.2"; MaximumVersion = "6.999" }
 
 Describe 'Tools/setup.ps1' -Tag Unit {
     BeforeAll {
@@ -235,7 +235,7 @@ Export-ModuleMember -Function Install-AtlassianPSVIIDependencyRequirement, Sync-
             Remove-Module -Name 'AtlassianPSVII.Standards' -Force -ErrorAction SilentlyContinue
         }
 
-        Assert-MockCalled -CommandName Install-Module -Exactly -Times 1 -ParameterFilter {
+        Should -Invoke -CommandName Install-Module -Exactly -Times 1 -ParameterFilter {
             $Name -eq 'AtlassianPSVII.Standards' -and
             $RequiredVersion -eq '9.9.9' -and
             $Scope -eq 'CurrentUser' -and

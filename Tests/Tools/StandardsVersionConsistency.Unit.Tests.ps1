@@ -1,4 +1,4 @@
-﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "4.10" }
+﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "6.2"; MaximumVersion = "6.999" }
 
 Describe 'AtlassianPSVII.Standards version consistency' -Tag Unit {
     BeforeAll {

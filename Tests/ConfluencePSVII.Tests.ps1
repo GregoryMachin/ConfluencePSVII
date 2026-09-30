@@ -1,4 +1,4 @@
-﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "5.7"; MaximumVersion = "5.999" }
+﻿#requires -modules @{ ModuleName = "Pester"; ModuleVersion = "6.2"; MaximumVersion = "6.999" }
 
 BeforeDiscovery {
     . "$PSScriptRoot/Helpers/TestTools.ps1"
@@ -44,7 +44,9 @@ Describe "General project validation" -Tag Unit {
     }
 
     It "module is imported with default prefix" {
-        $prefix = $manifest.DefaultCommandPrefix
+        # Test-ModuleManifest returns PSModuleInfo, whose property is Prefix (DefaultCommandPrefix is $null).
+        $prefix = $manifest.Prefix
+        $prefix | Should -Not -BeNullOrEmpty
 
         Import-Module $moduleToTest -Force -ErrorAction Stop
         (Get-Command -Module ConfluencePSVII -CommandType Function).Name | ForEach-Object {
