@@ -48,7 +48,7 @@ jobs:
           path: ./Release/
           if_no_artifact_found: fail
 
-      - uses: AtlassianPS/AtlassianPS.Standards/.github/actions/setup-powershell@6fe5d05db84cdd10c9e4284e235a8f359c9537ad # v0.1.11
+      - uses: GregoryMachin/AtlassianPSVII.Standards/.github/actions/setup-powershell@c70eaec1e4d771fe56f9e0b378eda1e521db8a07 # v1.0.0
 
       - run: Invoke-Build -Task Publish -VersionToPublish ${{ steps.release_ref.outputs.release_tag }}
           -PSGalleryAPIKey ${{ secrets.PSGALLERY_API_KEY }}
@@ -65,12 +65,3 @@ jobs:
           prerelease: ${{ contains(steps.release_ref.outputs.release_tag, 'alpha') || contains(steps.release_ref.outputs.release_tag, 'beta') || contains(steps.release_ref.outputs.release_tag, 'rc') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Notify homepage to update submodule
-        if: ${{ !contains(steps.release_ref.outputs.release_tag, 'alpha') && !contains(steps.release_ref.outputs.release_tag, 'beta') && !contains(steps.release_ref.outputs.release_tag, 'rc') }}
-        uses: peter-evans/repository-dispatch@v4
-        with:
-          token: ${{ secrets.HOMEPAGE_PAT }}
-          repository: AtlassianPS/AtlassianPS.github.io
-          event-type: module-release
-          client-payload: "{\"module\": \"ConfluencePSVII\", \"version\": \"${{ steps.release_ref.outputs.release_tag }}\"}"

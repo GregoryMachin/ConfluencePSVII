@@ -1,12 +1,13 @@
+
+> **Fork notice:** ConfluencePSVII is a fork of [ConfluencePS](https://github.com/AtlassianPS/ConfluencePS) by the [AtlassianPS](https://github.com/AtlassianPS) team (MIT License), renamed and maintained by Gregory Machin. "VII" is only part of the name: it supports Windows PowerShell 5.1 and PowerShell 7.4+, and can be loaded side by side with the upstream module.
 ---
 layout: module
 permalink: /module/ConfluencePSVII/
 ---
 # [ConfluencePSVII](https://atlassianps.org/module/ConfluencePS)
 
-[![GitHub release](https://img.shields.io/github/release/AtlassianPS/ConfluencePS.svg?style=for-the-badge)](https://github.com/AtlassianPS/ConfluencePS/releases/latest)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/AtlassianPS/ConfluencePS/ci.yml?style=for-the-badge)](https://github.com/AtlassianPS/ConfluencePS/actions/workflows/ci.yml)
-[![PowerShell Gallery](https://img.shields.io/powershellgallery/dt/ConfluencePS.svg?style=for-the-badge)](https://www.powershellgallery.com/packages/ConfluencePS)
+[![GitHub release](https://img.shields.io/github/release/GregoryMachin/ConfluencePSVII.svg?style=for-the-badge)](https://github.com/GregoryMachin/ConfluencePSVII/releases/latest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/GregoryMachin/ConfluencePSVII/ci.yml?style=for-the-badge)](https://github.com/GregoryMachin/ConfluencePSVII/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)
 
 Automate your documentation! ConfluencePSVII is a PowerShell module that interacts with Atlassian's [Confluence] wiki product.
@@ -26,17 +27,19 @@ Join the conversation on [![SlackLogo][] AtlassianPSVII.Slack.com](https://atlas
 
 ### Installation
 
-Install ConfluencePSVII from the [PowerShell Gallery]! `Install-Module` requires PowerShellGet (included in PS v5, or download for v3/v4 via the gallery link)
+ConfluencePSVII is not published to the PowerShell Gallery; use it straight from its repository:
 
 ```powershell
-# One time only install: (requires an admin PowerShell window)
-Install-Module ConfluencePSVII
+git clone https://github.com/GregoryMachin/ConfluencePSVII.git
+Import-Module ./ConfluencePSVII/ConfluencePSVII/ConfluencePSVII.psd1
+```
 
-# Check for updates occasionally:
-Update-Module ConfluencePSVII
+For the built release copy (merged module and compiled help) run `./Tools/setup.ps1` and
+`Invoke-Build -Task Build` in the clone, then import `./Release/ConfluencePSVII/ConfluencePSVII.psd1`.
 
+```powershell
 # To use each session:
-Import-Module ConfluencePSVII
+Import-Module ./ConfluencePSVII/ConfluencePSVII/ConfluencePSVII.psd1
 $credential = Get-Credential -UserName 'me@example.com'
 Set-ConfluenceInfo -BaseURI 'https://YourCloudWiki.atlassian.net/wiki' -Credential $credential
 ```
@@ -67,10 +70,10 @@ Check out our guidelines on [Contributing](https://atlassianps.org/docs/Contribu
 
 | Configuration | Status |
 | ------------- | ------ |
-| Windows PowerShell v5.1 | [CI workflow](https://github.com/AtlassianPS/ConfluencePS/actions/workflows/ci.yml) |
-| PowerShell 7 on Windows | [CI workflow](https://github.com/AtlassianPS/ConfluencePS/actions/workflows/ci.yml) |
-| PowerShell 7 on Ubuntu | [CI workflow](https://github.com/AtlassianPS/ConfluencePS/actions/workflows/ci.yml) |
-| PowerShell 7 on macOS | [CI workflow](https://github.com/AtlassianPS/ConfluencePS/actions/workflows/ci.yml) |
+| Windows PowerShell v5.1 | [CI workflow](https://github.com/GregoryMachin/ConfluencePSVII/actions/workflows/ci.yml) |
+| PowerShell 7 on Windows | [CI workflow](https://github.com/GregoryMachin/ConfluencePSVII/actions/workflows/ci.yml) |
+| PowerShell 7 on Ubuntu | [CI workflow](https://github.com/GregoryMachin/ConfluencePSVII/actions/workflows/ci.yml) |
+| PowerShell 7 on macOS | [CI workflow](https://github.com/GregoryMachin/ConfluencePSVII/actions/workflows/ci.yml) |
 
 ## Acknowledgements
 
@@ -84,7 +87,7 @@ Check out our guidelines on [Contributing](https://atlassianps.org/docs/Contribu
 * [Latest Release]
 * [Submit an Issue]
 * [Contributing]
-* How you can help us: [List of Issues](https://github.com/AtlassianPS/ConfluencePS/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs)
+* How you can help us: [List of Issues](https://github.com/GregoryMachin/ConfluencePSVII/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs)
 
 ## Disclaimer
 
@@ -98,9 +101,9 @@ Hopefully this is obvious, but:
   [PoshConfluence]: <https://github.com/thomykay/PoshConfluence>
   [RamblingCookieMonster]: <https://github.com/RamblingCookieMonster>
   [PSStackExchange]: <https://github.com/RamblingCookieMonster/PSStackExchange>
-  [Source Code]: <https://github.com/AtlassianPS/ConfluencePS>
-  [Latest Release]: <https://github.com/AtlassianPS/ConfluencePS/releases/latest>
-  [Submit an Issue]: <https://github.com/AtlassianPS/ConfluencePS/issues/new>
+  [Source Code]: <https://github.com/GregoryMachin/ConfluencePSVII>
+  [Latest Release]: <https://github.com/GregoryMachin/ConfluencePSVII/releases/latest>
+  [Submit an Issue]: <https://github.com/GregoryMachin/ConfluencePSVII/issues/new>
   [Contributing]: https://atlassianps.org/docs/Contributing/
   [juneb]: <https://github.com/juneb>
   [brianbunke]: <https://github.com/brianbunke>

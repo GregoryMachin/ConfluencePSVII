@@ -399,4 +399,4 @@ Piped output into other cmdlets is generally tested and supported.
 
 ## RELATED LINKS
 
-[https://github.com/AtlassianPS/ConfluencePS](https://github.com/AtlassianPS/ConfluencePS)
+[https://github.com/GregoryMachin/ConfluencePSVII](https://github.com/GregoryMachin/ConfluencePSVII)

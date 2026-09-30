@@ -141,6 +141,6 @@ See links section.
 
 ## RELATED LINKS
 
-[https://github.com/AtlassianPS/ConfluencePS](https://github.com/AtlassianPS/ConfluencePS)
+[https://github.com/GregoryMachin/ConfluencePSVII](https://github.com/GregoryMachin/ConfluencePSVII)
 
 [thomykay PoshConfluence](https://github.com/thomykay/PoshConfluence)

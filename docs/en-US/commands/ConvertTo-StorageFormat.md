@@ -175,6 +175,6 @@ a caller-facing behavior change (and a major version bump) will be required.
 
 ## RELATED LINKS
 
-[https://github.com/AtlassianPS/ConfluencePS](https://github.com/AtlassianPS/ConfluencePS)
+[https://github.com/GregoryMachin/ConfluencePSVII](https://github.com/GregoryMachin/ConfluencePSVII)
 
 [Confluence Storage Format](https://confluence.atlassian.com/confcloud/confluence-storage-format-724765084.html)

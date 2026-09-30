@@ -24,7 +24,7 @@
     CompanyName       = 'AtlassianPSVII'
 
     # Copyright statement for this module
-    Copyright         = 'MIT License'
+    Copyright         = '(c) 2016 Brian Bunke; (c) 2026 Gregory Machin. MIT License.'
 
     # Description of the functionality provided by this module
     Description       = 'PowerShell module to interact with the Atlassian Confluence REST API'
@@ -145,16 +145,16 @@
             Tags       = @('confluence', 'wiki', 'atlassian')
 
             # A URL to the license for this module.
-            LicenseUri = 'https://github.com/AtlassianPS/ConfluencePS/blob/master/LICENSE'
+            LicenseUri = 'https://github.com/GregoryMachin/ConfluencePSVII/blob/master/LICENSE'
 
             # A URL to the main website for this project.
-            ProjectUri = 'https://github.com/AtlassianPS/ConfluencePS'
+            ProjectUri = 'https://github.com/GregoryMachin/ConfluencePSVII'
 
             # A URL to an icon representing this module.
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'https://github.com/AtlassianPS/ConfluencePS/blob/master/CHANGELOG.md'
+            ReleaseNotes = 'https://github.com/GregoryMachin/ConfluencePSVII/blob/master/CHANGELOG.md'
 
         } # End of PSData hashtable
 

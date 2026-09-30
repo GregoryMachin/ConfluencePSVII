@@ -141,7 +141,7 @@ Find us on GitHub or Slack, and let us know what you think.
 
 [Classes index](/docs/ConfluencePS/classes/)
 
-ConfluencePSVII on Github: <https://github.com/AtlassianPS/ConfluencePS>
+ConfluencePSVII on Github: <https://github.com/GregoryMachin/ConfluencePSVII>
 
 Confluence's REST API documentation: <https://docs.atlassian.com/atlassian-confluence/REST/latest/>
 

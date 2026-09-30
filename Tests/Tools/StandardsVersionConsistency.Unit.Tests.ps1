@@ -67,7 +67,7 @@ Describe 'AtlassianPSVII.Standards version consistency' -Tag Unit {
             $workflowContent = Get-Content -LiteralPath $workflowPath -Raw
             [regex]::Matches(
                 $workflowContent,
-                "AtlassianPS/AtlassianPS\.Standards/\.github/actions/setup-powershell@(?<ref>[^\s#]+)(?:\s+#\s+v(?<version>[0-9]+\.[0-9]+\.[0-9]+))?"
+                "GregoryMachin/AtlassianPSVII\.Standards/\.github/actions/setup-powershell@(?<ref>[^\s#]+)(?:\s+#\s+v(?<version>[0-9]+\.[0-9]+\.[0-9]+))?"
             ) | ForEach-Object {
                 [PSCustomObject]@{
                     WorkflowPath = $workflowPath
