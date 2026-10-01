@@ -132,9 +132,11 @@ jobs:
     # a green CI Result. First-party PRs and pushes to master gate on the
     # smoke result, which in turn gates release.yml's artifact download
     # (workflow_conclusion: success).
-    if: github.event_name != 'pull_request' ||
+    # Also skipped until the repository has its live test instance configured (the Cloud URL
+    # variable below; set it with the matching secrets to enable smoke tests on the fork).
+    if: vars.CONFLUENCE_CLOUD_URL != '' && (github.event_name != 'pull_request' ||
       (github.event.pull_request.head.repo.full_name == github.repository &&
-      github.actor != 'dependabot[bot]')
+      github.actor != 'dependabot[bot]'))
     env:
       CI_CONFLUENCE_TYPE: Cloud
       CONFLUENCE_CLOUD_URL: ${{ vars.CONFLUENCE_CLOUD_URL }}

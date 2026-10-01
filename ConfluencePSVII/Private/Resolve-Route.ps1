@@ -97,7 +97,8 @@
         }
 
         $parsedBaseUri = $null
-        if (-not [Uri]::TryCreate($BaseUri, [UriKind]::Absolute, [ref]$parsedBaseUri)) {
+        # Require http(s): on Linux/macOS .NET also accepts "/wiki" as an absolute file:// URI.
+        if (-not ([Uri]::TryCreate($BaseUri, [UriKind]::Absolute, [ref]$parsedBaseUri) -and $parsedBaseUri.Scheme -in @('http', 'https'))) {
             throw "BaseUri '$BaseUri' is not an absolute URI."
         }
 

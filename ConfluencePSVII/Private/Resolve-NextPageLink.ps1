@@ -78,7 +78,10 @@
     }
 
     [Uri]$nextUri = $null
-    if ([Uri]::TryCreate([string]$nextRaw, [UriKind]::Absolute, [ref]$nextUri)) {
+    # Only an http(s) URI counts as absolute: on Linux/macOS .NET also parses a leading-'/' path
+    # such as "/wiki/rest/api/content?start=25" as an absolute file:// URI.
+    $isAbsoluteLink = [Uri]::TryCreate([string]$nextRaw, [UriKind]::Absolute, [ref]$nextUri) -and $nextUri.Scheme -in @('http', 'https')
+    if ($isAbsoluteLink) {
         # Already absolute, e.g. a typical `Link` header value.
     }
     elseif ($baseRaw) {
