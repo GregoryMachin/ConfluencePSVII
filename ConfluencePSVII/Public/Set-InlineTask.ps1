@@ -1,12 +1,9 @@
 ﻿function Set-InlineTask {
-    <#
-    .NOTES
-    Cloud v2 only, same reasoning as Get-InlineTask: inline tasks have no v1/Data Center
-    status-update API at all, only inline markup inside a page body. There is no
-    -DeploymentType parameter here and -BaseUri is mandatory. The only supported mutation is
-    -Status (complete/incomplete); task body/assignee/due-date editing is not exposed here,
-    since those are edited through the owning page's body, not this resource.
-    #>
+    # Cloud v2 only, same reasoning as Get-InlineTask: inline tasks have no v1/Data Center
+    # status-update API at all, only inline markup inside a page body. There is no
+    # -DeploymentType parameter here and -BaseUri is mandatory. The only supported mutation is
+    # -Status (complete/incomplete); task body/assignee/due-date editing is not exposed here,
+    # since those are edited through the owning page's body, not this resource.
     [CmdletBinding(
         ConfirmImpact = 'Low',
         SupportsShouldProcess = $true

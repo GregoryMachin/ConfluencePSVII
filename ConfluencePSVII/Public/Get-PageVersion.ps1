@@ -1,12 +1,9 @@
 ﻿function Get-PageVersion {
-    <#
-    .NOTES
-    -VersionNumber's response shape on Cloud v2 (a specific historical revision of the page,
-    optionally with body via -IncludeBody) is based on the same field conventions as the main
-    page v2 response and has not been live-verified against a Cloud tenant; treat it as
-    best-effort until confirmed. The byList path (both v1 and v2) is the well-established
-    version-history collection and carries no such caveat.
-    #>
+    # -VersionNumber's response shape on Cloud v2 (a specific historical revision of the page,
+    # optionally with body via -IncludeBody) is based on the same field conventions as the main
+    # page v2 response and has not been live-verified against a Cloud tenant; treat it as
+    # best-effort until confirmed. The byList path (both v1 and v2) is the well-established
+    # version-history collection and carries no such caveat.
     [CmdletBinding(
         SupportsPaging = $true,
         DefaultParameterSetName = "byList"

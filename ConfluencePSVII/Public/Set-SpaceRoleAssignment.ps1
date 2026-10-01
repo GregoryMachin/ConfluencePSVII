@@ -1,17 +1,14 @@
 ﻿function Set-SpaceRoleAssignment {
-    <#
-    .NOTES
-    Cloud v2 only, same reasoning as Get-SpaceRoleAssignment. This is the only mutation
-    surface Cloud v2 exposes for space access governance -- individual permission grants
-    (Get-ConfluenceSpacePermission) cannot be changed directly, only role assignments.
-
-    High-impact by design (ConfirmImpact High, so a confirmation prompt appears unless
-    -Confirm:$false is passed explicitly): changing or removing a principal's role can revoke
-    their access to the entire space. Genuine self-lockout detection (warning when the caller
-    is about to remove their own admin access) would require resolving the caller's own Cloud
-    account ID, which this module has no command for yet; the practical mitigation available
-    today is requiring deliberate confirmation for every change, which this command enforces.
-    #>
+    # Cloud v2 only, same reasoning as Get-SpaceRoleAssignment. This is the only mutation
+    # surface Cloud v2 exposes for space access governance -- individual permission grants
+    # (Get-ConfluenceSpacePermission) cannot be changed directly, only role assignments.
+    #
+    # High-impact by design (ConfirmImpact High, so a confirmation prompt appears unless
+    # -Confirm:$false is passed explicitly): changing or removing a principal's role can revoke
+    # their access to the entire space. Genuine self-lockout detection (warning when the caller
+    # is about to remove their own admin access) would require resolving the caller's own Cloud
+    # account ID, which this module has no command for yet; the practical mitigation available
+    # today is requiring deliberate confirmation for every change, which this command enforces.
     [CmdletBinding(
         ConfirmImpact = 'High',
         SupportsShouldProcess = $true

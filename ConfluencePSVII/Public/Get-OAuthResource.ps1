@@ -1,14 +1,11 @@
 ﻿function Get-OAuthResource {
-    <#
-    .NOTES
-    Cloud v2 only: this command discovers the Confluence sites (and other Atlassian Cloud
-    products) an OAuth 2.0 (3LO) access token can reach, via
-    https://api.atlassian.com/oauth/token/accessible-resources. It is an Atlassian identity
-    endpoint external to any single Confluence site, so it takes -OAuthAccessToken directly
-    rather than -BaseUri/-DeploymentType, and is never resolved through
-    Resolve-ConfluenceRoute. This response shape has not been live-verified against a Cloud
-    tenant; see docs/api-contract-inventory.md.
-    #>
+    # Cloud v2 only: this command discovers the Confluence sites (and other Atlassian Cloud
+    # products) an OAuth 2.0 (3LO) access token can reach, via
+    # https://api.atlassian.com/oauth/token/accessible-resources. It is an Atlassian identity
+    # endpoint external to any single Confluence site, so it takes -OAuthAccessToken directly
+    # rather than -BaseUri/-DeploymentType, and is never resolved through
+    # Resolve-ConfluenceRoute. This response shape has not been live-verified against a Cloud
+    # tenant; see docs/api-contract-inventory.md.
     [CmdletBinding(DefaultParameterSetName = "default")]
     [OutputType([ConfluencePSVII.OAuthResource])]
     param (

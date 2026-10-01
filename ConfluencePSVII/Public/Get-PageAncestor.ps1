@@ -1,10 +1,7 @@
 ﻿function Get-PageAncestor {
-    <#
-    .NOTES
-    Returns the same minimal ancestor shape (ID, Status, Title only -- no Body, Version, or
-    Space) on both v1 and Cloud v2, matching the existing partial objects Get-Page has always
-    populated on its own -Ancestors property. Ancestors are returned in root-to-parent order.
-    #>
+    # Returns the same minimal ancestor shape (ID, Status, Title only -- no Body, Version, or
+    # Space) on both v1 and Cloud v2, matching the existing partial objects Get-Page has always
+    # populated on its own -Ancestors property. Ancestors are returned in root-to-parent order.
     [CmdletBinding(
         SupportsPaging = $true
     )]

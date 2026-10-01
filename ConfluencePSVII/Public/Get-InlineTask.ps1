@@ -1,12 +1,9 @@
 ﻿function Get-InlineTask {
-    <#
-    .NOTES
-    Cloud v2 only: Confluence inline tasks (the checkbox action items embedded in a page's
-    body) are exposed as a dedicated queryable resource only by Cloud v2; v1/Data Center only
-    ever surfaced them as inline markup inside a page's storage-format body, with no separate
-    listing/filtering/status API. There is no -DeploymentType parameter here and -BaseUri is
-    mandatory.
-    #>
+    # Cloud v2 only: Confluence inline tasks (the checkbox action items embedded in a page's
+    # body) are exposed as a dedicated queryable resource only by Cloud v2; v1/Data Center only
+    # ever surfaced them as inline markup inside a page's storage-format body, with no separate
+    # listing/filtering/status API. There is no -DeploymentType parameter here and -BaseUri is
+    # mandatory.
     [CmdletBinding(
         SupportsPaging = $true,
         DefaultParameterSetName = "byFilter"

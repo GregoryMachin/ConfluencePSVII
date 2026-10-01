@@ -1,10 +1,7 @@
 ﻿function Get-SpaceProperty {
-    <#
-    .NOTES
-    Cloud v2 only: Confluence space properties (arbitrary JSON key/value metadata attached to
-    a space) are exposed only by Cloud v2, with no v1/Data Center equivalent resource at all.
-    There is no -DeploymentType parameter here and -BaseUri is mandatory.
-    #>
+    # Cloud v2 only: Confluence space properties (arbitrary JSON key/value metadata attached to
+    # a space) are exposed only by Cloud v2, with no v1/Data Center equivalent resource at all.
+    # There is no -DeploymentType parameter here and -BaseUri is mandatory.
     [CmdletBinding(
         SupportsPaging = $true,
         DefaultParameterSetName = "byKey"

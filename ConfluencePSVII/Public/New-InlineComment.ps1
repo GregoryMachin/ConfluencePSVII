@@ -1,10 +1,7 @@
 ﻿function New-InlineComment {
-    <#
-    .NOTES
-    Cloud v2 only: Confluence's v1/Data Center content API has no operation for creating an
-    inline (text-anchored) comment, only generic page comments. See
-    docs/api-contract-inventory.md for the parity gap.
-    #>
+    # Cloud v2 only: Confluence's v1/Data Center content API has no operation for creating an
+    # inline (text-anchored) comment, only generic page comments. See
+    # docs/api-contract-inventory.md for the parity gap.
     [CmdletBinding(
         ConfirmImpact = 'Low',
         SupportsShouldProcess = $true

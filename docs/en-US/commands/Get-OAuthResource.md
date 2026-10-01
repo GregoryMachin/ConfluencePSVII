@@ -86,6 +86,15 @@ Set-ConfluenceInfo -OAuthAccessToken $token -CloudId $resource.CloudId
 Discovers a site's Cloud ID by name, then configures an OAuth-authenticated Cloud session for
 it.
 
+### -------------------------- EXAMPLE 4 --------------------------
+
+```powershell
+Get-ConfluenceOAuthResource -OAuthAccessToken $token -CloudId "11223344-a1b2-3c4d-5e6f-7a8b9c0d1e2f"
+```
+
+Returns the single resource with that Cloud ID, for example to confirm the token can still
+reach a site whose Cloud ID is already configured; throws if it cannot.
+
 ## PARAMETERS
 
 ### -OAuthAccessToken

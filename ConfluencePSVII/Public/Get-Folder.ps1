@@ -1,12 +1,9 @@
 ﻿function Get-Folder {
-    <#
-    .NOTES
-    Cloud v2 only: Confluence folders (organizational containers for grouping content) do not
-    exist in the legacy v1/Data Center content model at all, so there is no -DeploymentType
-    parameter here and -BaseUri is mandatory. Read-only: no New-/Set-/Remove-ConfluenceFolder
-    exists yet -- write support is deferred until this read model is proven stable, per this
-    task's own scope.
-    #>
+    # Cloud v2 only: Confluence folders (organizational containers for grouping content) do not
+    # exist in the legacy v1/Data Center content model at all, so there is no -DeploymentType
+    # parameter here and -BaseUri is mandatory. Read-only: no New-/Set-/Remove-ConfluenceFolder
+    # exists yet -- write support is deferred until this read model is proven stable, per this
+    # task's own scope.
     [CmdletBinding(
         SupportsPaging = $true,
         DefaultParameterSetName = "byId"

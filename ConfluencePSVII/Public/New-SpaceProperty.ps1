@@ -1,12 +1,9 @@
 ﻿function New-SpaceProperty {
-    <#
-    .NOTES
-    Cloud v2 only, same reasoning as Get-SpaceProperty. -Key and -Value are validated by
-    Assert-PropertyKey/ConvertTo-PropertyJson before anything is sent: keys and nested value
-    keys are checked against a secret-name pattern and a small blocklist, and the serialized
-    value is capped at 32,768 UTF-8 bytes, matching Confluence Cloud's own limit and this
-    task's security review (properties must never be used to store secrets).
-    #>
+    # Cloud v2 only, same reasoning as Get-SpaceProperty. -Key and -Value are validated by
+    # Assert-PropertyKey/ConvertTo-PropertyJson before anything is sent: keys and nested value
+    # keys are checked against a secret-name pattern and a small blocklist, and the serialized
+    # value is capped at 32,768 UTF-8 bytes, matching Confluence Cloud's own limit and this
+    # task's security review (properties must never be used to store secrets).
     [CmdletBinding(
         ConfirmImpact = 'Low',
         SupportsShouldProcess = $true

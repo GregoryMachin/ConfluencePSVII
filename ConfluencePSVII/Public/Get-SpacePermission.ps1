@@ -1,14 +1,11 @@
 ﻿function Get-SpacePermission {
-    <#
-    .NOTES
-    Cloud v2 only: Confluence space permission grants are exposed as a dedicated queryable
-    resource only by Cloud v2, with no v1/Data Center equivalent resource at all. There is no
-    -DeploymentType parameter here and -BaseUri is mandatory.
-
-    Read-only: Cloud v2 does not expose a way to add or remove an individual permission grant
-    directly, only space role assignments (see Get-/Set-ConfluenceSpaceRoleAssignment). This
-    command returns currently effective, inherited grants, not a mutation surface.
-    #>
+    # Cloud v2 only: Confluence space permission grants are exposed as a dedicated queryable
+    # resource only by Cloud v2, with no v1/Data Center equivalent resource at all. There is no
+    # -DeploymentType parameter here and -BaseUri is mandatory.
+    #
+    # Read-only: Cloud v2 does not expose a way to add or remove an individual permission grant
+    # directly, only space role assignments (see Get-/Set-ConfluenceSpaceRoleAssignment). This
+    # command returns currently effective, inherited grants, not a mutation surface.
     [CmdletBinding(
         SupportsPaging = $true
     )]

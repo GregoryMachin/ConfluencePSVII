@@ -1,10 +1,7 @@
 ﻿function Set-SpaceProperty {
-    <#
-    .NOTES
-    Cloud v2 only, same reasoning as Get-SpaceProperty. -Value is validated the same way
-    New-SpaceProperty validates it (see Assert-PropertyKey/ConvertTo-PropertyJson): secrets are
-    rejected and the serialized value is capped at 32,768 UTF-8 bytes.
-    #>
+    # Cloud v2 only, same reasoning as Get-SpaceProperty. -Value is validated the same way
+    # New-SpaceProperty validates it (see Assert-PropertyKey/ConvertTo-PropertyJson): secrets are
+    # rejected and the serialized value is capped at 32,768 UTF-8 bytes.
     [CmdletBinding(
         ConfirmImpact = 'Medium',
         SupportsShouldProcess = $true

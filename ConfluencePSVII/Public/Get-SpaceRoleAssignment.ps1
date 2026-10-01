@@ -1,10 +1,7 @@
 ﻿function Get-SpaceRoleAssignment {
-    <#
-    .NOTES
-    Cloud v2 only: Confluence space role assignments are exposed as a dedicated queryable
-    resource only by Cloud v2, with no v1/Data Center equivalent resource at all. There is no
-    -DeploymentType parameter here and -BaseUri is mandatory.
-    #>
+    # Cloud v2 only: Confluence space role assignments are exposed as a dedicated queryable
+    # resource only by Cloud v2, with no v1/Data Center equivalent resource at all. There is no
+    # -DeploymentType parameter here and -BaseUri is mandatory.
     [CmdletBinding(
         SupportsPaging = $true
     )]

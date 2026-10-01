@@ -1,10 +1,7 @@
 ﻿function Set-InlineComment {
-    <#
-    .NOTES
-    Updating a comment's body needs no text-selection anchor, so unlike New-InlineComment
-    this command works on v1/Data Center as well as Cloud v2 -- it is just a generic
-    comment-body update either way.
-    #>
+    # Updating a comment's body needs no text-selection anchor, so unlike New-InlineComment
+    # this command works on v1/Data Center as well as Cloud v2 -- it is just a generic
+    # comment-body update either way.
     [CmdletBinding(
         ConfirmImpact = 'Medium',
         SupportsShouldProcess = $true,
