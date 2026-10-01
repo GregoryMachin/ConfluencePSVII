@@ -5,7 +5,7 @@
         [Parameter(
             ValueFromPipeline = $true,
             ValueFromPipelineByPropertyName = $true,
-            HelpMessage = 'Example = https://brianbunke.atlassian.net/wiki (/wiki for Cloud instances)'
+            HelpMessage = 'Example = https://yourcompany.atlassian.net/wiki (/wiki for Cloud instances)'
         )]
         [Alias('Uri')]
         [Object]$BaseURi,

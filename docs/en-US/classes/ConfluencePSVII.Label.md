@@ -1,7 +1,5 @@
 ---
-layout: documentation
 title: ConfluencePSVII.Label
-permalink: /docs/ConfluencePS/classes/ConfluencePSVII.Label/
 ---
 <!-- markdownlint-disable MD036 -->
 

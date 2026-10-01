@@ -18,7 +18,7 @@
     GUID              = '2eaf222c-8c98-46f6-97ac-fde11880ec6f'
 
     # Author of this module
-    Author            = 'AtlassianPSVII'
+    Author            = 'Gregory Machin'
 
     # Company or vendor of this module
     CompanyName       = 'AtlassianPSVII'

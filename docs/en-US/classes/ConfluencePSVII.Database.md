@@ -1,8 +1,3 @@
----
-layout: documentation
-permalink: /docs/ConfluencePS/classes/ConfluencePSVII.Database/
----
-
 # ConfluencePSVII.Database
 
 ## SYNOPSIS

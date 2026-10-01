@@ -1,9 +1,7 @@
 ---
 locale: en-US
-layout: documentation
-online version: https://atlassianps.org/docs/ConfluencePS/about/authentication.html
+online version: https://github.com/GregoryMachin/ConfluencePSVII/blob/master/docs/en-US/about_ConfluencePSVII_Authentication.md
 Module Name: ConfluencePSVII
-permalink: /docs/ConfluencePS/about/authentication.html
 ---
 # Authentication
 

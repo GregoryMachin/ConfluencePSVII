@@ -1,8 +1,3 @@
----
-layout: documentation
-permalink: /docs/ConfluencePS/classes/ConfluencePSVII.SpacePermission/
----
-
 # ConfluencePSVII.SpacePermission
 
 ## SYNOPSIS

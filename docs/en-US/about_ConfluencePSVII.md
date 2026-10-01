@@ -1,9 +1,7 @@
 ---
 locale: en-US
-layout: documentation
-online version: https://atlassianps.org/docs/ConfluencePS/
+online version: https://github.com/GregoryMachin/ConfluencePSVII/blob/master/docs/en-US/about_ConfluencePSVII.md
 Module Name: ConfluencePSVII
-permalink: /docs/ConfluencePS/
 hide: true
 ---
 # About ConfluencePSVII
@@ -129,9 +127,9 @@ But that's the basic idea :)
 
 # NOTE
 
-This project is run by the volunteer organization AtlassianPSVII.
+This project is a fork of ConfluencePS by the AtlassianPS volunteer organization, maintained by Gregory Machin.
 We are always interested in hearing from new users!
-Find us on GitHub or Slack, and let us know what you think.
+Open an issue on GitHub and let us know what you think.
 
 # SEE ALSO
 
@@ -144,10 +142,6 @@ Find us on GitHub or Slack, and let us know what you think.
 ConfluencePSVII on Github: <https://github.com/GregoryMachin/ConfluencePSVII>
 
 Confluence's REST API documentation: <https://docs.atlassian.com/atlassian-confluence/REST/latest/>
-
-AtlassianPSVII org: <https://atlassianps.org>
-
-AtlassianPSVII Slack team: <https://atlassianps.org/slack>
 
 # KEYWORD
 

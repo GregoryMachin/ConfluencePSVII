@@ -1,8 +1,3 @@
----
-layout: documentation
-permalink: /docs/ConfluencePS/classes/ConfluencePSVII.Whiteboard/
----
-
 # ConfluencePSVII.Whiteboard
 
 ## SYNOPSIS

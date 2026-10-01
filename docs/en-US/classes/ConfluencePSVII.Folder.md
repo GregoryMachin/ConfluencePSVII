@@ -1,8 +1,3 @@
----
-layout: documentation
-permalink: /docs/ConfluencePS/classes/ConfluencePSVII.Folder/
----
-
 # ConfluencePSVII.Folder
 
 ## SYNOPSIS

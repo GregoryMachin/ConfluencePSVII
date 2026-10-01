@@ -1,11 +1,9 @@
 ---
 external help file: ConfluencePSVII-help.xml
-online version: https://atlassianps.org/docs/ConfluencePS/commands/Remove-Page/
+online version: https://github.com/GregoryMachin/ConfluencePSVII/blob/master/docs/en-US/commands/Remove-Page.md
 Module Name: ConfluencePSVII
 locale: en-US
 schema: 2.0.0
-layout: documentation
-permalink: /docs/ConfluencePS/commands/Remove-Page/
 ---
 # Remove-Page
 

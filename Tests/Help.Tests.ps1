@@ -127,16 +127,16 @@ Describe "Help tests" -Tag "Documentation", "Build" {
                 }
 
                 It "has a valid online version" {
-                    $pattern = [regex]::Escape("https://atlassianps.org/docs/ConfluencePS/commands/$docName/")
+                    $pattern = [regex]::Escape("https://github.com/GregoryMachin/ConfluencePSVII/blob/master/docs/en-US/commands/$docName.md")
 
                     $markdownFile | Should -FileContentMatch $pattern
                 }
 
-                It "defines the frontmatter for the homepage" {
+                It "has no atlassianps.org website front matter" {
                     $markdownFile | Should -Not -BeNullOrEmpty
                     $markdownFile | Should -FileContentMatch "Module Name: ConfluencePSVII"
-                    $markdownFile | Should -FileContentMatchExactly "layout: documentation"
-                    $markdownFile | Should -FileContentMatch "permalink: /docs/ConfluencePS/commands/$docName/"
+                    $markdownFile | Should -Not -FileContentMatch '^layout:'
+                    $markdownFile | Should -Not -FileContentMatch '^permalink:'
                 }
             }
 
@@ -170,14 +170,14 @@ Describe "Help tests" -Tag "Documentation", "Build" {
                 It "has a link to the 'Online Version'" {
                     [Uri]$onlineLink = ($help.relatedLinks.navigationLink | Where-Object { $_.linkText -match "^Online Version:?$" }).Uri
 
-                    $onlineLink.Authority | Should -Be "atlassianps.org"
+                    $onlineLink.Authority | Should -Be "github.com"
                     $onlineLink.Scheme | Should -Be "https"
-                    $onlineLink.PathAndQuery | Should -Be "/docs/ConfluencePS/commands/$docName/"
+                    $onlineLink.PathAndQuery | Should -Be "/GregoryMachin/ConfluencePSVII/blob/master/docs/en-US/commands/$docName.md"
                 }
 
                 It "has a valid HelpUri" -Skip {
                     $command.HelpUri | Should -Not -BeNullOrEmpty
-                    $pattern = [regex]::Escape("https://atlassianps.org/docs/ConfluencePS/commands/$docName")
+                    $pattern = [regex]::Escape("https://github.com/GregoryMachin/ConfluencePSVII/blob/master/docs/en-US/commands/$docName.md")
 
                     $command.HelpUri | Should -Match $pattern
                 }

@@ -1,7 +1,3 @@
----
-layout: documentation
-permalink: /docs/ConfluencePS/commands/
----
 # ConfluencePSVII commands
 
 ConfluencePSVII exports these commands with the `Confluence` default command prefix.
