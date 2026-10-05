@@ -156,6 +156,9 @@
             # ReleaseNotes of this module
             ReleaseNotes = 'https://github.com/GregoryMachin/ConfluencePSVII/blob/master/CHANGELOG.md'
 
+            # Prerelease label of this module; the release build sets or clears it.
+            Prerelease = ''
+
         } # End of PSData hashtable
 
     } # End of PrivateData hashtable
